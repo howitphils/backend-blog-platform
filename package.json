@@ -4,6 +4,11 @@
   "main": "index.js",
   "author": "howitphils <uladzislauhr@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "watch": "tsc -w",
+    "dev": "nodemon --inspect dist/index.js",
+    "test": "jest -i"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
