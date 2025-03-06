@@ -1,9 +1,13 @@
 import { BlogInputModel } from "./blogs-types";
 import { PostInputModel } from "./posts-types";
 
+export type ErrorMessageType = {
+  message: string;
+  field: string;
+};
+
 export type FieldNamesType = keyof BlogInputModel | keyof PostInputModel;
-// const f: FieldsType = 'some' // error
 
 export type OutputErrorsType = {
-  errorsMessages: { message: string; field: FieldNamesType }[];
+  errorsMessages: ErrorMessageType[];
 };

@@ -1,51 +1,26 @@
-import { Router, Request, Response } from "express";
-import { blogsRepository } from "../db/repositories/blogs-repository";
-import { BlogInputModel } from "../types/blogs-types";
-import { postsRepository } from "../db/repositories/posts-repository";
-import { PostInputModel } from "../types/posts-types";
+import { bodyValidationResult } from "./../middlewares/validation-result";
+import { postsBodyValidator } from "./../middlewares/posts-body-validators/posts-validators";
+import { Router } from "express";
+
+import { authGuard } from "../middlewares/auth-validator";
+import { postsController } from "../controllers/posts-controller";
 
 export const postsRouter = Router();
 
-const postsController = {
-  getPosts: (req: Request, res: Response) => {
-    const posts = postsRepository.getAllPosts();
-    res.status(200).json(posts);
-  },
-  createPost: (req: Request<{}, {}, PostInputModel>, res: Response) => {
-    const newPost = postsRepository.createNewPost(req.body);
-    res.status(201).json(newPost);
-  },
-  getPostById: (req: Request<{ id: string }>, res: Response) => {
-    const targetPost = postsRepository.getPostById(req.params.id);
-    if (!targetPost) {
-      res.sendStatus(404);
-      return;
-    }
-    res.status(200).json(targetPost);
-  },
-  updatePost: (
-    req: Request<{ id: string }, {}, PostInputModel>,
-    res: Response
-  ) => {
-    const updatedPost = postsRepository.updatePost(req.params.id, req.body);
-    if (!updatedPost) {
-      res.sendStatus(404);
-      return;
-    }
-    res.sendStatus(204);
-  },
-  deletePost: (req: Request<{ id: string }>, res: Response) => {
-    const targetItem = postsRepository.deletePost(req.params.id);
-    if (!targetItem) {
-      res.sendStatus(404);
-      return;
-    }
-    res.sendStatus(204);
-  },
-};
-
 postsRouter.get("/", postsController.getPosts);
 postsRouter.get("/:id", postsController.getPostById);
-postsRouter.post("/", postsController.createPost);
-postsRouter.put("/:id", postsController.updatePost);
-postsRouter.delete("/:id", postsController.deletePost);
+postsRouter.post(
+  "/",
+  authGuard,
+  postsBodyValidator,
+  bodyValidationResult,
+  postsController.createPost
+);
+postsRouter.put(
+  "/:id",
+  authGuard,
+  postsBodyValidator,
+  bodyValidationResult,
+  postsController.updatePost
+);
+postsRouter.delete("/:id", authGuard, postsController.deletePost);

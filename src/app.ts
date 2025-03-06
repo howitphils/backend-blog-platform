@@ -11,6 +11,7 @@ app.use(express.json());
 
 app.use(SETTINGS.PATHS.BLOGS, blogsRouter);
 app.use(SETTINGS.PATHS.POSTS, postsRouter);
+app.use(SETTINGS.PATHS.TESTS, postsRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, Friend!");

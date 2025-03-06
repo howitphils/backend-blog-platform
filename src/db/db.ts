@@ -12,3 +12,8 @@ export const db: DBType = {
   blogs: [],
   posts: [],
 };
+
+export const setDb = () => {
+  db.blogs = [];
+  db.posts = [];
+};
