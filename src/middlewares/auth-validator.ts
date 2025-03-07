@@ -9,7 +9,11 @@ export const authGuard = (req: Request, res: Response, next: NextFunction) => {
     res.sendStatus(401);
     return;
   }
-  const authToken = auth.split(" ")[1];
+  const [authType, authToken] = auth.split(" ");
+  if (authType !== "Basic") {
+    res.sendStatus(401);
+    return;
+  }
 
   const [username, password] = Buffer.from(authToken, "base64")
     .toString("utf-8")
