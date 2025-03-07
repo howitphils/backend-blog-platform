@@ -23,7 +23,7 @@ export const bodyValidationResult = (
     .formatWith(createOutputErrors)
     .array({ onlyFirstError: true });
   if (errros.length) {
-    res.status(400).send({ errrosMessages: errros });
+    res.status(400).json({ errosMessages: errros });
     return;
   }
   next();
