@@ -3,6 +3,7 @@ import cors from "cors";
 import { SETTINGS } from "./settings";
 import { blogsRouter } from "./routers/blogs-router";
 import { postsRouter } from "./routers/posts-router";
+import { testsRouter } from "./routers/tests-router";
 
 export const app = express();
 
@@ -11,7 +12,7 @@ app.use(express.json());
 
 app.use(SETTINGS.PATHS.BLOGS, blogsRouter);
 app.use(SETTINGS.PATHS.POSTS, postsRouter);
-app.use(SETTINGS.PATHS.TESTS, postsRouter);
+app.use(SETTINGS.PATHS.TESTS, testsRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, Friend!");
