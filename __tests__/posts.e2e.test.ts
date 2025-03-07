@@ -1,6 +1,7 @@
 import { setDb } from "../src/db/db";
+import { encodedCredentials } from "../src/middlewares/auth-validator";
 import { SETTINGS } from "../src/settings";
-import { credentials, req } from "./test-helpers";
+import { req } from "./test-helpers";
 
 describe("/posts", () => {
   let blogId = "";
@@ -15,7 +16,7 @@ describe("/posts", () => {
         websiteUrl:
           "https://4fd52Gm05tw-H.IvRO784KcLEXZfMiGH2HCCBknni9Lb3fslAoStogClBLYb2oLnvcbatCNWUIdxhxr_j.PNjEnWql3u",
       })
-      .set("Authorization", `Basic ${credentials}`);
+      .set("Authorization", `Basic ${encodedCredentials}`);
 
     blogId = res.body.id;
 
@@ -34,7 +35,7 @@ describe("/posts", () => {
   it("should create new post", async () => {
     const res = await req
       .post(SETTINGS.PATHS.POSTS)
-      .set("authorization", `Basic ${credentials}`)
+      .set("authorization", `Basic ${encodedCredentials}`)
       .send({
         title: "string",
         shortDescription: "string",
@@ -64,7 +65,7 @@ describe("/posts", () => {
   it("should update the post", async () => {
     const res = await req
       .put(SETTINGS.PATHS.POSTS + `/${newPostId}`)
-      .set("Authorization", `Basic ${credentials}`)
+      .set("Authorization", `Basic ${encodedCredentials}`)
       .send({
         title: "string",
         shortDescription: "string",
@@ -78,7 +79,7 @@ describe("/posts", () => {
   it("should not update the post with incorrect input values", async () => {
     const res = await req
       .put(SETTINGS.PATHS.POSTS + `/${newPostId}`)
-      .set("Authorization", `Basic ${credentials}`)
+      .set("Authorization", `Basic ${encodedCredentials}`)
       .send({
         title: "",
         shortDescription: "string",
@@ -92,7 +93,7 @@ describe("/posts", () => {
   it("should not create new post with incorrect input values", async () => {
     const res = await req
       .post(SETTINGS.PATHS.POSTS)
-      .set("authorization", `Basic ${credentials}`)
+      .set("authorization", `Basic ${encodedCredentials}`)
       .send({
         title: "",
         shortDescription: 10,
@@ -111,7 +112,7 @@ describe("/posts", () => {
   it("should not update the post by incorrect id", async () => {
     const res = await req
       .put(SETTINGS.PATHS.POSTS + "/22")
-      .set("Authorization", `Basic ${credentials}`)
+      .set("Authorization", `Basic ${encodedCredentials}`)
       .send({
         title: "string",
         shortDescription: "string",
@@ -153,7 +154,7 @@ describe("/posts", () => {
   it("should not delete the post by incorrect id", async () => {
     const res = await req
       .delete(SETTINGS.PATHS.POSTS + "/22")
-      .set("Authorization", `Basic ${credentials}`);
+      .set("Authorization", `Basic ${encodedCredentials}`);
 
     expect(res.status).toBe(404);
   });
@@ -161,7 +162,7 @@ describe("/posts", () => {
   it("should delete the post", async () => {
     const res = await req
       .delete(SETTINGS.PATHS.POSTS + `/${newPostId}`)
-      .set("Authorization", `Basic ${credentials}`);
+      .set("Authorization", `Basic ${encodedCredentials}`);
 
     expect(res.status).toBe(204);
   });

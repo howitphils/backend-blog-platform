@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
+import { SETTINGS } from "../settings";
 
-const VALID_USERNAME = "admin";
-const VALID_PASSWORD = "qwerty";
+export const encodedCredentials = Buffer.from(SETTINGS.ADMIN).toString(
+  "base64"
+);
 
 export const authGuard = (req: Request, res: Response, next: NextFunction) => {
   const auth = req.headers["authorization"];
@@ -15,13 +17,10 @@ export const authGuard = (req: Request, res: Response, next: NextFunction) => {
     return;
   }
 
-  const [username, password] = Buffer.from(authToken, "base64")
-    .toString("utf-8")
-    .split(":");
-
-  if (username !== VALID_USERNAME || password !== VALID_PASSWORD) {
+  if (authToken !== encodedCredentials) {
     res.sendStatus(401);
     return;
   }
+
   next();
 };

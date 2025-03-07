@@ -1,6 +1,7 @@
 import { setDb } from "../src/db/db";
+import { encodedCredentials } from "../src/middlewares/auth-validator";
 import { SETTINGS } from "../src/settings";
-import { credentials, req } from "./test-helpers";
+import { req } from "./test-helpers";
 
 describe("/blogs", () => {
   beforeAll(async () => {
@@ -18,7 +19,7 @@ describe("/blogs", () => {
   it("should create new blog", async () => {
     const res = await req
       .post(SETTINGS.PATHS.BLOGS)
-      .set("Authorization", `Basic ${credentials}`)
+      .set("Authorization", `Basic ${encodedCredentials}`)
       .send({
         name: "string",
         description: "string",
@@ -45,7 +46,7 @@ describe("/blogs", () => {
   it("should update the blog", async () => {
     const res = await req
       .put(SETTINGS.PATHS.BLOGS + `/${newBlogId}`)
-      .set("Authorization", `Basic ${credentials}`)
+      .set("Authorization", `Basic ${encodedCredentials}`)
       .send({
         name: "string",
         description: "string",
@@ -59,7 +60,7 @@ describe("/blogs", () => {
   it("should not update the blog with incorrect input values", async () => {
     const res = await req
       .put(SETTINGS.PATHS.BLOGS + `/${newBlogId}`)
-      .set("Authorization", `Basic ${credentials}`)
+      .set("Authorization", `Basic ${encodedCredentials}`)
       .send({
         name: "",
         description: 22,
@@ -73,7 +74,7 @@ describe("/blogs", () => {
   it("should not create new blog with incorrect input values", async () => {
     const res = await req
       .post(SETTINGS.PATHS.BLOGS)
-      .set("Authorization", `Basic ${credentials}`)
+      .set("Authorization", `Basic ${encodedCredentials}`)
       .send({
         name: 22,
         description: 10,
@@ -120,7 +121,7 @@ describe("/blogs", () => {
   it("should not update the blog with incorrect id", async () => {
     const res = await req
       .put(SETTINGS.PATHS.BLOGS + "/22")
-      .set("Authorization", `Basic ${credentials}`)
+      .set("Authorization", `Basic ${encodedCredentials}`)
       .send({
         name: "string",
         description: "string",
@@ -134,7 +135,7 @@ describe("/blogs", () => {
   it("should not delete the blog with incorrect id", async () => {
     const res = await req
       .delete(SETTINGS.PATHS.BLOGS + "/22")
-      .set("Authorization", `Basic ${credentials}`);
+      .set("Authorization", `Basic ${encodedCredentials}`);
 
     expect(res.status).toBe(404);
   });
@@ -142,7 +143,7 @@ describe("/blogs", () => {
   it("should delete the blog", async () => {
     const res = await req
       .delete(SETTINGS.PATHS.BLOGS + `/${newBlogId}`)
-      .set("Authorization", `Basic ${credentials}`);
+      .set("Authorization", `Basic ${encodedCredentials}`);
 
     expect(res.status).toBe(204);
   });
