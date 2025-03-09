@@ -12,5 +12,3 @@ export type BlogViewModel = {
   createdAt: string;
   isMembership: boolean;
 };
-
-export type BlogDBType = BlogViewModel[];

@@ -1,17 +1,17 @@
-import { Collection, Db, MongoClient } from "mongodb";
+import { MongoClient } from "mongodb";
 import { SETTINGS } from "../../settings";
-import { BlogDBType } from "../../types/blogs-types";
-import { PostDBType } from "../../types/posts-types";
+import { BlogViewModel } from "../../types/blogs-types";
+import { PostViewModel } from "../../types/posts-types";
 
 // получение доступа к бд
-const client: MongoClient = new MongoClient(SETTINGS.MONGO_URL);
-export const db: Db = client.db(SETTINGS.DB_NAME);
+const client = new MongoClient(SETTINGS.MONGO_URL);
+const db = client.db(SETTINGS.DB_NAME);
 
 // получение доступа к коллекциям
-export const blogCollection: Collection<BlogDBType> = db.collection<BlogDBType>(
+export const blogCollection = db.collection<BlogViewModel>(
   SETTINGS.BLOG_COLLECTION_NAME
 );
-export const postCollection: Collection<PostDBType> = db.collection<PostDBType>(
+export const postCollection = db.collection<PostViewModel>(
   SETTINGS.POST_COLLECTION_NAME
 );
 

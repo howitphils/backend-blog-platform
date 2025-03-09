@@ -7,10 +7,10 @@ export const blogsController = {
     const blogs = await blogsRepository.getAllBlogs();
     res.status(200).json(blogs);
   },
-  // createBlog: (req: Request<{}, {}, BlogInputModel>, res: Response) => {
-  //   const newBlog = blogsRepository.createNewBlog(req.body);
-  //   res.status(201).json(newBlog);
-  // },
+  createBlog: async (req: Request<{}, {}, BlogInputModel>, res: Response) => {
+    const newBlog = await blogsRepository.createNewBlog(req.body);
+    res.status(201).json(newBlog);
+  },
   // getBlogById: (req: Request<{ id: string }>, res: Response) => {
   //   const targetBlog = blogsRepository.getBlogById(req.params.id);
   //   if (!targetBlog) {

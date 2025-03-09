@@ -1,4 +1,4 @@
-// import { BlogInputModel, BlogViewModel } from "../../../types/blogs-types";
+import { BlogInputModel, BlogViewModel } from "../../../types/blogs-types";
 import { blogCollection } from "../mongodb";
 // import { blogCollection } from "../db";
 
@@ -11,16 +11,16 @@ export const blogsRepository = {
     const blogs = await blogCollection.find({}).toArray();
     return blogs;
   },
-  // createNewBlog: async (blog: BlogInputModel): Promise<BlogViewModel> => {
-  //   const newBlog: BlogViewModel = {
-  //     ...blog,
-  //     id: String(Math.random() * 1000),
-  //     createdAt: new Date().toISOString(),
-  //     isMembership: false,
-  //   };
-  //   // db.blogs.unshift(newBlog);
-  //   // return newBlog;
-  // },
+  createNewBlog: async (blog: BlogInputModel): Promise<BlogViewModel> => {
+    const newBlog: BlogViewModel = {
+      ...blog,
+      id: String(Math.random() * 1000),
+      createdAt: new Date().toISOString(),
+      isMembership: false,
+    };
+    await blogCollection.insertOne(newBlog);
+    return newBlog;
+  },
   // getBlogById: (id: string) => {
   //   const targetBlogIndex = findIndexByIdHelper(id);
   //   if (targetBlogIndex === -1) return null;

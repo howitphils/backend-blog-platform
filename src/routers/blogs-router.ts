@@ -9,13 +9,13 @@ export const blogsRouter = Router();
 
 blogsRouter.get("/", blogsController.getBlogs);
 // blogsRouter.get("/:id", blogsController.getBlogById);
-// blogsRouter.post(
-//   "/",
-//   authGuard,
-//   blogsBodyValidator,
-//   bodyValidationResult,
-//   blogsController.createBlog
-// );
+blogsRouter.post(
+  "/",
+  // authGuard,
+  blogsBodyValidator,
+  bodyValidationResult,
+  blogsController.createBlog
+);
 // blogsRouter.put(
 //   "/:id",
 //   authGuard,
