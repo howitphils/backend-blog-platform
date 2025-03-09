@@ -8,19 +8,19 @@ import { postsController } from "../controllers/posts-controller";
 export const postsRouter = Router();
 
 postsRouter.get("/", postsController.getPosts);
-postsRouter.get("/:id", postsController.getPostById);
-postsRouter.post(
-  "/",
-  authGuard,
-  postsBodyValidator,
-  bodyValidationResult,
-  postsController.createPost
-);
-postsRouter.put(
-  "/:id",
-  authGuard,
-  postsBodyValidator,
-  bodyValidationResult,
-  postsController.updatePost
-);
-postsRouter.delete("/:id", authGuard, postsController.deletePost);
+// postsRouter.get("/:id", postsController.getPostById);
+// postsRouter.post(
+//   "/",
+//   authGuard,
+//   postsBodyValidator,
+//   bodyValidationResult,
+//   postsController.createPost
+// );
+// postsRouter.put(
+//   "/:id",
+//   authGuard,
+//   postsBodyValidator,
+//   bodyValidationResult,
+//   postsController.updatePost
+// );
+// postsRouter.delete("/:id", authGuard, postsController.deletePost);

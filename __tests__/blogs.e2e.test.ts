@@ -1,4 +1,4 @@
-import { setDb } from "../src/db/db";
+import { setDb } from "../src/db/memory/db";
 import { encodedCredentials } from "../src/middlewares/auth-validator";
 import { SETTINGS } from "../src/settings";
 import { req } from "./test-helpers";

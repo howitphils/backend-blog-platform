@@ -1,4 +1,4 @@
-import { PostInputModel, PostViewModel } from "../../types/posts-types";
+import { PostInputModel, PostViewModel } from "../../../types/posts-types";
 import { db } from "../db";
 
 const findIndexByIdHelper = (id: string) => {
@@ -14,6 +14,7 @@ export const postsRepository = {
       ...post,
       id: String(Math.random() * 1000),
       blogName: "Blog" + Math.random() * 1000,
+      createdAt: new Date().toISOString(),
     };
     db.posts.unshift(newPost);
     return newPost;

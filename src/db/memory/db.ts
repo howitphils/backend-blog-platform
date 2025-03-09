@@ -1,5 +1,5 @@
-import { BlogViewModel } from "../types/blogs-types";
-import { PostViewModel } from "../types/posts-types";
+import { BlogViewModel } from "../../types/blogs-types";
+import { PostViewModel } from "../../types/posts-types";
 
 export type DBType = {
   // типизация базы данных (что мы будем в ней хранить)

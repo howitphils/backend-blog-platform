@@ -1,4 +1,4 @@
-import { BlogInputModel, BlogViewModel } from "../../types/blogs-types";
+import { BlogInputModel, BlogViewModel } from "../../../types/blogs-types";
 import { db } from "../db";
 
 const findIndexByIdHelper = (id: string) => {
@@ -13,6 +13,8 @@ export const blogsRepository = {
     const newBlog: BlogViewModel = {
       ...blog,
       id: String(Math.random() * 1000),
+      createdAt: new Date().toISOString(),
+      isMembership: false,
     };
     db.blogs.unshift(newBlog);
     return newBlog;
