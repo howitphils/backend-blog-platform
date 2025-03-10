@@ -1,4 +1,4 @@
-import { closeConnection, dropCollecitions } from "../src/db/mongodb/mongodb";
+import { closeConnection, clearCollections } from "../src/db/mongodb/mongodb";
 import { encodedCredentials } from "../src/middlewares/auth-validator";
 import { SETTINGS } from "../src/settings";
 import { req } from "./test-helpers";
@@ -8,7 +8,7 @@ describe("/posts", () => {
 
   beforeAll(async () => {
     // Очищаем коллекции
-    await dropCollecitions();
+    await clearCollections();
     const res = await req
       .post(SETTINGS.PATHS.BLOGS)
       .send({
