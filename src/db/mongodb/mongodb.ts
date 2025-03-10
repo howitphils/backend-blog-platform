@@ -15,11 +15,11 @@ export const postsCollection = db.collection<PostViewModel>(
   SETTINGS.POST_COLLECTION_NAME
 );
 
-export const dropCollecitions = async () => {
+export const clearCollections = async () => {
   const collections = await db.listCollections().toArray();
 
   for (const collection of collections) {
-    await db.collection(collection.name).drop();
+    await db.collection(collection.name).deleteMany({});
     console.log(`Dropped collection: ${collection.name}`);
   }
   console.log("all collections dropped");
