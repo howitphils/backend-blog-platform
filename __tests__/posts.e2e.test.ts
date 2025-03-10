@@ -1,18 +1,19 @@
-import { setDb } from "../src/db/memory/db";
+import { closeConnection, dropCollecitions } from "../src/db/mongodb/mongodb";
 import { encodedCredentials } from "../src/middlewares/auth-validator";
 import { SETTINGS } from "../src/settings";
 import { req } from "./test-helpers";
 
 describe("/posts", () => {
   let blogId = "";
-  beforeAll(async () => {
-    setDb();
 
+  beforeAll(async () => {
+    // Очищаем коллекции
+    await dropCollecitions();
     const res = await req
       .post(SETTINGS.PATHS.BLOGS)
       .send({
-        name: "string",
-        description: "string",
+        name: "for tests",
+        description: "testing blog",
         websiteUrl:
           "https://4fd52Gm05tw-H.IvRO784KcLEXZfMiGH2HCCBknni9Lb3fslAoStogClBLYb2oLnvcbatCNWUIdxhxr_j.PNjEnWql3u",
       })
@@ -22,6 +23,11 @@ describe("/posts", () => {
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty("name");
+  });
+
+  afterAll(async () => {
+    // Закрываем коннект с дб
+    await closeConnection();
   });
 
   it("should return all posts", async () => {

@@ -8,19 +8,19 @@ import { blogsController } from "../controllers/blogs-controller";
 export const blogsRouter = Router();
 
 blogsRouter.get("/", blogsController.getBlogs);
-// blogsRouter.get("/:id", blogsController.getBlogById);
+blogsRouter.get("/:id", blogsController.getBlogById);
 blogsRouter.post(
   "/",
-  // authGuard,
+  authGuard,
   blogsBodyValidator,
   bodyValidationResult,
   blogsController.createBlog
 );
-// blogsRouter.put(
-//   "/:id",
-//   authGuard,
-//   blogsBodyValidator,
-//   bodyValidationResult,
-//   blogsController.updateBlog
-// );
-// blogsRouter.delete("/:id", authGuard, blogsController.deleteBlog);
+blogsRouter.put(
+  "/:id",
+  authGuard,
+  blogsBodyValidator,
+  bodyValidationResult,
+  blogsController.updateBlog
+);
+blogsRouter.delete("/:id", authGuard, blogsController.deleteBlog);

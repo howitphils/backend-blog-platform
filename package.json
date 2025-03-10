@@ -7,7 +7,7 @@
   "scripts": {
     "watch": "tsc -w",
     "dev": "nodemon --inspect dist/index.js",
-    "test": "jest -i"
+    "test": "jest -i --detectOpenHandles"
   },
   "dependencies": {
     "cors": "^2.8.5",

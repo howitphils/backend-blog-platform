@@ -8,18 +8,33 @@ const client = new MongoClient(SETTINGS.MONGO_URL);
 const db = client.db(SETTINGS.DB_NAME);
 
 // получение доступа к коллекциям
-export const blogCollection = db.collection<BlogViewModel>(
+export const blogsCollection = db.collection<BlogViewModel>(
   SETTINGS.BLOG_COLLECTION_NAME
 );
-export const postCollection = db.collection<PostViewModel>(
+export const postsCollection = db.collection<PostViewModel>(
   SETTINGS.POST_COLLECTION_NAME
 );
+
+export const dropCollecitions = async () => {
+  const collections = await db.listCollections().toArray();
+
+  for (const collection of collections) {
+    await db.collection(collection.name).drop();
+    console.log(`Dropped collection: ${collection.name}`);
+  }
+  console.log("all collections dropped");
+};
+
+export const closeConnection = async () => {
+  await client.close();
+};
 
 // проверка подключения к бд
 export const connectToDB = async () => {
   try {
     await client.connect();
     console.log("connected to db");
+    await dropCollecitions();
   } catch (e) {
     console.log(e);
     await client.close();

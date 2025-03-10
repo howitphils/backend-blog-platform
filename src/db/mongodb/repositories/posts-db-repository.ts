@@ -1,46 +1,34 @@
-import {
-  PostDBType,
-  PostInputModel,
-  PostViewModel,
-} from "../../../types/posts-types";
-import { postCollection } from "../mongodb";
-
-// const findIndexByIdHelper = (id: string) => {
-//   return db.posts.findIndex((post) => post.id === id);
-// };
+import { PostInputModel, PostViewModel } from "../../../types/posts-types";
+import { postsCollection } from "../mongodb";
 
 export const postsRepository = {
-  getAllPosts: async () => {
-    const posts = await postCollection.find({}).toArray();
+  async getAllPosts() {
+    const posts = await postsCollection.find({}).toArray();
     return posts;
   },
-  // createNewPost: (post: PostInputModel): PostViewModel => {
-  //   const newPost: PostViewModel = {
-  //     ...post,
-  //     id: String(Math.random() * 1000),
-  //     blogName: "Blog" + Math.random() * 1000,
-  //     createdAt: new Date().toISOString(),
-  //   };
-  //   db.posts.unshift(newPost);
-  //   return newPost;
-  // },
-  // getPostById: (id: string) => {
-  //   const targetPostIndex = findIndexByIdHelper(id);
-  //   if (targetPostIndex === -1) return null;
-  //   return db.posts[targetPostIndex];
-  // },
-  // updatePost: (id: string, post: PostInputModel) => {
-  //   const targetPostIndex = findIndexByIdHelper(id);
-  //   if (targetPostIndex === -1) return null;
-  //   db.posts.splice(targetPostIndex, 1, {
-  //     ...db.posts[targetPostIndex],
-  //     ...post,
-  //   });
-  //   return db.posts[targetPostIndex];
-  // },
-  // deletePost: (id: string) => {
-  //   const targetPostIndex = findIndexByIdHelper(id);
-  //   if (targetPostIndex === -1) return null;
-  //   return db.posts.splice(targetPostIndex, 1);
-  // },
+  async createNewPost(post: PostInputModel): Promise<PostViewModel> {
+    const newPost: PostViewModel = {
+      ...post,
+      id: String(Math.random() * 1000),
+      blogName: "Blog" + Math.random() * 1000,
+      createdAt: new Date().toISOString(),
+    };
+    await postsCollection.insertOne(newPost);
+    return newPost;
+  },
+  async getPostById(id: string): Promise<PostViewModel | null> {
+    const targetPost = postsCollection.findOne({ id });
+    return targetPost;
+  },
+  async updatePost(id: string, post: PostInputModel): Promise<boolean> {
+    const updateResult = await postsCollection.updateOne(
+      { id },
+      { $set: { ...post } }
+    );
+    return updateResult.matchedCount === 1;
+  },
+  async deletePost(id: string): Promise<boolean> {
+    const deleteResult = await postsCollection.deleteOne({ id });
+    return deleteResult.deletedCount === 1;
+  },
 };

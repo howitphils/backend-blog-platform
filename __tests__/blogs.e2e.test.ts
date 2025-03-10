@@ -1,11 +1,17 @@
-import { setDb } from "../src/db/memory/db";
+import { closeConnection, dropCollecitions } from "../src/db/mongodb/mongodb";
 import { encodedCredentials } from "../src/middlewares/auth-validator";
 import { SETTINGS } from "../src/settings";
 import { req } from "./test-helpers";
 
 describe("/blogs", () => {
   beforeAll(async () => {
-    setDb();
+    // Очищаем коллекции
+    await dropCollecitions();
+  });
+
+  afterAll(async () => {
+    // Закрываем коннект с дб
+    await closeConnection();
   });
 
   it("should return all blogs", async () => {

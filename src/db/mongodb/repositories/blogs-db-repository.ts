@@ -1,14 +1,9 @@
 import { BlogInputModel, BlogViewModel } from "../../../types/blogs-types";
-import { blogCollection } from "../mongodb";
-// import { blogCollection } from "../db";
-
-// const findIndexByIdHelper = (id: string) => {
-//   // return db.blogs.findIndex((blog) => blog.id === id);
-// };
+import { blogsCollection } from "../mongodb";
 
 export const blogsRepository = {
-  getAllBlogs: async () => {
-    const blogs = await blogCollection.find({}).toArray();
+  async getAllBlogs() {
+    const blogs = await blogsCollection.find({}).toArray();
     return blogs;
   },
   createNewBlog: async (blog: BlogInputModel): Promise<BlogViewModel> => {
@@ -18,26 +13,23 @@ export const blogsRepository = {
       createdAt: new Date().toISOString(),
       isMembership: false,
     };
-    await blogCollection.insertOne(newBlog);
+    await blogsCollection.insertOne(newBlog);
     return newBlog;
   },
-  // getBlogById: (id: string) => {
-  //   const targetBlogIndex = findIndexByIdHelper(id);
-  //   if (targetBlogIndex === -1) return null;
-  //   return db.blogs[targetBlogIndex];
-  // },
-  // updateBlog: (id: string, blog: BlogInputModel) => {
-  //   const targetBlogIndex = findIndexByIdHelper(id);
-  //   if (targetBlogIndex === -1) return null;
-  //   db.blogs.splice(targetBlogIndex, 1, {
-  //     ...db.blogs[targetBlogIndex],
-  //     ...blog,
-  //   });
-  //   return db.blogs[targetBlogIndex];
-  // },
-  // deleteBlog: (id: string) => {
-  //   const targetBlogIndex = findIndexByIdHelper(id);
-  //   if (targetBlogIndex === -1) return null;
-  //   return db.blogs.splice(targetBlogIndex, 1);
-  // },
+  async getBlogById(id: string): Promise<BlogViewModel | null> {
+    const targetBlog = await blogsCollection.findOne({ id });
+    return targetBlog;
+  },
+  async updateBlog(id: string, blog: BlogInputModel) {
+    const updateResult = await blogsCollection.updateOne(
+      { id },
+      { $set: { ...blog } }
+    );
+
+    return updateResult.matchedCount === 1;
+  },
+  async deleteBlog(id: string) {
+    const deleteResult = await blogsCollection.deleteOne({ id });
+    return deleteResult.deletedCount === 1;
+  },
 };

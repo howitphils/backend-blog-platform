@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { setDb } from "../db/memory/db";
+import { closeConnection, dropCollecitions } from "../db/mongodb/mongodb";
 
 export const testsRouter = Router();
 
-testsRouter.delete("/all-data", (req, res) => {
-  setDb();
+testsRouter.delete("/all-data", async (req, res) => {
+  await dropCollecitions();
+  await closeConnection();
   res.sendStatus(204);
 });
