@@ -34,7 +34,6 @@ export const connectToDB = async () => {
   try {
     await client.connect();
     console.log("connected to db");
-    await dropCollecitions();
   } catch (e) {
     console.log(e);
     await client.close();
