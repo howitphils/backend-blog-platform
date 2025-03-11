@@ -8,7 +8,8 @@ export const blogsController = {
     res.status(200).json(blogs);
   },
   async createBlog(req: Request<{}, {}, BlogInputModel>, res: Response) {
-    const newBlog = await blogsRepository.createNewBlog(req.body);
+    const createdBlogId = await blogsRepository.createNewBlog(req.body);
+    const newBlog = await blogsRepository.getBlogByUUId(createdBlogId);
     res.status(201).json(newBlog);
   },
   async getBlogById(req: Request<{ id: string }>, res: Response) {

@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 export type PostInputModel = {
   title: string; // max 30
   shortDescription: string; // max 100
@@ -15,4 +17,12 @@ export type PostViewModel = {
   createdAt: string;
 };
 
-export type PostDBType = PostViewModel[];
+export type PostDbType = {
+  _id: ObjectId;
+  title: string; // max 30
+  shortDescription: string; // max 100
+  content: string; // max 1000
+  blogId: string; // valid
+  blogName: string;
+  createdAt: string;
+};

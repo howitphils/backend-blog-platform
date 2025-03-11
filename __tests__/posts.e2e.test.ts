@@ -1,14 +1,21 @@
-import { closeConnection, clearCollections } from "../src/db/mongodb/mongodb";
+import { MongoClient } from "mongodb";
+import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
 import { encodedCredentials } from "../src/middlewares/auth-validator";
 import { SETTINGS } from "../src/settings";
 import { req } from "./test-helpers";
 
 describe("/posts", () => {
+  let client: MongoClient;
   let blogId = "";
 
   beforeAll(async () => {
+    // Создаем новое тестовое соединение
+    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+
     // Очищаем коллекции
     await clearCollections();
+
+    // Создаем тестовый блог
     const res = await req
       .post(SETTINGS.PATHS.BLOGS)
       .send({
@@ -27,7 +34,8 @@ describe("/posts", () => {
 
   afterAll(async () => {
     // Закрываем коннект с дб
-    await closeConnection();
+    await client.close();
+    console.log("Connection closed");
   });
 
   it("should return all posts", async () => {

@@ -1,17 +1,23 @@
-import { closeConnection, clearCollections } from "../src/db/mongodb/mongodb";
+// import { closeConnection, clearCollections } from "../src/db/mongodb/mongodb";
+import { MongoClient } from "mongodb";
 import { encodedCredentials } from "../src/middlewares/auth-validator";
 import { SETTINGS } from "../src/settings";
 import { req } from "./test-helpers";
+import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
 
 describe("/blogs", () => {
+  let client: MongoClient;
   beforeAll(async () => {
+    // Создаем новое тестовое соединение
+    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
     // Очищаем коллекции
     await clearCollections();
   });
 
   afterAll(async () => {
     // Закрываем коннект с дб
-    await closeConnection();
+    await client.close();
+    console.log("Connection closed");
   });
 
   it("should return all blogs", async () => {

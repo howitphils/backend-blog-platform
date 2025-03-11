@@ -1,24 +1,27 @@
+import { ObjectId } from "mongodb";
 import { BlogInputModel, BlogViewModel } from "../../../types/blogs-types";
 import { blogsCollection } from "../mongodb";
 
 export const blogsRepository = {
-  async getAllBlogs() {
-    const blogs = await blogsCollection.find({}).toArray();
+  async getAllBlogs(): Promise<BlogViewModel[]> {
+    const blogs = blogsCollection.find({}).toArray();
     return blogs;
   },
-  createNewBlog: async (blog: BlogInputModel): Promise<BlogViewModel> => {
+  createNewBlog: async (blog: BlogInputModel): Promise<ObjectId> => {
     const newBlog: BlogViewModel = {
       ...blog,
       id: String(Math.random() * 1000),
       createdAt: new Date().toISOString(),
       isMembership: false,
     };
-    await blogsCollection.insertOne(newBlog);
-    return newBlog;
+    const createResult = await blogsCollection.insertOne(newBlog);
+    return createResult.insertedId;
   },
   async getBlogById(id: string): Promise<BlogViewModel | null> {
-    const targetBlog = await blogsCollection.findOne({ id });
-    return targetBlog;
+    return blogsCollection.findOne({ id });
+  },
+  async getBlogByUUId(_id: ObjectId): Promise<BlogViewModel | null> {
+    return blogsCollection.findOne({ _id });
   },
   async updateBlog(id: string, blog: BlogInputModel) {
     const updateResult = await blogsCollection.updateOne(
