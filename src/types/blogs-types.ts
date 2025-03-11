@@ -16,7 +16,7 @@ export type BlogViewModel = {
 };
 
 export type BlogDbType = {
-  _id: ObjectId;
+  _id?: ObjectId;
   name: string;
   description: string;
   websiteUrl: string;

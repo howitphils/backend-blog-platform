@@ -1,5 +1,6 @@
 import { body } from "express-validator";
 import { blogsRepository } from "../../db/mongodb/repositories/blogs-db-repository";
+import { ObjectId } from "mongodb";
 
 export const validateTitle = body("title")
   .isString()
@@ -34,7 +35,8 @@ const validateBlogId = body("blogId")
   .notEmpty()
   .withMessage("Should not be empty")
   .custom(async (blogId: string) => {
-    const targetBlog = await blogsRepository.getBlogById(blogId);
+    const convertedId = new ObjectId(blogId);
+    const targetBlog = await blogsRepository.getBlogById(convertedId);
     if (!targetBlog) {
       throw new Error("Blog does not exist");
     }

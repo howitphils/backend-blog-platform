@@ -18,7 +18,7 @@ export type PostViewModel = {
 };
 
 export type PostDbType = {
-  _id: ObjectId;
+  _id?: ObjectId;
   title: string; // max 30
   shortDescription: string; // max 100
   content: string; // max 1000

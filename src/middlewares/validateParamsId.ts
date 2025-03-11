@@ -8,7 +8,7 @@ export const validateParamsId = (
 ) => {
   const incomingId = req.params.id;
   if (!ObjectId.isValid(incomingId)) {
-    res.sendStatus(400);
+    res.sendStatus(404);
     return;
   }
   req.params.id = new ObjectId(incomingId);

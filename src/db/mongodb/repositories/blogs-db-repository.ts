@@ -1,38 +1,34 @@
 import { ObjectId } from "mongodb";
-import { BlogInputModel, BlogViewModel } from "../../../types/blogs-types";
+import { BlogDbType, BlogInputModel } from "../../../types/blogs-types";
 import { blogsCollection } from "../mongodb";
 
 export const blogsRepository = {
-  async getAllBlogs(): Promise<BlogViewModel[]> {
+  async getAllBlogs(): Promise<BlogDbType[]> {
     const blogs = blogsCollection.find({}).toArray();
     return blogs;
   },
-  createNewBlog: async (blog: BlogInputModel): Promise<ObjectId> => {
-    const newBlog: BlogViewModel = {
+  async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {
+    const newBlog: BlogDbType = {
       ...blog,
-      id: String(Math.random() * 1000),
       createdAt: new Date().toISOString(),
       isMembership: false,
     };
     const createResult = await blogsCollection.insertOne(newBlog);
     return createResult.insertedId;
   },
-  async getBlogById(id: string): Promise<BlogViewModel | null> {
-    return blogsCollection.findOne({ id });
-  },
-  async getBlogByUUId(_id: ObjectId): Promise<BlogViewModel | null> {
+  async getBlogById(_id: ObjectId): Promise<BlogDbType | null> {
     return blogsCollection.findOne({ _id });
   },
-  async updateBlog(id: string, blog: BlogInputModel) {
+  async updateBlog(_id: ObjectId, blog: BlogInputModel) {
     const updateResult = await blogsCollection.updateOne(
-      { id },
+      { _id },
       { $set: { ...blog } }
     );
 
     return updateResult.matchedCount === 1;
   },
-  async deleteBlog(id: string) {
-    const deleteResult = await blogsCollection.deleteOne({ id });
+  async deleteBlog(_id: ObjectId) {
+    const deleteResult = await blogsCollection.deleteOne({ _id });
     return deleteResult.deletedCount === 1;
   },
 };

@@ -1,21 +1,17 @@
-import { PostViewModel } from "./../../types/posts-types";
+import { PostDbType } from "./../../types/posts-types";
 import { Collection, MongoClient } from "mongodb";
 import { SETTINGS } from "../../settings";
-import { BlogViewModel } from "../../types/blogs-types";
+import { BlogDbType } from "../../types/blogs-types";
 
-export let blogsCollection: Collection<BlogViewModel>;
-export let postsCollection: Collection<PostViewModel>;
+export let blogsCollection: Collection<BlogDbType>;
+export let postsCollection: Collection<PostDbType>;
 
 export const runDb = async (url: string, dbName: string | undefined) => {
   const client = new MongoClient(url);
   const db = client.db(dbName);
 
-  blogsCollection = db.collection<BlogViewModel>(
-    SETTINGS.BLOGS_COLLECTION_NAME
-  );
-  postsCollection = db.collection<PostViewModel>(
-    SETTINGS.POSTS_COLLECTION_NAME
-  );
+  blogsCollection = db.collection<BlogDbType>(SETTINGS.BLOGS_COLLECTION_NAME);
+  postsCollection = db.collection<PostDbType>(SETTINGS.POSTS_COLLECTION_NAME);
 
   try {
     await client.connect();
