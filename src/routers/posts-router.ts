@@ -3,12 +3,13 @@ import { postsBodyValidator } from "./../middlewares/posts-body-validators/posts
 import { Router } from "express";
 
 import { authGuard } from "../middlewares/auth-validator";
-import { postsController } from "../controllers/posts-controller";
+import { postsController } from "./controllers/posts-controller";
+import { validateParamsId } from "../middlewares/validateParamsId";
 
 export const postsRouter = Router();
 
 postsRouter.get("/", postsController.getPosts);
-postsRouter.get("/:id", postsController.getPostById);
+postsRouter.get("/:id", validateParamsId, postsController.getPostById);
 postsRouter.post(
   "/",
   authGuard,
@@ -19,8 +20,14 @@ postsRouter.post(
 postsRouter.put(
   "/:id",
   authGuard,
+  validateParamsId,
   postsBodyValidator,
   bodyValidationResult,
   postsController.updatePost
 );
-postsRouter.delete("/:id", authGuard, postsController.deletePost);
+postsRouter.delete(
+  "/:id",
+  authGuard,
+  validateParamsId,
+  postsController.deletePost
+);

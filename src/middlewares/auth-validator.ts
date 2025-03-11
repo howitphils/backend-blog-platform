@@ -5,7 +5,11 @@ export const encodedCredentials = Buffer.from(SETTINGS.ADMIN).toString(
   "base64"
 );
 
-export const authGuard = (req: Request, res: Response, next: NextFunction) => {
+export const authGuard = (
+  req: Request<{}>,
+  res: Response,
+  next: NextFunction
+) => {
   const auth = req.headers["authorization"];
   if (!auth) {
     res.sendStatus(401);

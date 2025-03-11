@@ -15,7 +15,7 @@ const createOutputErrors = (errors: ValidationError): ErrorMessageType => {
 };
 
 export const bodyValidationResult = (
-  req: Request,
+  req: Request<{}>,
   res: Response,
   next: NextFunction
 ) => {

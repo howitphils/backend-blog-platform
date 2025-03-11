@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { PostInputModel } from "../types/posts-types";
 import { postsRepository } from "../db/mongodb/repositories/posts-db-repository";
+import { ObjectId } from "mongodb";
 
 export const postsController = {
   async getPosts(req: Request, res: Response) {
@@ -12,7 +13,7 @@ export const postsController = {
     const newPost = await postsRepository.getPostByUUId(createdId);
     res.status(201).json(newPost);
   },
-  async getPostById(req: Request<{ id: string }>, res: Response) {
+  async getPostById(req: Request<{ id: ObjectId }>, res: Response) {
     const targetPost = await postsRepository.getPostById(req.params.id);
     if (!targetPost) {
       res.sendStatus(404);
@@ -21,7 +22,7 @@ export const postsController = {
     res.status(200).json(targetPost);
   },
   async updatePost(
-    req: Request<{ id: string }, {}, PostInputModel>,
+    req: Request<{ id: ObjectId }, {}, PostInputModel>,
     res: Response
   ) {
     const updatedPost = await postsRepository.updatePost(
@@ -34,7 +35,7 @@ export const postsController = {
     }
     res.sendStatus(204);
   },
-  async deletePost(req: Request<{ id: string }>, res: Response) {
+  async deletePost(req: Request<{ id: ObjectId }>, res: Response) {
     const targetItem = await postsRepository.deletePost(req.params.id);
     if (!targetItem) {
       res.sendStatus(404);

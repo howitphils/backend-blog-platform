@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
-import { BlogInputModel } from "../types/blogs-types";
-import { blogsRepository } from "../db/mongodb/repositories/blogs-db-repository";
+
+import { ObjectId } from "mongodb";
+import { blogsRepository } from "../../db/mongodb/repositories/blogs-db-repository";
+import { BlogInputModel } from "../../types/blogs-types";
 
 export const blogsController = {
   async getBlogs(req: Request, res: Response) {
@@ -12,7 +14,7 @@ export const blogsController = {
     const newBlog = await blogsRepository.getBlogByUUId(createdBlogId);
     res.status(201).json(newBlog);
   },
-  async getBlogById(req: Request<{ id: string }>, res: Response) {
+  async getBlogById(req: Request<{ id: ObjectId }>, res: Response) {
     const targetBlog = await blogsRepository.getBlogById(req.params.id);
     if (!targetBlog) {
       res.sendStatus(404);
