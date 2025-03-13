@@ -4,11 +4,12 @@ import { ObjectId } from "mongodb";
 import { blogsRepository } from "../../db/mongodb/repositories/blogs-db-repository";
 import { BlogInputModel } from "../../types/blogs-types";
 import { mapFromDbToViewModel } from "./utils";
+import { RequestQueryType } from "../../types/request-types";
 
 export const blogsController = {
-  async getBlogs(req: Request, res: Response) {
+  async getBlogs(req: Request<{}, {}, {}, RequestQueryType>, res: Response) {
     // Получаем массив объектов DbType
-    const blogs = await blogsRepository.getAllBlogs();
+    const blogs = await blogsRepository.getAllBlogs(req.query);
     // Преобразуем во ViewModel
     const blogsView = blogs.map(mapFromDbToViewModel);
     res.status(200).json(blogsView);

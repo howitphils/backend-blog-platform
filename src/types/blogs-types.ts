@@ -23,3 +23,11 @@ export type BlogDbType = {
   createdAt: string;
   isMembership: boolean;
 };
+
+export type FilteredBlogsType = {
+  pagesCount: number;
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  items: BlogViewModel[];
+};
