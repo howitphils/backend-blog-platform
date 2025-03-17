@@ -25,7 +25,7 @@ export type BlogDbType = {
   isMembership: boolean;
 };
 
-export type PaginationBlogsType = {
+export type PaginationType = {
   pagesCount: number;
   page: number;
   pageSize: number;

@@ -1,6 +1,6 @@
 import { BlogDbType, BlogViewModel } from "../../types/blogs-types";
 import { PostDbType, PostViewModel } from "../../types/posts-types";
-import { MapedQueryTypes, RequestQueryType } from "../../types/request-types";
+import { MapedQueryType, RequestQueryType } from "../../types/request-types";
 
 export const mapFromDbToViewModel = (
   obj: BlogDbType | PostDbType
@@ -11,12 +11,12 @@ export const mapFromDbToViewModel = (
 
 export const mapQueryParams = (
   queryParams: RequestQueryType
-): MapedQueryTypes => {
+): MapedQueryType => {
   const { pageNumber, pageSize, searchNameTerm, sortBy, sortDirection } =
     queryParams;
 
   return {
-    searchNameTerm: searchNameTerm ? searchNameTerm.toLowerCase() : null,
+    searchNameTerm: searchNameTerm ? searchNameTerm : null,
     pageNumber: pageNumber ? +pageNumber : 1,
     pageSize: pageSize ? +pageSize : 10,
     sortBy: sortBy ? sortBy : "createdAt",

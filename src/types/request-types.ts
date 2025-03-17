@@ -6,7 +6,7 @@ export type RequestQueryType = {
   pageSize: string;
 };
 
-export type MapedQueryTypes = {
+export type MapedQueryType = {
   searchNameTerm: string | null;
   sortBy: string;
   sortDirection: string;

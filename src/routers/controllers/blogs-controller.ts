@@ -1,6 +1,6 @@
+import { ObjectId } from "mongodb";
 import { Request, Response } from "express";
 
-import { ObjectId } from "mongodb";
 import { BlogInputModel } from "../../types/blogs-types";
 import { RequestQueryType } from "../../types/request-types";
 import { blogsService } from "../../services/blogs-service";
@@ -9,6 +9,16 @@ export const blogsController = {
   async getBlogs(req: Request<{}, {}, {}, RequestQueryType>, res: Response) {
     const blogs = await blogsService.getAllBlogs(req.query);
     res.status(200).json(blogs);
+  },
+  async getPostsByBlogId(
+    req: Request<{ id: ObjectId }, {}, {}, RequestQueryType>,
+    res: Response
+  ) {
+    const posts = await blogsService.getAllPostsByBlogId(
+      req.params.id,
+      req.query
+    );
+    res.status(200).json(posts);
   },
   async createBlog(req: Request<{}, {}, BlogInputModel>, res: Response) {
     const createdBlogId = await blogsService.createNewBlog(req.body);

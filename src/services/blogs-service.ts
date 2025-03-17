@@ -5,7 +5,7 @@ import {
   BlogDbType,
   BlogInputModel,
   BlogViewModel,
-  PaginationBlogsType,
+  PaginationType,
 } from "../types/blogs-types";
 import { RequestQueryType } from "../types/request-types";
 import {
@@ -14,12 +14,18 @@ import {
 } from "../routers/controllers/utils";
 
 export const blogsService = {
-  async getAllBlogs(
-    queryParams: RequestQueryType
-  ): Promise<PaginationBlogsType> {
+  async getAllBlogs(queryParams: RequestQueryType): Promise<PaginationType> {
     const mapedQueryParams = mapQueryParams(queryParams);
 
     return blogsRepository.getAllBlogs(mapedQueryParams);
+  },
+  async getAllPostsByBlogId(
+    id: ObjectId,
+    queryParams: RequestQueryType
+  ): Promise<PaginationType> {
+    const mapedQueryParams = mapQueryParams(queryParams);
+
+    return blogsRepository.getAllPostsByBlogId(id, mapedQueryParams);
   },
 
   async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {

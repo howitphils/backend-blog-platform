@@ -10,6 +10,11 @@ export const blogsRouter = Router();
 
 blogsRouter.get("/", blogsController.getBlogs);
 blogsRouter.get("/:id", validateParamsId, blogsController.getBlogById);
+blogsRouter.get(
+  "/:id/posts",
+  validateParamsId,
+  blogsController.getPostsByBlogId
+);
 blogsRouter.post(
   "/",
   authGuard,
