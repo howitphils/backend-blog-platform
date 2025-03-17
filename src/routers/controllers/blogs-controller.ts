@@ -1,41 +1,33 @@
 import { Request, Response } from "express";
 
 import { ObjectId } from "mongodb";
-import { blogsRepository } from "../../db/mongodb/repositories/blogs-db-repository";
 import { BlogInputModel } from "../../types/blogs-types";
-import { mapFromDbToViewModel } from "./utils";
 import { RequestQueryType } from "../../types/request-types";
+import { blogsService } from "../../services/blogs-service";
 
 export const blogsController = {
   async getBlogs(req: Request<{}, {}, {}, RequestQueryType>, res: Response) {
-    // Получаем массив объектов DbType
-    const blogs = await blogsRepository.getAllBlogs(req.query);
-    // Преобразуем во ViewModel
-    const blogsView = blogs.map(mapFromDbToViewModel);
-    res.status(200).json(blogsView);
+    const blogs = await blogsService.getAllBlogs(req.query);
+    res.status(200).json(blogs);
   },
   async createBlog(req: Request<{}, {}, BlogInputModel>, res: Response) {
-    const createdBlogId = await blogsRepository.createNewBlog(req.body);
-    const newBlog = await blogsRepository.getBlogById(createdBlogId);
-    if (newBlog) {
-      const blogView = mapFromDbToViewModel(newBlog);
-      res.status(201).json(blogView);
-    }
+    const createdBlogId = await blogsService.createNewBlog(req.body);
+    const newBlog = await blogsService.getBlogById(createdBlogId);
+    res.status(201).json(newBlog);
   },
   async getBlogById(req: Request<{ id: ObjectId }>, res: Response) {
-    const targetBlog = await blogsRepository.getBlogById(req.params.id);
+    const targetBlog = await blogsService.getBlogById(req.params.id);
     if (!targetBlog) {
       res.sendStatus(404);
       return;
     }
-    const blogView = mapFromDbToViewModel(targetBlog);
-    res.status(200).json(blogView);
+    res.status(200).json(targetBlog);
   },
   async updateBlog(
     req: Request<{ id: ObjectId }, {}, BlogInputModel>,
     res: Response
   ) {
-    const isUpdated = await blogsRepository.updateBlog(req.params.id, req.body);
+    const isUpdated = await blogsService.updateBlog(req.params.id, req.body);
     if (!isUpdated) {
       res.sendStatus(404);
       return;
@@ -43,7 +35,7 @@ export const blogsController = {
     res.sendStatus(204);
   },
   async deleteBlog(req: Request<{ id: ObjectId }>, res: Response) {
-    const isDeleted = await blogsRepository.deleteBlog(req.params.id);
+    const isDeleted = await blogsService.deleteBlog(req.params.id);
     if (!isDeleted) {
       res.sendStatus(404);
       return;

@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import { PostViewModel } from "./posts-types";
 
 export type BlogInputModel = {
   name: string;
@@ -24,10 +25,12 @@ export type BlogDbType = {
   isMembership: boolean;
 };
 
-export type FilteredBlogsType = {
+export type PaginationBlogsType = {
   pagesCount: number;
   page: number;
   pageSize: number;
   totalCount: number;
-  items: BlogViewModel[];
+  items: (BlogViewModel | PostViewModel)[];
 };
+
+export type SortByType = keyof BlogViewModel;
