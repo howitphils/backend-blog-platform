@@ -33,4 +33,20 @@ export type PaginationType = {
   items: (BlogViewModel | PostViewModel)[];
 };
 
+export type BlogsRequestQueryType = {
+  searchNameTerm: string;
+  sortBy: string;
+  sortDirection: string;
+  pageNumber: string;
+  pageSize: string;
+};
+
+export type BlogsMapedQueryType = {
+  searchNameTerm: string | null;
+  sortBy: string;
+  sortDirection: string;
+  pageNumber: number;
+  pageSize: number;
+};
+
 export type SortByType = keyof BlogViewModel;

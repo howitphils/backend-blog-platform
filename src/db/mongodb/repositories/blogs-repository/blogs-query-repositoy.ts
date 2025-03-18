@@ -1,13 +1,16 @@
-import { PaginationType } from "./../../../types/blogs-types";
+import {
+  BlogViewModel,
+  BlogsMapedQueryType,
+  PaginationType,
+} from "../../../../types/blogs-types";
 import { ObjectId } from "mongodb";
-import { BlogDbType, BlogInputModel } from "../../../types/blogs-types";
-import { blogsCollection, postsCollection } from "../mongodb";
-import { MapedQueryType } from "../../../types/request-types";
-import { mapFromDbToViewModel } from "../../../routers/controllers/utils";
+import { BlogDbType } from "../../../../types/blogs-types";
+import { blogsCollection, postsCollection } from "../../mongodb";
+import { mapFromDbToViewModel } from "../../../../routers/controllers/utils";
 
-export const blogsRepository = {
+export const blogsQueryRepository = {
   // Получение всех блогов
-  async getAllBlogs(filters: MapedQueryType): Promise<PaginationType> {
+  async getAllBlogs(filters: BlogsMapedQueryType): Promise<PaginationType> {
     const { pageNumber, pageSize, searchNameTerm, sortBy, sortDirection } =
       filters;
 
@@ -27,11 +30,15 @@ export const blogsRepository = {
       pagesCount: Math.ceil(totalCount / pageSize),
       pageSize: pageSize,
       totalCount,
-      items: blogs.map(mapFromDbToViewModel),
+      items: blogs.map(this.mapFromDbToViewModel),
     };
   },
+
   // Получение постов конкретного блога
-  async getAllPostsByBlogId(_id: ObjectId, queryParams: MapedQueryType) {
+  async getAllPostsByBlogId(
+    _id: ObjectId,
+    queryParams: BlogsMapedQueryType
+  ): Promise<PaginationType> {
     const { pageNumber, pageSize, searchNameTerm, sortBy, sortDirection } =
       queryParams;
 
@@ -55,27 +62,13 @@ export const blogsRepository = {
       items: posts.map(mapFromDbToViewModel),
     };
   },
-  // Создание нового блога
-  async createNewBlog(blog: BlogDbType): Promise<ObjectId> {
-    const createResult = await blogsCollection.insertOne(blog);
-    return createResult.insertedId;
-  },
   // Получение блога по айди
   async getBlogById(_id: ObjectId): Promise<BlogDbType | null> {
     return blogsCollection.findOne({ _id });
   },
-  // Обновление блога
-  async updateBlog(_id: ObjectId, blog: BlogInputModel): Promise<boolean> {
-    const updateResult = await blogsCollection.updateOne(
-      { _id },
-      { $set: { ...blog } }
-    );
 
-    return updateResult.matchedCount === 1;
-  },
-  // Удаление блога
-  async deleteBlog(_id: ObjectId): Promise<boolean> {
-    const deleteResult = await blogsCollection.deleteOne({ _id });
-    return deleteResult.deletedCount === 1;
+  mapFromDbToViewModel(obj: BlogDbType): BlogViewModel {
+    const { _id, ...rest } = obj;
+    return { ...rest, id: _id!.toString() };
   },
 };

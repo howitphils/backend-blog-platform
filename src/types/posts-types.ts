@@ -26,3 +26,17 @@ export type PostDbType = {
   blogName: string;
   createdAt: string;
 };
+
+export type PostsRequestQueryType = {
+  sortBy: string;
+  sortDirection: string;
+  pageNumber: string;
+  pageSize: string;
+};
+
+export type PostsMapedQueryType = {
+  sortBy: string;
+  sortDirection: string;
+  pageNumber: number;
+  pageSize: number;
+};

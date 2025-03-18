@@ -1,33 +1,14 @@
 import { ObjectId } from "mongodb";
 
-import { blogsRepository } from "../db/mongodb/repositories/blogs-db-repository";
+import { blogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
 import {
   BlogDbType,
   BlogInputModel,
   BlogViewModel,
-  PaginationType,
 } from "../types/blogs-types";
-import { RequestQueryType } from "../types/request-types";
-import {
-  mapFromDbToViewModel,
-  mapQueryParams,
-} from "../routers/controllers/utils";
+import { mapFromDbToViewModel } from "../routers/controllers/utils";
 
 export const blogsService = {
-  async getAllBlogs(queryParams: RequestQueryType): Promise<PaginationType> {
-    const mapedQueryParams = mapQueryParams(queryParams);
-
-    return blogsRepository.getAllBlogs(mapedQueryParams);
-  },
-  async getAllPostsByBlogId(
-    id: ObjectId,
-    queryParams: RequestQueryType
-  ): Promise<PaginationType> {
-    const mapedQueryParams = mapQueryParams(queryParams);
-
-    return blogsRepository.getAllPostsByBlogId(id, mapedQueryParams);
-  },
-
   async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {
     const newBlog: BlogDbType = {
       ...blog,
