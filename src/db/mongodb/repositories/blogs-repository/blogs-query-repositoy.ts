@@ -61,8 +61,13 @@ export const blogsQueryRepository = {
     };
   },
   // Получение блога по айди
-  async getBlogById(_id: ObjectId): Promise<BlogDbType | null> {
-    return blogsCollection.findOne({ _id });
+  async getBlogById(_id: ObjectId): Promise<BlogViewModel | null> {
+    const targetBlog = await blogsCollection.findOne({ _id });
+    if (targetBlog) {
+      return this.mapFromDbToViewModel(targetBlog);
+    } else {
+      return null;
+    }
   },
 
   mapFromDbToViewModel(obj: BlogDbType): BlogViewModel {
