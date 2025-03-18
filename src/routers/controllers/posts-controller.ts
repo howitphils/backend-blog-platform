@@ -1,14 +1,18 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import { PostInputModel } from "../../types/posts-types";
-import { mapQueryParams } from "./utils";
+import { PostInputModel, PostsRequestQueryType } from "../../types/posts-types";
+import { mapPostsQueryParams } from "./utils";
 import { postsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
 import { postsService } from "../../services/posts-service";
 
 export const postsController = {
-  async getPosts(req: Request, res: Response) {
-    const mapedQueryParams = mapQueryParams(req.query);
+  async getPosts(
+    req: Request<{}, {}, {}, PostsRequestQueryType>,
+    res: Response
+  ) {
+    const mapedQueryParams = mapPostsQueryParams(req.query);
     const posts = await postsQueryRepository.getAllPosts(mapedQueryParams);
+
     res.status(200).json(posts);
   },
   async createPost(req: Request<{}, {}, PostInputModel>, res: Response) {

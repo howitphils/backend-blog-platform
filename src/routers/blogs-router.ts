@@ -16,6 +16,11 @@ blogsRouter.get(
   blogsController.getPostsByBlogId
 );
 blogsRouter.post(
+  "/:id/posts",
+  validateParamsId,
+  blogsController.createPostForBlog
+);
+blogsRouter.post(
   "/",
   authGuard,
   blogsBodyValidator,

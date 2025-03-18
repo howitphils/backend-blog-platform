@@ -50,3 +50,9 @@ export type BlogsMapedQueryType = {
 };
 
 export type SortByType = keyof BlogViewModel;
+
+export type PostForBlogType = {
+  title: string;
+  shortDescription: string;
+  content: string;
+};

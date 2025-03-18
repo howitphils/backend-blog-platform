@@ -43,9 +43,7 @@ export const blogsQueryRepository = {
       queryParams;
 
     const posts = await postsCollection
-      .find(
-        searchNameTerm ? { name: { $regex: searchNameTerm }, _id } : { _id }
-      )
+      .find({ blogId: _id.toString() })
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)

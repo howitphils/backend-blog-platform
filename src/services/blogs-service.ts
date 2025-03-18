@@ -7,6 +7,8 @@ import {
   BlogViewModel,
 } from "../types/blogs-types";
 import { mapFromDbToViewModel } from "../routers/controllers/utils";
+import { PostDbType } from "../types/posts-types";
+import { postsRepository } from "../db/mongodb/repositories/posts-repository/posts-db-repository";
 
 export const blogsService = {
   async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {
@@ -16,6 +18,19 @@ export const blogsService = {
       isMembership: false,
     };
     return blogsRepository.createNewBlog(newBlog);
+  },
+
+  async createNewPostForBlog(
+    blogId: string,
+    post: { title: string; shortDescription: string; content: string }
+  ): Promise<ObjectId> {
+    const newPost: PostDbType = {
+      ...post,
+      blogId,
+      blogName: "Blog" + Math.random() * 1000,
+      createdAt: new Date().toISOString(),
+    };
+    return postsRepository.createNewPost(newPost);
   },
 
   async getBlogById(_id: ObjectId): Promise<BlogViewModel | null> {

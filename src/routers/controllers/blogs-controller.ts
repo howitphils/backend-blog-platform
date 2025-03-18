@@ -1,17 +1,22 @@
 import { ObjectId } from "mongodb";
 import { Request, Response } from "express";
 
-import { BlogInputModel, BlogsRequestQueryType } from "../../types/blogs-types";
+import {
+  BlogInputModel,
+  BlogsRequestQueryType,
+  PostForBlogType,
+} from "../../types/blogs-types";
 import { blogsService } from "../../services/blogs-service";
 import { blogsQueryRepository } from "../../db/mongodb/repositories/blogs-repository/blogs-query-repositoy";
-import { mapQueryParams } from "./utils";
+import { mapBlogsQueryParams } from "./utils";
+import { postsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
 
 export const blogsController = {
   async getBlogs(
     req: Request<{}, {}, {}, BlogsRequestQueryType>,
     res: Response
   ) {
-    const mapedQueryParams = mapQueryParams(req.query);
+    const mapedQueryParams = mapBlogsQueryParams(req.query);
 
     const blogs = await blogsQueryRepository.getAllBlogs(mapedQueryParams);
 
@@ -21,18 +26,34 @@ export const blogsController = {
     req: Request<{ id: ObjectId }, {}, {}, BlogsRequestQueryType>,
     res: Response
   ) {
-    const mapedQueryParams = mapQueryParams(req.query);
+    const mapedQueryParams = mapBlogsQueryParams(req.query);
     const posts = await blogsQueryRepository.getAllPostsByBlogId(
       req.params.id,
       mapedQueryParams
     );
     res.status(200).json(posts);
   },
-  async createBlog(req: Request<{}, {}, BlogInputModel>, res: Response) {
+  async createBlog(
+    req: Request<{ id: string }, {}, BlogInputModel>,
+    res: Response
+  ) {
     const createdBlogId = await blogsService.createNewBlog(req.body);
     const newBlog = await blogsQueryRepository.getBlogById(createdBlogId);
     res.status(201).json(newBlog);
   },
+
+  async createPostForBlog(
+    req: Request<{ id: ObjectId }, {}, PostForBlogType>,
+    res: Response
+  ) {
+    const newPostId = await blogsService.createNewPostForBlog(
+      req.params.id.toString(),
+      req.body
+    );
+    const newPost = await postsQueryRepository.getPostById(newPostId);
+    res.status(200).json(newPost);
+  },
+
   async getBlogById(req: Request<{ id: ObjectId }>, res: Response) {
     const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
     if (!targetBlog) {
