@@ -1,6 +1,4 @@
 import { body } from "express-validator";
-import { blogsRepository } from "../../db/mongodb/repositories/blogs-repository/blogs-db-repository";
-import { ObjectId } from "mongodb";
 
 export const validateTitle = body("title")
   .isString()

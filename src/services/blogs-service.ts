@@ -9,6 +9,7 @@ import {
 import { mapFromDbToViewModel } from "../routers/controllers/utils";
 import { PostDbType } from "../types/posts-types";
 import { postsRepository } from "../db/mongodb/repositories/posts-repository/posts-db-repository";
+import { blogsQueryRepository } from "../db/mongodb/repositories/blogs-repository/blogs-query-repositoy";
 
 export const blogsService = {
   async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {
@@ -21,12 +22,17 @@ export const blogsService = {
   },
 
   async createNewPostForBlog(
-    blogId: string,
+    blogId: ObjectId,
     post: { title: string; shortDescription: string; content: string }
-  ): Promise<ObjectId> {
+  ): Promise<ObjectId | null> {
+    const targetBlog = await blogsQueryRepository.getBlogById(blogId);
+    if (!targetBlog) {
+      return null;
+    }
+    const convertedId = blogId.toString();
     const newPost: PostDbType = {
       ...post,
-      blogId,
+      blogId: convertedId,
       blogName: "Blog" + Math.random() * 1000,
       createdAt: new Date().toISOString(),
     };

@@ -26,6 +26,11 @@ export const blogsController = {
     req: Request<{ id: ObjectId }, {}, {}, BlogsRequestQueryType>,
     res: Response
   ) {
+    const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
+    if (!targetBlog) {
+      res.sendStatus(404);
+      return;
+    }
     const mapedQueryParams = mapBlogsQueryParams(req.query);
     const posts = await blogsQueryRepository.getAllPostsByBlogId(
       req.params.id,
@@ -47,9 +52,13 @@ export const blogsController = {
     res: Response
   ) {
     const newPostId = await blogsService.createNewPostForBlog(
-      req.params.id.toString(),
+      req.params.id,
       req.body
     );
+    if (!newPostId) {
+      res.sendStatus(404);
+      return;
+    }
     const newPost = await postsQueryRepository.getPostById(newPostId);
     res.status(201).json(newPost);
   },
