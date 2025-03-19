@@ -5,6 +5,7 @@ import { authGuard } from "../middlewares/auth-validator";
 import { bodyValidationResult } from "../middlewares/validation-result";
 import { blogsController } from "./controllers/blogs-controller";
 import { validateParamsId } from "../middlewares/validateParamsId";
+import { postsBodyValidator } from "../middlewares/posts-body-validators/posts-validators";
 
 export const blogsRouter = Router();
 
@@ -26,6 +27,8 @@ blogsRouter.post(
   "/:id/posts",
   authGuard,
   validateParamsId,
+  postsBodyValidator,
+  bodyValidationResult,
   blogsController.createPostForBlog
 );
 
