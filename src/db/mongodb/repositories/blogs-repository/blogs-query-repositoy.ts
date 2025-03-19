@@ -54,7 +54,10 @@ export const blogsQueryRepository = {
       .toArray();
     const totalCount = await postsCollection.countDocuments(
       searchNameTerm
-        ? { name: { $regex: searchNameTerm }, blogId: _id.toString() }
+        ? {
+            name: { $regex: searchNameTerm, $options: "i" },
+            blogId: _id.toString(),
+          }
         : { blogId: _id.toString() }
     );
 
