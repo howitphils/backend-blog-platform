@@ -15,7 +15,11 @@ export const blogsQueryRepository = {
       filters;
 
     const blogs = await blogsCollection
-      .find(searchNameTerm ? { name: { $regex: searchNameTerm } } : {})
+      .find(
+        searchNameTerm
+          ? { name: { $regex: searchNameTerm, $options: "i" } }
+          : {}
+      )
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
