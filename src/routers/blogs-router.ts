@@ -24,6 +24,7 @@ blogsRouter.get(
 // Создание поста по айди блога
 blogsRouter.post(
   "/:id/posts",
+  authGuard,
   validateParamsId,
   blogsController.createPostForBlog
 );
