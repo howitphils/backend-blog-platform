@@ -8,18 +8,27 @@ import { validateParamsId } from "../middlewares/validateParamsId";
 
 export const blogsRouter = Router();
 
+// Получение всех блогов
 blogsRouter.get("/", blogsController.getBlogs);
+
+// Получение блога по айди
 blogsRouter.get("/:id", validateParamsId, blogsController.getBlogById);
+
+// Получение постов по айди блога
 blogsRouter.get(
   "/:id/posts",
   validateParamsId,
   blogsController.getPostsByBlogId
 );
+
+// Создание поста по айди блога
 blogsRouter.post(
   "/:id/posts",
   validateParamsId,
   blogsController.createPostForBlog
 );
+
+// Создание блога
 blogsRouter.post(
   "/",
   authGuard,
@@ -27,6 +36,8 @@ blogsRouter.post(
   bodyValidationResult,
   blogsController.createBlog
 );
+
+// Обновление блога
 blogsRouter.put(
   "/:id",
   authGuard,
@@ -35,6 +46,8 @@ blogsRouter.put(
   bodyValidationResult,
   blogsController.updateBlog
 );
+
+// Удаление блога
 blogsRouter.delete(
   "/:id",
   authGuard,

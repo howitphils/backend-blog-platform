@@ -8,8 +8,13 @@ import { validateParamsId } from "../middlewares/validateParamsId";
 
 export const postsRouter = Router();
 
+// Получение постов
 postsRouter.get("/", postsController.getPosts);
+
+// Получение поста по айди
 postsRouter.get("/:id", validateParamsId, postsController.getPostById);
+
+// Создание поста
 postsRouter.post(
   "/",
   authGuard,
@@ -17,6 +22,8 @@ postsRouter.post(
   bodyValidationResult,
   postsController.createPost
 );
+
+// Обновление поста
 postsRouter.put(
   "/:id",
   authGuard,
@@ -25,6 +32,8 @@ postsRouter.put(
   bodyValidationResult,
   postsController.updatePost
 );
+
+// Удаление поста
 postsRouter.delete(
   "/:id",
   authGuard,

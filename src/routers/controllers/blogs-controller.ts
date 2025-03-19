@@ -51,7 +51,7 @@ export const blogsController = {
       req.body
     );
     const newPost = await postsQueryRepository.getPostById(newPostId);
-    res.status(200).json(newPost);
+    res.status(201).json(newPost);
   },
 
   async getBlogById(req: Request<{ id: ObjectId }>, res: Response) {
