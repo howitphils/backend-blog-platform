@@ -24,7 +24,10 @@ describe("/blogs", () => {
     const res = await req.get(SETTINGS.PATHS.BLOGS);
 
     expect(res.status).toBe(200);
-    expect(res.body.length).toBe(0);
+    expect(res.body).toHaveProperty("items");
+    expect(res.body).toHaveProperty("page");
+    expect(res.body).toHaveProperty("totalCount");
+    expect(res.body.items.length).toBe(0);
   });
 
   let newBlogId = "";

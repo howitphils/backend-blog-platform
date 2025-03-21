@@ -26,19 +26,16 @@ export const blogsService = {
   ): Promise<ObjectId | null> {
     // Получаем блог по id
     const targetBlog = await blogsQueryRepository.getBlogById(blogId);
-
     // Если блог не найден, возвращаем null
     if (!targetBlog) {
       return null;
     }
-
     // Если блог найден, создаем новый пост
     const newPost: PostDbType = {
       ...post,
       blogName: "Blog" + Math.random() * 1000,
       createdAt: new Date().toISOString(),
     };
-
     // Возвращаем id созданного поста
     return postsRepository.createNewPost(newPost);
   },

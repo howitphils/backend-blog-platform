@@ -16,10 +16,8 @@ export const blogsController = {
   ) {
     // Преобразуем query параметры в формат, который можно использовать в запросе к БД
     const mapedQueryParams = mapBlogsQueryParams(req.query);
-
     // Получаем все блоги с учетом query параметров
     const blogs = await blogsQueryRepository.getAllBlogs(mapedQueryParams);
-
     // Отправляем ответ с полученными блогами
     res.status(200).json(blogs);
   },
@@ -38,7 +36,7 @@ export const blogsController = {
     }
     // Преобразуем query параметры в формат, который можно использовать в запросе к БД
     const mapedQueryParams = mapPostsQueryParams(req.query);
-
+    // Преобразуем id из req.params в строку
     const convertedId = req.params.id.toString();
     // Получаем все посты конкретного блога с учетом query параметров и айди блога
     const posts = await postsQueryRepository.getAllPostsByBlogId(
