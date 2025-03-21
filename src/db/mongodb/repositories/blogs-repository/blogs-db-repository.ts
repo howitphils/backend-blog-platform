@@ -8,10 +8,12 @@ export const blogsRepository = {
     const createResult = await blogsCollection.insertOne(blog);
     return createResult.insertedId;
   },
+
   // Получение блога по айди
   async getBlogById(_id: ObjectId): Promise<BlogDbType | null> {
     return blogsCollection.findOne({ _id });
   },
+
   // Обновление блога
   async updateBlog(_id: ObjectId, blog: BlogInputModel): Promise<boolean> {
     const updateResult = await blogsCollection.updateOne(
@@ -21,6 +23,7 @@ export const blogsRepository = {
 
     return updateResult.matchedCount === 1;
   },
+
   // Удаление блога
   async deleteBlog(_id: ObjectId): Promise<boolean> {
     const deleteResult = await blogsCollection.deleteOne({ _id });

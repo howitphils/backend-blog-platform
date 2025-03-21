@@ -48,11 +48,3 @@ export type BlogsMapedQueryType = {
   pageNumber: number;
   pageSize: number;
 };
-
-export type SortByType = keyof BlogViewModel;
-
-export type PostForBlogType = {
-  title: string;
-  shortDescription: string;
-  content: string;
-};

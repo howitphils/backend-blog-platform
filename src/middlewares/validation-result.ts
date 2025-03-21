@@ -7,7 +7,9 @@ import { ErrorMessageType } from "../types/output-errors-types";
 import { NextFunction, Request, Response } from "express";
 
 const createOutputErrors = (errors: ValidationError): ErrorMessageType => {
+  // Переприсваиваем тип
   const targetOutputErrors = errors as unknown as FieldValidationError;
+  // Возвращаем объект нужной структуры
   return {
     message: targetOutputErrors.msg,
     field: targetOutputErrors.path,
@@ -19,12 +21,15 @@ export const bodyValidationResult = (
   res: Response,
   next: NextFunction
 ) => {
-  const errros = validationResult(req)
-    .formatWith(createOutputErrors)
-    .array({ onlyFirstError: true });
+  const errros = validationResult(req) // Получаем ошибки валидации в виде массива
+    .formatWith(createOutputErrors) // Преобразуем ошибки в нужный формат
+    .array({ onlyFirstError: true }); // Возвращаем только первую ошибку из каждого поля
+
+  // Если ошибки есть, возвращаем и отправляем их клиенту
   if (errros.length) {
     res.status(400).json({ errorsMessages: errros });
     return;
   }
+
   next();
 };

@@ -1,22 +1,11 @@
 import {
-  BlogDbType,
   BlogsMapedQueryType,
   BlogsRequestQueryType,
-  BlogViewModel,
 } from "../../types/blogs-types";
 import {
-  PostDbType,
   PostsMapedQueryType,
   PostsRequestQueryType,
-  PostViewModel,
 } from "../../types/posts-types";
-
-export const mapFromDbToViewModel = (
-  obj: BlogDbType | PostDbType
-): BlogViewModel | PostViewModel => {
-  const { _id, ...rest } = obj;
-  return { ...rest, id: _id!.toString() };
-};
 
 export const mapBlogsQueryParams = (
   queryParams: BlogsRequestQueryType
