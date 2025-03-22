@@ -36,8 +36,8 @@ describe("/blogs", () => {
       .post(SETTINGS.PATHS.BLOGS)
       .set("Authorization", `Basic ${encodedCredentials}`)
       .send({
-        name: "string",
-        description: "string",
+        name: "test-blog",
+        description: "for tests",
         websiteUrl:
           "https://prCzBUZX3K470uTKkNarDsYVFRAuTgO69cNATgDtBoH69Z3H.X93fa_hi1VVPvCJLchzT29V245-7s3ET5UsFtWYTT.c",
       });

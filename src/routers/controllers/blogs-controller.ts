@@ -7,6 +7,7 @@ import { blogsQueryRepository } from "../../db/mongodb/repositories/blogs-reposi
 import { mapBlogsQueryParams, mapPostsQueryParams } from "./utils";
 import { postsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
 import { PostInputModel, PostsRequestQueryType } from "../../types/posts-types";
+import { postsService } from "../../services/posts-service";
 
 export const blogsController = {
   // Получение всех блогов
@@ -36,7 +37,7 @@ export const blogsController = {
     }
     // Преобразуем query параметры в формат, который можно использовать в запросе к БД
     const mapedQueryParams = mapPostsQueryParams(req.query);
-    // Преобразуем id из req.params в строку
+    // Преобразуем id из req.params из ObjectId в строку
     const convertedId = req.params.id.toString();
     // Получаем все посты конкретного блога с учетом query параметров и айди блога
     const posts = await postsQueryRepository.getAllPostsByBlogId(
@@ -60,16 +61,15 @@ export const blogsController = {
     req: Request<{ id: ObjectId }, {}, PostInputModel>,
     res: Response
   ) {
-    // Создаем новый пост для блога и получаем его id в формате ObjectId
-    const newPostId = await blogsService.createNewPostForBlog(
-      req.params.id,
-      req.body
-    );
-    // Если пост не создан, отправляем 404
-    if (!newPostId) {
+    // Проверка на существование блога
+    const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
+    // Если блог не найден, отправляем 404
+    if (!targetBlog) {
       res.sendStatus(404);
       return;
     }
+    // Если блог существует - создаем новый пост
+    const newPostId = await postsService.createNewPost(req.body);
     // Получаем созданный пост по id
     const newPost = await postsQueryRepository.getPostById(newPostId);
     res.status(201).json(newPost);
