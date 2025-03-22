@@ -6,7 +6,10 @@ export const postsService = {
   // Создание нового поста
   async createNewPost(post: PostInputModel): Promise<ObjectId> {
     const newPost: PostDbType = {
-      ...post,
+      blogId: post.blogId,
+      content: post.content,
+      shortDescription: post.shortDescription,
+      title: post.title,
       blogName: "Blog" + Math.random() * 1000,
       createdAt: new Date().toISOString(),
     };

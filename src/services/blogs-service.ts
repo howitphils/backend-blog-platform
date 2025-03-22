@@ -11,7 +11,9 @@ export const blogsService = {
   async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {
     // Создаем новый блог
     const newBlog: BlogDbType = {
-      ...blog,
+      name: blog.name,
+      description: blog.description,
+      websiteUrl: blog.websiteUrl,
       createdAt: new Date().toISOString(),
       isMembership: false,
     };
@@ -30,9 +32,12 @@ export const blogsService = {
     if (!targetBlog) {
       return null;
     }
-    // Если блог найден, создаем новый пост
+    // Если блог найден, создаем для него новый пост
     const newPost: PostDbType = {
-      ...post,
+      content: post.content,
+      blogId: post.blogId,
+      shortDescription: post.shortDescription,
+      title: post.title,
       blogName: "Blog" + Math.random() * 1000,
       createdAt: new Date().toISOString(),
     };

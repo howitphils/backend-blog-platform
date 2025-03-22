@@ -72,6 +72,83 @@ describe("/blogs", () => {
     expect(res.status).toBe(204);
   });
 
+  it("should return all posts for a specific blog", async () => {
+    const res = await req.get(
+      SETTINGS.PATHS.BLOGS + `/${newBlogId}` + "/posts"
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.items.length).toBe(0);
+    expect(res.body).toHaveProperty("items");
+    expect(res.body).toHaveProperty("page");
+    expect(res.body).toHaveProperty("totalCount");
+  });
+
+  it("should create new post for a specific blog", async () => {
+    const res = await req
+      .post(SETTINGS.PATHS.BLOGS + `/${newBlogId}` + "/posts")
+      .set("Authorization", `Basic ${encodedCredentials}`)
+      .send({
+        title: "new post",
+        shortDescription: "description of new post",
+        content: "hi",
+        blogId: newBlogId,
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty("shortDescription");
+    expect(res.body).toHaveProperty("id");
+    expect(res.body).toHaveProperty("title");
+    expect(res.body).toHaveProperty("content");
+  });
+
+  it("should not create new post for a specific blog with incorrect blogId", async () => {
+    const res = await req
+      .post(SETTINGS.PATHS.BLOGS + `/22` + "/posts")
+      .set("Authorization", `Basic ${encodedCredentials}`)
+      .send({
+        title: "new post",
+        shortDescription: "description of new post",
+        content: "hi",
+        blogId: "22",
+      });
+
+    expect(res.status).toBe(404);
+  });
+
+  it("should not create new post for a specific blog with incorrect input values", async () => {
+    const res = await req
+      .post(SETTINGS.PATHS.BLOGS + `/${newBlogId}` + "/posts")
+      .set("Authorization", `Basic ${encodedCredentials}`)
+      .send({
+        title: "",
+        shortDescription: 29,
+        content: "hi",
+        blogId: "22",
+      });
+
+    expect(res.status).toBe(400);
+  });
+
+  it("should not create new post for a specific blog without authorization", async () => {
+    const res = await req
+      .post(SETTINGS.PATHS.BLOGS + `/${newBlogId}` + "/posts")
+      .send({
+        title: "asd",
+        shortDescription: "dasd",
+        content: "hi",
+        blogId: newBlogId,
+      });
+
+    expect(res.status).toBe(401);
+  });
+
+  it("should not return all posts for a specific blog with incorrect blogId", async () => {
+    const res = await req.get(SETTINGS.PATHS.BLOGS + "/22" + "/posts");
+
+    expect(res.status).toBe(404);
+  });
+
   it("should not update the blog with incorrect input values", async () => {
     const res = await req
       .put(SETTINGS.PATHS.BLOGS + `/${newBlogId}`)
