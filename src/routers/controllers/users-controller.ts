@@ -5,9 +5,11 @@ import { mapPostsQueryParams, mapUsersQueryParams } from "./utils";
 import { postsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
 import { postsService } from "../../services/posts-service";
 import { UserInputModel, UsersRequestQueryType } from "../../types/users-types";
+import { usersQueryRepository } from "../../db/mongodb/repositories/users-repository/users-query-repository";
+import { usersService } from "../../services/users-service";
 
 export const usersController = {
-  // Получение постов
+  // Получение юзеров
   async getUsers(
     req: Request<{}, {}, {}, UsersRequestQueryType>,
     res: Response
@@ -15,19 +17,19 @@ export const usersController = {
     // Преобразуем query параметры в нужный формат
     const mapedQueryParams = mapUsersQueryParams(req.query);
 
-    // Получаем посты из базы
-    // const posts = await postsQueryRepository.getAllPosts(mapedQueryParams);
+    // Получаем юзеров из бд
+    const users = await usersQueryRepository.getAllUsers(mapedQueryParams);
 
-    // res.status(200).json(posts);
+    res.status(200).json(users);
   },
 
-  // Создание поста
+  // Создание юзера
   async createUser(req: Request<{}, {}, UserInputModel>, res: Response) {
-    // Создаем новый пост
-    // const createdId = await postsService.createNewPost(req.body);
-    // Получаем созданный пост
-    // const newPost = await postsQueryRepository.getPostById(createdId);
-    // res.status(201).json(newPost);
+    // Создаем нового юзера
+    const createdId = await usersService.createNewUser(req.body);
+    // Получаем созданного юзера
+    const newUser = await usersQueryRepository.getUserById(createdId);
+    res.status(201).json(newUser);
   },
 
   // Удаление поста
