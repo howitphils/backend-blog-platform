@@ -14,7 +14,9 @@ export const SETTINGS = {
   MONGO_URL: process.env.MONGO_URL || "mongodb://localhost:27017",
   DB_NAME: process.env.DB_NAME,
   TEST_DB_NAME: process.env.TEST_DB_NAME,
-  BLOGS_COLLECTION_NAME: "blogs",
-  POSTS_COLLECTION_NAME: "posts",
-  USERS_COLLECTION_NAME: "users",
+  COLLECTIONS: {
+    BLOGS_COLLECTION_NAME: "blogs",
+    POSTS_COLLECTION_NAME: "posts",
+    USERS_COLLECTION_NAME: "users",
+  },
 };
