@@ -1,4 +1,3 @@
-// import { closeConnection, clearCollections } from "../src/db/mongodb/mongodb";
 import { MongoClient } from "mongodb";
 import { encodedCredentials } from "../src/middlewares/auth-validator";
 import { SETTINGS } from "../src/settings";

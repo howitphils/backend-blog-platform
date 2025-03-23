@@ -9,7 +9,9 @@ import { PaginationType } from "../../../../types/blogs-types";
 
 export const postsQueryRepository = {
   // Получение всех постов с учетом query параметров
-  async getAllPosts(filters: PostsMapedQueryType): Promise<PaginationType> {
+  async getAllPosts(
+    filters: PostsMapedQueryType
+  ): Promise<PaginationType<PostViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = filters;
 
     // Получаем посты с учетом query параметров
@@ -36,7 +38,7 @@ export const postsQueryRepository = {
   async getAllPostsByBlogId(
     blogId: string,
     filters: PostsMapedQueryType
-  ): Promise<PaginationType> {
+  ): Promise<PaginationType<PostViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = filters;
 
     // Получаем посты конкретного блога с учетом query параметров и айди блога

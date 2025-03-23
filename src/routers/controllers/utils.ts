@@ -6,6 +6,10 @@ import {
   PostsMapedQueryType,
   PostsRequestQueryType,
 } from "../../types/posts-types";
+import {
+  UsersMapedQueryType,
+  UsersRequestQueryType,
+} from "../../types/users-types";
 
 export const mapBlogsQueryParams = (
   queryParams: BlogsRequestQueryType
@@ -18,7 +22,7 @@ export const mapBlogsQueryParams = (
     pageNumber: pageNumber ? +pageNumber : 1,
     pageSize: pageSize ? +pageSize : 10,
     sortBy: sortBy ? sortBy : "createdAt",
-    sortDirection: sortDirection ? sortDirection : "desc",
+    sortDirection: sortDirection === "asc" ? sortDirection : "desc",
   };
 };
 
@@ -31,6 +35,28 @@ export const mapPostsQueryParams = (
     pageNumber: pageNumber ? +pageNumber : 1,
     pageSize: pageSize ? +pageSize : 10,
     sortBy: sortBy ? sortBy : "createdAt",
-    sortDirection: sortDirection ? sortDirection : "desc",
+    sortDirection: sortDirection === "asc" ? sortDirection : "desc",
+  };
+};
+
+export const mapUsersQueryParams = (
+  queryParams: UsersRequestQueryType
+): UsersMapedQueryType => {
+  const {
+    pageNumber,
+    pageSize,
+    sortBy,
+    sortDirection,
+    searchEmailTerm,
+    searchLoginTerm,
+  } = queryParams;
+
+  return {
+    searchEmailTerm: searchEmailTerm ? searchEmailTerm : null,
+    searchLoginTerm: searchLoginTerm ? searchLoginTerm : null,
+    pageNumber: pageNumber ? +pageNumber : 1,
+    pageSize: pageSize ? +pageSize : 10,
+    sortBy: sortBy ? sortBy : "createdAt",
+    sortDirection: sortDirection === "asc" ? sortDirection : "desc",
   };
 };

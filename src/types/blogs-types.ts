@@ -1,5 +1,4 @@
 import { ObjectId } from "mongodb";
-import { PostViewModel } from "./posts-types";
 
 export type BlogInputModel = {
   name: string;
@@ -25,12 +24,12 @@ export type BlogDbType = {
   isMembership: boolean;
 };
 
-export type PaginationType = {
+export type PaginationType<T> = {
   pagesCount: number;
   page: number;
   pageSize: number;
   totalCount: number;
-  items: (BlogViewModel | PostViewModel)[];
+  items: T[];
 };
 
 export type BlogsRequestQueryType = {
@@ -43,8 +42,8 @@ export type BlogsRequestQueryType = {
 
 export type BlogsMapedQueryType = {
   searchNameTerm: string | null;
-  sortBy: string;
-  sortDirection: string;
+  sortBy: string | "createdAt";
+  sortDirection: string | "desc";
   pageNumber: number;
   pageSize: number;
 };

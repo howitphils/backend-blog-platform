@@ -9,7 +9,9 @@ import { blogsCollection } from "../../mongodb";
 
 export const blogsQueryRepository = {
   // Получение всех блогов
-  async getAllBlogs(filters: BlogsMapedQueryType): Promise<PaginationType> {
+  async getAllBlogs(
+    filters: BlogsMapedQueryType
+  ): Promise<PaginationType<BlogViewModel>> {
     const { pageNumber, pageSize, searchNameTerm, sortBy, sortDirection } =
       filters;
 
