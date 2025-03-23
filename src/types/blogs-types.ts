@@ -24,14 +24,6 @@ export type BlogDbType = {
   isMembership: boolean;
 };
 
-export type PaginationType<T> = {
-  pagesCount: number;
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  items: T[];
-};
-
 export type BlogsRequestQueryType = {
   searchNameTerm: string;
   sortBy: string;
@@ -46,4 +38,12 @@ export type BlogsMapedQueryType = {
   sortDirection: string | "desc";
   pageNumber: number;
   pageSize: number;
+};
+
+export type PaginationType<T> = {
+  pagesCount: number;
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  items: T[];
 };

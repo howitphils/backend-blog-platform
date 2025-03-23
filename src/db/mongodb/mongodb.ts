@@ -2,9 +2,11 @@ import { PostDbType } from "./../../types/posts-types";
 import { Collection, MongoClient } from "mongodb";
 import { SETTINGS } from "../../settings";
 import { BlogDbType } from "../../types/blogs-types";
+import { UserDbType } from "../../types/users-types";
 
 export let blogsCollection: Collection<BlogDbType>;
 export let postsCollection: Collection<PostDbType>;
+export let usersCollection: Collection<UserDbType>;
 
 export const runDb = async (url: string, dbName: string | undefined) => {
   const client = new MongoClient(url);
