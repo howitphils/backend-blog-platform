@@ -40,6 +40,7 @@ export const runDb = async (url: string, dbName: string | undefined) => {
 export const clearCollections = async () => {
   await blogsCollection.deleteMany({});
   await postsCollection.deleteMany({});
+  await usersCollection.deleteMany({});
 };
 
 // export const closeConnection = async () => {

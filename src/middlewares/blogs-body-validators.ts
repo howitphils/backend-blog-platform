@@ -19,6 +19,8 @@ const validateDescription = body("description")
   .withMessage("Length is more than 500 symbols");
 
 const validateWebsiteUrl = body("websiteUrl")
+  .isString()
+  .withMessage("Should be a string")
   .trim()
   .notEmpty()
   .withMessage("Should not be empty")

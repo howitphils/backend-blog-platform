@@ -1,5 +1,5 @@
 import { bodyValidationResult } from "./../middlewares/validation-result";
-import { postsBodyValidator } from "./../middlewares/posts-body-validators/posts-validators";
+import { postsBodyValidator } from "../middlewares/posts-body-validators";
 import { Router } from "express";
 
 import { authGuard } from "../middlewares/auth-validator";

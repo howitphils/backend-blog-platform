@@ -1,11 +1,11 @@
 import { Router } from "express";
 
-import { blogsBodyValidator } from "../middlewares/blogs-body-validators/blogs-validators";
+import { blogsBodyValidator } from "../middlewares/blogs-body-validators";
 import { authGuard } from "../middlewares/auth-validator";
 import { bodyValidationResult } from "../middlewares/validation-result";
 import { blogsController } from "./controllers/blogs-controller";
 import { validateParamsId } from "../middlewares/validateParamsId";
-import { postsBodyValidator } from "../middlewares/posts-body-validators/posts-validators";
+import { postsBodyValidator } from "../middlewares/posts-body-validators";
 
 export const blogsRouter = Router();
 
