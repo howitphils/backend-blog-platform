@@ -25,9 +25,11 @@ export const usersQueryRepository = {
       const searchByEmail = searchEmailTerm
         ? { email: { $regex: searchEmailTerm } }
         : {};
+
       const searchByLogin = searchLoginTerm
         ? { login: { $regex: searchLoginTerm } }
         : {};
+
       return {
         ...searchByEmail,
         ...searchByLogin,
