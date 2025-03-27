@@ -23,18 +23,11 @@ export const usersQueryRepository = {
 
     // Cоздаем фильтр
     const createFilter = () => {
-      const searchByEmail = searchEmailTerm
+      return searchEmailTerm
         ? { email: { $regex: searchEmailTerm, $options: "i" } }
-        : {};
-
-      const searchByLogin = searchLoginTerm
+        : searchLoginTerm
         ? { login: { $regex: searchLoginTerm, $options: "i" } }
         : {};
-
-      return {
-        ...searchByEmail,
-        ...searchByLogin,
-      };
     };
 
     // Получаем юзеров с учетом query параметров

@@ -5,7 +5,6 @@ import { usersRepository } from "../db/mongodb/repositories/users-repository/use
 import { LoginInputModel } from "../types/login-types";
 import bcrypt from "bcryptjs";
 import { OutputErrorsType } from "../types/output-errors-types";
-// import { OutputErrorsType } from "../types/output-errors-types";
 
 export const usersService = {
   // Создание нового юзера
@@ -18,19 +17,15 @@ export const usersService = {
     const existingUser = await usersRepository.getUserByCredentials(login);
 
     if (existingUser) {
-      if (existingUser?.email === email) {
-        return {
-          errorsMessages: [
-            { field: "email", message: "User with this email already exists" },
-          ],
-        };
-      } else if (existingUser?.login === login) {
-        return {
-          errorsMessages: [
-            { field: "login", message: "User with this login already exists" },
-          ],
-        };
-      }
+      const field = existingUser.email === email ? "email" : "login";
+      return {
+        errorsMessages: [
+          {
+            field: `${field}`,
+            message: `User with this ${field} already exists`,
+          },
+        ],
+      };
     }
 
     const passHash = await this.generateHash(password);

@@ -23,7 +23,9 @@ export const usersController = {
   // Создание юзера
   async createUser(req: Request<{}, {}, UserInputModel>, res: Response) {
     // Создаем нового юзера
-    const createdId = await usersService.createNewUser(req.body);
+    const createResult = await usersService.createNewUser(req.body);
+    // Ошибку проверить
+
     // Получаем созданного юзера по айди
     const newUser = await usersQueryRepository.getUserById(createdId);
     res.status(201).json(newUser);

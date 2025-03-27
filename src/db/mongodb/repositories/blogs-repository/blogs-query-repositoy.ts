@@ -28,9 +28,7 @@ export const blogsQueryRepository = {
       .toArray();
 
     // Подсчет общего количества блогов
-    const totalCount = await blogsCollection.countDocuments(
-      searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {} // options: 'i' для игнорирования регистра
-    );
+    const totalCount = await blogsCollection.countDocuments();
 
     return {
       page: pageNumber,
