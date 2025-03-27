@@ -5,10 +5,10 @@ import {
   UsersMapedQueryType,
   UserViewModel,
 } from "../../../../types/users-types";
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 
 export const usersQueryRepository = {
-  // Получение всех постов с учетом query параметров
+  // Получение всех юзеров с учетом query параметров
   async getAllUsers(
     filters: UsersMapedQueryType
   ): Promise<PaginationType<UserViewModel>> {
@@ -21,13 +21,14 @@ export const usersQueryRepository = {
       searchLoginTerm,
     } = filters;
 
+    // Cоздаем фильтр
     const createFilter = () => {
       const searchByEmail = searchEmailTerm
-        ? { email: { $regex: searchEmailTerm } }
+        ? { email: { $regex: searchEmailTerm, $options: "i" } }
         : {};
 
       const searchByLogin = searchLoginTerm
-        ? { login: { $regex: searchLoginTerm } }
+        ? { login: { $regex: searchLoginTerm, $options: "i" } }
         : {};
 
       return {
@@ -36,14 +37,15 @@ export const usersQueryRepository = {
       };
     };
 
-    // Получаем посты с учетом query параметров
+    // Получаем юзеров с учетом query параметров
     const users = await usersCollection
       .find(createFilter())
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .toArray();
-    // Получаем число всех постов
+
+    // Получаем число всех юзеров
     const totalCount = await usersCollection.countDocuments({});
     return {
       page: pageNumber,
@@ -61,7 +63,7 @@ export const usersQueryRepository = {
   },
 
   // Преобразование юзера из формата базы данных в формат, который ожидает клиент
-  mapFromDbToViewModel(obj: UserDbType): UserViewModel {
+  mapFromDbToViewModel(obj: WithId<UserDbType>): UserViewModel {
     const { createdAt, email, login, _id } = obj;
     return {
       id: _id!.toString(),

@@ -4,24 +4,34 @@ import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { LoginInputModel } from "../types/login-types";
 import bcrypt from "bcryptjs";
+import { OutputErrorsType } from "../types/output-errors-types";
 // import { OutputErrorsType } from "../types/output-errors-types";
 
 export const usersService = {
   // Создание нового юзера
-  async createNewUser(user: UserInputModel): Promise<ObjectId> {
+  async createNewUser(
+    user: UserInputModel
+  ): Promise<ObjectId | OutputErrorsType> {
     // Добавить проверку на уникальность логина и мейла
     const { email, login, password } = user;
 
-    // const existingUser = await usersRepository.getUserByLoginOrEmail({
-    //   login,
-    //   email,
-    // });
+    const existingUser = await usersRepository.getUserByCredentials(login);
 
-    // if (existingUser) {
-    //   return {
-    //     errorsMessages: [{field:}],
-    //   };
-    // }
+    if (existingUser) {
+      if (existingUser?.email === email) {
+        return {
+          errorsMessages: [
+            { field: "email", message: "User with this email already exists" },
+          ],
+        };
+      } else if (existingUser?.login === login) {
+        return {
+          errorsMessages: [
+            { field: "login", message: "User with this login already exists" },
+          ],
+        };
+      }
+    }
 
     const passHash = await this.generateHash(password);
 

@@ -14,7 +14,6 @@ export type UserViewModel = {
 };
 
 export type UserDbType = {
-  _id?: ObjectId;
   login: string;
   email: string;
   passHash: string;

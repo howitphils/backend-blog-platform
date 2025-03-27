@@ -52,14 +52,14 @@ export const blogsQueryRepository = {
   },
 
   // Преобразование данных из БД в формат, который будет отправлен клиенту
-  mapFromDbToViewModel(obj: WithId<BlogDbType>): BlogViewModel {
+  mapFromDbToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
     return {
-      id: obj._id.toString(),
-      createdAt: obj.createdAt,
-      description: obj.description,
-      isMembership: obj.isMembership,
-      name: obj.name,
-      websiteUrl: obj.websiteUrl,
+      id: blog._id.toString(),
+      createdAt: blog.createdAt,
+      description: blog.description,
+      isMembership: blog.isMembership,
+      name: blog.name,
+      websiteUrl: blog.websiteUrl,
     };
   },
 };
