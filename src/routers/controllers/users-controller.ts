@@ -24,10 +24,14 @@ export const usersController = {
   async createUser(req: Request<{}, {}, UserInputModel>, res: Response) {
     // Создаем нового юзера
     const createResult = await usersService.createNewUser(req.body);
-    // Ошибку проверить
 
+    // Если пришел объект с ошибкой
+    if (typeof createResult === "object") {
+      res.status(400).json(createResult);
+      return;
+    }
     // Получаем созданного юзера по айди
-    const newUser = await usersQueryRepository.getUserById(createdId);
+    const newUser = await usersQueryRepository.getUserById(createResult);
     res.status(201).json(newUser);
   },
 

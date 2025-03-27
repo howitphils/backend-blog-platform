@@ -39,7 +39,8 @@ export const usersQueryRepository = {
       .toArray();
 
     // Получаем число всех юзеров
-    const totalCount = await usersCollection.countDocuments({});
+    const totalCount = await usersCollection.countDocuments();
+
     return {
       page: pageNumber,
       pagesCount: Math.ceil(totalCount / pageSize),
@@ -56,8 +57,8 @@ export const usersQueryRepository = {
   },
 
   // Преобразование юзера из формата базы данных в формат, который ожидает клиент
-  mapFromDbToViewModel(obj: WithId<UserDbType>): UserViewModel {
-    const { createdAt, email, login, _id } = obj;
+  mapFromDbToViewModel(user: WithId<UserDbType>): UserViewModel {
+    const { createdAt, email, login, _id } = user;
     return {
       id: _id!.toString(),
       login: login,
