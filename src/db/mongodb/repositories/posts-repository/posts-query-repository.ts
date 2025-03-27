@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import {
   PostDbType,
   PostsMapedQueryType,
@@ -75,8 +75,15 @@ export const postsQueryRepository = {
   },
 
   // Преобразование поста из формата базы данных в формат, который ожидает клиент
-  mapFromDbToViewModel(obj: PostDbType): PostViewModel {
-    const { _id, ...rest } = obj;
-    return { ...rest, id: _id!.toString() };
+  mapFromDbToViewModel(post: WithId<PostDbType>): PostViewModel {
+    return {
+      id: post._id.toString(),
+      blogId: post.blogId,
+      blogName: post.blogName,
+      content: post.content,
+      createdAt: post.createdAt,
+      shortDescription: post.shortDescription,
+      title: post.title,
+    };
   },
 };

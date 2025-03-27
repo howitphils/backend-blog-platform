@@ -3,13 +3,27 @@ import { hash } from "bcryptjs";
 import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { LoginInputModel } from "../types/login-types";
+import bcrypt from "bcryptjs";
+// import { OutputErrorsType } from "../types/output-errors-types";
 
 export const usersService = {
   // Создание нового юзера
   async createNewUser(user: UserInputModel): Promise<ObjectId> {
-    // Добавить проверку на уникальность
+    // Добавить проверку на уникальность логина и мейла
+    const { email, login, password } = user;
 
-    const passHash = await this.generateHash(user.password);
+    // const existingUser = await usersRepository.getUserByLoginOrEmail({
+    //   login,
+    //   email,
+    // });
+
+    // if (existingUser) {
+    //   return {
+    //     errorsMessages: [{field:}],
+    //   };
+    // }
+
+    const passHash = await this.generateHash(password);
 
     const newUser: UserDbType = {
       email: user.email,
@@ -23,13 +37,12 @@ export const usersService = {
   async checkUser(credentials: LoginInputModel): Promise<boolean> {
     const { loginOrEmail, password } = credentials;
 
-    const passHash = await this.generateHash(password);
+    const targetUser = await usersRepository.getUserByCredentials(loginOrEmail);
+    if (!targetUser) {
+      return false;
+    }
 
-    const targetUser = await usersRepository.getUserByCredentials({
-      loginOrEmail,
-      passHash,
-    });
-    return !!targetUser;
+    return bcrypt.compare(password, targetUser.passHash);
   },
 
   // Удаление юзера

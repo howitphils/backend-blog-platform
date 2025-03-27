@@ -15,16 +15,22 @@ export const usersRepository = {
     return deleteResult.deletedCount === 1;
   },
 
-  async getUserByCredentials(credentials: {
-    loginOrEmail: string;
-    passHash: string;
-  }) {
-    const { loginOrEmail, passHash } = credentials;
+  // Получение по логин/мейлу (для логинизации)
+  async getUserByCredentials(loginOrEmail: string) {
     return usersCollection.findOne({
-      $and: [
-        { $or: [{ email: loginOrEmail }, { login: loginOrEmail }] },
-        { passHash },
-      ],
+      $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+    });
+  },
+
+  async getUserByLoginOrEmail({
+    login,
+    email,
+  }: {
+    login: string;
+    email: string;
+  }): Promise<UserDbType | null> {
+    return usersCollection.findOne({
+      $or: [{ login }, { email }],
     });
   },
 };

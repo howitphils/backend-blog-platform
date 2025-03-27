@@ -3,7 +3,7 @@ import {
   BlogsMapedQueryType,
   PaginationType,
 } from "../../../../types/blogs-types";
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { BlogDbType } from "../../../../types/blogs-types";
 import { blogsCollection } from "../../mongodb";
 
@@ -52,8 +52,14 @@ export const blogsQueryRepository = {
   },
 
   // Преобразование данных из БД в формат, который будет отправлен клиенту
-  mapFromDbToViewModel(obj: BlogDbType): BlogViewModel {
-    const { _id, ...rest } = obj;
-    return { ...rest, id: _id!.toString() };
+  mapFromDbToViewModel(obj: WithId<BlogDbType>): BlogViewModel {
+    return {
+      id: obj._id.toString(),
+      createdAt: obj.createdAt,
+      description: obj.description,
+      isMembership: obj.isMembership,
+      name: obj.name,
+      websiteUrl: obj.websiteUrl,
+    };
   },
 };
