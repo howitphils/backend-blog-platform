@@ -6,7 +6,7 @@ export const authController = {
   async checkUser(req: Request<{}, {}, LoginInputModel>, res: Response) {
     const isExisting = await usersService.checkUser(req.body);
     if (!isExisting) {
-      res.status(401);
+      res.sendStatus(401);
       return;
     }
     res.sendStatus(204);

@@ -39,7 +39,7 @@ export const usersQueryRepository = {
       .toArray();
 
     // Получаем число всех юзеров
-    const totalCount = await usersCollection.countDocuments();
+    const totalCount = await usersCollection.countDocuments(createFilter());
 
     return {
       page: pageNumber,
