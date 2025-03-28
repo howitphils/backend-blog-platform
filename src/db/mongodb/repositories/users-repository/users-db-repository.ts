@@ -15,7 +15,7 @@ export const usersRepository = {
     return deleteResult.deletedCount === 1;
   },
 
-  // Получение по логин/мейлу (для логинизации или проверки существования юзера)
+  // Получение юзера по логин/мейлу (для логинизации или проверки существования юзера)
   async getUserByCredentials(loginOrEmail: string): Promise<UserDbType | null> {
     return usersCollection.findOne({
       $or: [
