@@ -26,12 +26,15 @@ export const usersController = {
     const createResult = await usersService.createNewUser(req.body);
 
     // Если пришел объект с ошибкой
-    if (typeof createResult === "object") {
-      res.status(400).json(createResult);
-      return;
-    }
+    // if (createResult) {
+    //   res.status(400).json(createResult);
+    //   return;
+    // }
+
     // Получаем созданного юзера по айди
-    const newUser = await usersQueryRepository.getUserById(createResult);
+    const newUser = await usersQueryRepository.getUserById(
+      createResult as ObjectId
+    );
     res.status(201).json(newUser);
   },
 

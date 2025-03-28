@@ -6,7 +6,11 @@ import { blogsService } from "../../services/blogs-service";
 import { blogsQueryRepository } from "../../db/mongodb/repositories/blogs-repository/blogs-query-repositoy";
 import { mapBlogsQueryParams, mapPostsQueryParams } from "./utils";
 import { postsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
-import { PostInputModel, PostsRequestQueryType } from "../../types/posts-types";
+import {
+  PostForBlogInputModel,
+  PostInputModel,
+  PostsRequestQueryType,
+} from "../../types/posts-types";
 import { postsService } from "../../services/posts-service";
 
 export const blogsController = {
@@ -58,7 +62,7 @@ export const blogsController = {
 
   // Создание нового поста для блога
   async createPostForBlog(
-    req: Request<{ id: ObjectId }, {}, PostInputModel>,
+    req: Request<{ id: ObjectId }, {}, PostForBlogInputModel>,
     res: Response
   ) {
     // Проверка на существование блога
@@ -68,8 +72,16 @@ export const blogsController = {
       res.sendStatus(404);
       return;
     }
+
+    const newPostInputValues: PostInputModel = {
+      blogId: req.params.id.toString(),
+      content: req.body.content,
+      shortDescription: req.body.shortDescription,
+      title: req.body.title,
+    };
+
     // Если блог существует - создаем новый пост
-    const newPostId = await postsService.createNewPost(req.body);
+    const newPostId = await postsService.createNewPost(newPostInputValues);
     // Получаем созданный пост по id
     const newPost = await postsQueryRepository.getPostById(newPostId);
     res.status(201).json(newPost);

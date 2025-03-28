@@ -37,3 +37,9 @@ export type PostsMapedQueryType = {
   pageNumber: number;
   pageSize: number;
 };
+
+export type PostForBlogInputModel = {
+  title: string;
+  shortDescription: string;
+  content: string;
+};
