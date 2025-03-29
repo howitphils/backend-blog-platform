@@ -22,64 +22,38 @@ export const usersQueryRepository = {
     } = filters;
 
     // Cоздаем фильтр
-    // const createFilter = () => {
-    //   return {
-    //     $or: [
-    //       {
-    //         email: searchEmailTerm
-    //           ? { $regex: searchEmailTerm, $options: "i" }
-    //           : {},
-    //       },
-    //       {
-    //         login: searchLoginTerm
-    //           ? { $regex: searchLoginTerm, $options: "i" }
-    //           : {},
-    //       },
-    //     ],
-    //   };
-    //   // return searchEmailTerm
-    //   //   ? { $regex: searchEmailTerm, $options: "i" }
-    //   //   : searchLoginTerm
-    //   //   ? { $regex: searchLoginTerm, $options: "i" }
-    //   //   : {};
-    // };
+    const createFilter = () => {
+      // return {
+      //   $or: [
+      //     {
+      //       email: searchEmailTerm
+      //         ? { $regex: searchEmailTerm, $options: "i" }
+      //         : {},
+      //     },
+      //     {
+      //       login: searchLoginTerm
+      //         ? { $regex: searchLoginTerm, $options: "i" }
+      //         : {},
+      //     },
+      //   ],
+      // };
+      return searchEmailTerm
+        ? { $regex: searchEmailTerm, $options: "i" }
+        : searchLoginTerm
+        ? { $regex: searchLoginTerm, $options: "i" }
+        : {};
+    };
 
     // Получаем юзеров с учетом query параметров
     const users = await usersCollection
-      .find({
-        $or: [
-          {
-            email: searchEmailTerm
-              ? { $regex: searchEmailTerm, $options: "i" }
-              : {},
-          },
-          {
-            login: searchLoginTerm
-              ? { $regex: searchLoginTerm, $options: "i" }
-              : {},
-          },
-        ],
-      })
+      .find(createFilter())
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
       .toArray();
 
     // Получаем число всех юзеров
-    const totalCount = await usersCollection.countDocuments({
-      $or: [
-        {
-          email: searchEmailTerm
-            ? { $regex: searchEmailTerm, $options: "i" }
-            : {},
-        },
-        {
-          login: searchLoginTerm
-            ? { $regex: searchLoginTerm, $options: "i" }
-            : {},
-        },
-      ],
-    });
+    const totalCount = await usersCollection.countDocuments(createFilter());
 
     return {
       page: pageNumber,
