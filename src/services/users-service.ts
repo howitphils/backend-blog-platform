@@ -10,11 +10,14 @@ export const usersService = {
   // Создание нового юзера
   async createNewUser(
     user: UserInputModel
-  ): Promise<ObjectId | OutputErrorsType> {
+  ): Promise<OutputErrorsType | ObjectId> {
     // Добавить проверку на уникальность логина и мейла
     const { email, login, password } = user;
 
-    const existingUser = await usersRepository.getUserByCredentials(login);
+    const existingUser = await usersRepository.getUserByCredentials(
+      login,
+      email
+    );
 
     if (existingUser) {
       const field = existingUser.email === email ? "email" : "login";
@@ -42,7 +45,9 @@ export const usersService = {
   async checkUser(credentials: LoginInputModel): Promise<boolean> {
     const { loginOrEmail, password } = credentials;
 
-    const targetUser = await usersRepository.getUserByCredentials(loginOrEmail);
+    const targetUser = await usersRepository.getUserByLoginOrEmail(
+      loginOrEmail
+    );
     if (!targetUser) {
       return false;
     }

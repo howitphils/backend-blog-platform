@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 export type UserInputModel = {
   login: string;
   email: string;

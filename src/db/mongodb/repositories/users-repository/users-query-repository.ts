@@ -23,25 +23,24 @@ export const usersQueryRepository = {
 
     // Cоздаем фильтр
     const createFilter = () => {
-      // return {
-      //   $or: [
-      //     {
-      //       email: searchEmailTerm
-      //         ? { $regex: searchEmailTerm, $options: "i" }
-      //         : {},
-      //     },
-      //     {
-      //       login: searchLoginTerm
-      //         ? { $regex: searchLoginTerm, $options: "i" }
-      //         : {},
-      //     },
-      //   ],
-      // };
-      return searchEmailTerm
-        ? { $regex: searchEmailTerm, $options: "i" }
-        : searchLoginTerm
-        ? { $regex: searchLoginTerm, $options: "i" }
-        : {};
+      if (searchEmailTerm && searchLoginTerm) {
+        return {
+          $or: [
+            {
+              email: { $regex: searchEmailTerm, $options: "i" },
+            },
+            {
+              login: { $regex: searchLoginTerm, $options: "i" },
+            },
+          ],
+        };
+      } else if (searchEmailTerm) {
+        return { email: { $regex: searchEmailTerm, $options: "i" } };
+      } else if (searchLoginTerm) {
+        return { login: { $regex: searchLoginTerm, $options: "i" } };
+      } else {
+        return {};
+      }
     };
 
     // Получаем юзеров с учетом query параметров

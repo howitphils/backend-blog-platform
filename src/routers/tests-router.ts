@@ -7,3 +7,5 @@ testsRouter.delete("/all-data", async (req, res) => {
   await clearCollections();
   res.sendStatus(204);
 });
+
+testsRouter.post("/insert-users", async (req, res) => {});

@@ -16,11 +16,25 @@ export const usersRepository = {
   },
 
   // Получение юзера по логин/мейлу (для логинизации или проверки существования юзера)
-  async getUserByCredentials(loginOrEmail: string): Promise<UserDbType | null> {
+  async getUserByLoginOrEmail(
+    loginOrEmail: string
+  ): Promise<UserDbType | null> {
     return usersCollection.findOne({
       $or: [
         { email: { $regex: loginOrEmail, $options: "i" } },
         { login: { $regex: loginOrEmail, $options: "i" } },
+      ],
+    });
+  },
+
+  async getUserByCredentials(
+    login: string,
+    email: string
+  ): Promise<UserDbType | null> {
+    return usersCollection.findOne({
+      $or: [
+        { email: { $regex: email, $options: "i" } },
+        { login: { $regex: login, $options: "i" } },
       ],
     });
   },
