@@ -7,6 +7,8 @@ export const jwtAuthGuard = (
   next: NextFunction
 ) => {
   if (!req.headers.authorization) {
+    console.log("no headers");
+
     res.sendStatus(401);
     return;
   }
@@ -14,6 +16,8 @@ export const jwtAuthGuard = (
   const [authType, token] = req.headers.authorization.split(" ");
 
   if (authType !== "Bearer") {
+    console.log("wrong type");
+
     res.sendStatus(401);
     return;
   }
@@ -21,7 +25,9 @@ export const jwtAuthGuard = (
   const verifiedUser = jwtService.verifyToken(token);
 
   if (!verifiedUser) {
+    console.log("no verified");
     res.sendStatus(401);
     return;
   }
+  // Add user to request
 };
