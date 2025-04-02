@@ -1,9 +1,9 @@
 import { Router } from "express";
 
-import { authGuard } from "../middlewares/auth-validator";
+import { authGuard } from "../middlewares/auth/basic-auth-validator";
 import { validateParamsId } from "../middlewares/validateParamsId";
 import { usersController } from "./controllers/users-controller";
-import { userBodyValidators } from "../middlewares/users-body-validators";
+import { userBodyValidators } from "../middlewares/body-validations/users-body-validators";
 import { bodyValidationResult } from "../middlewares/validation-result";
 
 export const usersRouter = Router();

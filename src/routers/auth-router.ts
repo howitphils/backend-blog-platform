@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { bodyValidationResult } from "../middlewares/validation-result";
 import { authController } from "./controllers/auth-controller";
-import { loginBodyValidators } from "../middlewares/login-body-validators";
+import { loginBodyValidators } from "../middlewares/body-validations/login-body-validators";
 
 export const authRouter = Router();
 

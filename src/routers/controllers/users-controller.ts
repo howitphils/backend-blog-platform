@@ -1,15 +1,20 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import { UserInputModel, UsersRequestQueryType } from "../../types/users-types";
+import {
+  UserInputModel,
+  UsersRequestQueryType,
+  UserViewModel,
+} from "../../types/users-types";
 import { usersQueryRepository } from "../../db/mongodb/repositories/users-repository/users-query-repository";
 import { usersService } from "../../services/users-service";
 import { mapUsersQueryParams } from "./utils";
+import { PaginationType } from "../../types/blogs-types";
 
 export const usersController = {
   // Получение юзеров
   async getUsers(
     req: Request<{}, {}, {}, UsersRequestQueryType>,
-    res: Response
+    res: Response<PaginationType<UserViewModel>>
   ) {
     // Преобразуем query параметры в нужный формат
     const mapedQueryParams = mapUsersQueryParams(req.query);
@@ -35,6 +40,7 @@ export const usersController = {
     const newUser = await usersQueryRepository.getUserById(
       createResult as ObjectId
     );
+
     res.status(201).json(newUser);
   },
 

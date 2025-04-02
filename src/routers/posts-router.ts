@@ -1,8 +1,8 @@
 import { bodyValidationResult } from "./../middlewares/validation-result";
-import { postsBodyValidator } from "../middlewares/posts-body-validators";
+import { postsBodyValidator } from "../middlewares/body-validations/posts-body-validators";
 import { Router } from "express";
 
-import { authGuard } from "../middlewares/auth-validator";
+import { authGuard } from "../middlewares/auth/basic-auth-validator";
 import { postsController } from "./controllers/posts-controller";
 import { validateParamsId } from "../middlewares/validateParamsId";
 
