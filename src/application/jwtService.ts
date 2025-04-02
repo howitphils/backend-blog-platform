@@ -9,4 +9,11 @@ export const jwtService = {
     });
     return token;
   },
+  verifyToken(token: string) {
+    try {
+      const userId = jwt.verify(token, SETTINGS.JWT_SECRET);
+    } catch (error) {
+      return null;
+    }
+  },
 };

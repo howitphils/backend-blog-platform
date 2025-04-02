@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { LoginInputModel } from "../types/login-types";
@@ -41,17 +41,25 @@ export const usersService = {
   },
 
   // Проверка на существование юзера
-  async checkUser(credentials: LoginInputModel): Promise<boolean> {
+  async checkUser(
+    credentials: LoginInputModel
+  ): Promise<WithId<UserDbType> | null> {
     const { loginOrEmail, password } = credentials;
 
     const targetUser = await usersRepository.getUserByLoginOrEmail(
       loginOrEmail
     );
     if (!targetUser) {
-      return false;
+      return null;
     }
 
-    return bcrypt.compare(password, targetUser.passHash);
+    const isCorrect = await bcrypt.compare(password, targetUser.passHash);
+
+    if (isCorrect) {
+      return targetUser;
+    } else {
+      return null;
+    }
   },
 
   // Удаление юзера

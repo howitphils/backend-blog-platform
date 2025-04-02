@@ -19,5 +19,5 @@ export const SETTINGS = {
     POSTS_COLLECTION_NAME: "posts",
     USERS_COLLECTION_NAME: "users",
   },
-  JWT_SECRET: process.env.JWT_SECRET || "YOUR_SECRET_JWT_KEY",
+  JWT_SECRET: process.env.JWT_SECRET || "TEST_KEY",
 };

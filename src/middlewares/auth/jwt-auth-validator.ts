@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { jwtService } from "../../application/jwtService";
 
 export const jwtAuthGuard = (
   req: Request,
@@ -14,5 +15,13 @@ export const jwtAuthGuard = (
 
   if (authType !== "Bearer") {
     res.sendStatus(401);
+    return;
+  }
+
+  const verifiedUser = jwtService.verifyToken(token);
+
+  if (!verifiedUser) {
+    res.sendStatus(401);
+    return;
   }
 };

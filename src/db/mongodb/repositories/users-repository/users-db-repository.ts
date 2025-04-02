@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { usersCollection } from "../../mongodb";
 import { UserDbType } from "../../../../types/users-types";
 
@@ -18,7 +18,7 @@ export const usersRepository = {
   // Получение юзера по логин/мейлу (для логинизации или проверки существования юзера)
   async getUserByLoginOrEmail(
     loginOrEmail: string
-  ): Promise<UserDbType | null> {
+  ): Promise<WithId<UserDbType> | null> {
     return usersCollection.findOne({
       $or: [
         { email: { $regex: loginOrEmail, $options: "i" } },
@@ -30,7 +30,7 @@ export const usersRepository = {
   async getUserByCredentials(
     login: string,
     email: string
-  ): Promise<UserDbType | null> {
+  ): Promise<WithId<UserDbType> | null> {
     return usersCollection.findOne({
       $or: [
         { email: { $regex: email, $options: "i" } },

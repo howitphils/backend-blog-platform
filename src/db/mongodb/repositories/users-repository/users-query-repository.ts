@@ -59,18 +59,18 @@ export const usersQueryRepository = {
       pagesCount: Math.ceil(totalCount / pageSize),
       pageSize: pageSize,
       totalCount,
-      items: users.map(this.mapFromDbToViewModel),
+      items: users.map(this._mapFromDbToViewModel),
     };
   },
 
   async getUserById(_id: ObjectId): Promise<UserViewModel | null> {
     const targetUser = await usersCollection.findOne({ _id });
     if (!targetUser) return null;
-    return this.mapFromDbToViewModel(targetUser);
+    return this._mapFromDbToViewModel(targetUser);
   },
 
   // Преобразование юзера из формата базы данных в формат, который ожидает клиент
-  mapFromDbToViewModel(user: WithId<UserDbType>): UserViewModel {
+  _mapFromDbToViewModel(user: WithId<UserDbType>): UserViewModel {
     const { createdAt, email, login, _id } = user;
     return {
       id: _id!.toString(),
