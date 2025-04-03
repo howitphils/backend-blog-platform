@@ -41,7 +41,7 @@ export const blogsQueryRepository = {
       pagesCount: Math.ceil(totalCount / pageSize),
       pageSize: pageSize,
       totalCount,
-      items: blogs.map(this.mapFromDbToViewModel),
+      items: blogs.map(this._mapFromDbToViewModel),
     };
   },
 
@@ -49,14 +49,14 @@ export const blogsQueryRepository = {
   async getBlogById(_id: ObjectId): Promise<BlogViewModel | null> {
     const targetBlog = await blogsCollection.findOne({ _id });
     if (targetBlog) {
-      return this.mapFromDbToViewModel(targetBlog);
+      return this._mapFromDbToViewModel(targetBlog);
     } else {
       return null;
     }
   },
 
   // Преобразование данных из БД в формат, который будет отправлен клиенту
-  mapFromDbToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
+  _mapFromDbToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
     return {
       id: blog._id.toString(),
       createdAt: blog.createdAt,

@@ -2,7 +2,7 @@ import { MongoClient } from "mongodb";
 import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
 import { SETTINGS } from "../src/settings";
 import { req } from "./test-helpers";
-import { encodedCredentials } from "../src/middlewares/auth-validator";
+import { encodedCredentials } from "../src/middlewares/auth/basic-auth-validator";
 
 describe("/users", () => {
   let client: MongoClient;

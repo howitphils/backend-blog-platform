@@ -6,12 +6,11 @@ import { bodyValidationResult } from "../middlewares/validation-result";
 import { blogsController } from "./controllers/blogs-controller";
 import { validateParamsId } from "../middlewares/validateParamsId";
 import { postsBodyValidator } from "../middlewares/body-validations/posts-body-validators";
-import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 
 export const blogsRouter = Router();
 
 // Получение всех блогов
-blogsRouter.get("/", jwtAuthGuard, blogsController.getBlogs);
+blogsRouter.get("/", blogsController.getBlogs);
 
 // Получение блога по айди
 blogsRouter.get("/:id", validateParamsId, blogsController.getBlogById);

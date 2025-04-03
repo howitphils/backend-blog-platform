@@ -1,8 +1,7 @@
 import { MongoClient } from "mongodb";
 import { runDb } from "../src/db/mongodb/mongodb";
 import { SETTINGS } from "../src/settings";
-import { req } from "./test-helpers";
-import { encodedCredentials } from "../src/middlewares/auth-validator";
+import { basicAuth, req } from "./test-helpers";
 
 describe("/auth", () => {
   let client: MongoClient;
@@ -11,14 +10,11 @@ describe("/auth", () => {
     // Создаем новое тестовое соединение
     client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
 
-    const res = await req
-      .post(SETTINGS.PATHS.USERS)
-      .set("Authorization", `Basic ${encodedCredentials}`)
-      .send({
-        login: "new-user",
-        password: "string",
-        email: "example@example.com",
-      });
+    const res = await req.post(SETTINGS.PATHS.USERS).set(basicAuth).send({
+      login: "new-user",
+      password: "string",
+      email: "example@example.com",
+    });
 
     expect(res.status).toBe(201);
   });
@@ -35,7 +31,8 @@ describe("/auth", () => {
       password: "string",
     });
 
-    expect(res.status).toBe(204);
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("accessToken");
   });
 
   it("it should not login a not existing user", async () => {

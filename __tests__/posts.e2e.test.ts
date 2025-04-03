@@ -1,8 +1,7 @@
 import { MongoClient } from "mongodb";
-import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
-import { encodedCredentials } from "../src/middlewares/auth-validator";
+import { runDb } from "../src/db/mongodb/mongodb";
 import { SETTINGS } from "../src/settings";
-import { req } from "./test-helpers";
+import { basicAuth, defaultPagination, req } from "./test-helpers";
 
 describe("/posts", () => {
   let client: MongoClient;
@@ -13,23 +12,20 @@ describe("/posts", () => {
     client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
 
     // Очищаем коллекции
-    await clearCollections();
+    await req.delete(SETTINGS.PATHS.TESTS + "/all-data").expect(204);
 
     // Создаем тестовый блог
-    const res = await req
-      .post(SETTINGS.PATHS.BLOGS)
-      .send({
-        name: "for tests",
-        description: "testing blog",
-        websiteUrl:
-          "https://4fd52Gm05tw-H.IvRO784KcLEXZfMiGH2HCCBknni9Lb3fslAoStogClBLYb2oLnvcbatCNWUIdxhxr_j.PNjEnWql3u",
-      })
-      .set("Authorization", `Basic ${encodedCredentials}`);
+    const res = await req.post(SETTINGS.PATHS.BLOGS).set(basicAuth).send({
+      name: "for tests",
+      description: "testing blog",
+      websiteUrl: "https://4fd52G",
+    });
 
     blogId = res.body.id;
 
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty("name");
+    expect(res.body).toHaveProperty("id");
   });
 
   afterAll(async () => {
@@ -42,65 +38,84 @@ describe("/posts", () => {
     const res = await req.get(SETTINGS.PATHS.POSTS);
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("items");
-    expect(res.body).toHaveProperty("page");
-    expect(res.body).toHaveProperty("totalCount");
-    expect(res.body.items.length).toBe(0);
+    expect(res.body).toEqual(defaultPagination);
   });
 
   let newPostId = "";
   it("should create new post", async () => {
-    const res = await req
-      .post(SETTINGS.PATHS.POSTS)
-      .set("authorization", `Basic ${encodedCredentials}`)
-      .send({
-        title: "string",
-        shortDescription: "string",
-        content: "string",
-        blogId,
-      });
+    const res = await req.post(SETTINGS.PATHS.POSTS).set(basicAuth).send({
+      title: "new post",
+      shortDescription: "description of new post",
+      content: "hi",
+      blogId,
+    });
+
     newPostId = res.body.id;
+
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty("id");
-    expect(res.body).toHaveProperty("shortDescription");
-    expect(res.body).toHaveProperty("blogId");
-    expect(res.body).toHaveProperty("title");
-    expect(res.body).toHaveProperty("content");
+    expect(res.body).toEqual({
+      id: expect.any(String),
+      title: "new post",
+      shortDescription: "description of new post",
+      content: "hi",
+      blogId: blogId,
+      blogName: expect.any(String),
+      createdAt: expect.any(String),
+    });
   });
 
   it("should return a post by id", async () => {
     const res = await req.get(SETTINGS.PATHS.POSTS + `/${newPostId}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("id");
-    expect(res.body).toHaveProperty("shortDescription");
-    expect(res.body).toHaveProperty("blogId");
-    expect(res.body).toHaveProperty("title");
-    expect(res.body).toHaveProperty("content");
+    expect(res.body).toEqual({
+      id: newPostId,
+      title: "new post",
+      shortDescription: "description of new post",
+      content: "hi",
+      blogId: blogId,
+      blogName: expect.any(String),
+      createdAt: expect.any(String),
+    });
   });
 
   it("should update the post", async () => {
     const res = await req
       .put(SETTINGS.PATHS.POSTS + `/${newPostId}`)
-      .set("Authorization", `Basic ${encodedCredentials}`)
+      .set(basicAuth)
       .send({
-        title: "string",
-        shortDescription: "string",
-        content: "string",
+        title: "new-title",
+        shortDescription: "new-description",
+        content: "new-content",
         blogId,
       });
 
     expect(res.status).toBe(204);
   });
 
+  it("should return updated post", async () => {
+    const res = await req.get(SETTINGS.PATHS.POSTS + `/${newPostId}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      id: newPostId,
+      title: "new-title",
+      shortDescription: "new-description",
+      content: "new-content",
+      blogId: blogId,
+      blogName: expect.any(String),
+      createdAt: expect.any(String),
+    });
+  });
+
   it("should not update the post with incorrect input values", async () => {
     const res = await req
       .put(SETTINGS.PATHS.POSTS + `/${newPostId}`)
-      .set("Authorization", `Basic ${encodedCredentials}`)
+      .set(basicAuth)
       .send({
         title: "",
-        shortDescription: "string",
-        content: "string",
+        shortDescription: 22,
+        content: false,
         blogId: "12",
       });
 
@@ -108,15 +123,12 @@ describe("/posts", () => {
   });
 
   it("should not create new post with incorrect input values", async () => {
-    const res = await req
-      .post(SETTINGS.PATHS.POSTS)
-      .set("authorization", `Basic ${encodedCredentials}`)
-      .send({
-        title: "",
-        shortDescription: 10,
-        content: "string",
-        blogId,
-      });
+    const res = await req.post(SETTINGS.PATHS.POSTS).set(basicAuth).send({
+      title: "",
+      shortDescription: 10,
+      content: false,
+      blogId,
+    });
     expect(res.status).toBe(400);
   });
 
@@ -129,35 +141,20 @@ describe("/posts", () => {
   it("should not update the post by incorrect id", async () => {
     const res = await req
       .put(SETTINGS.PATHS.POSTS + "/22")
-      .set("Authorization", `Basic ${encodedCredentials}`)
-      .send({
-        title: "string",
-        shortDescription: "string",
-        content: "string",
-        blogId,
-      });
+      .set(basicAuth)
+      .send({});
 
     expect(res.status).toBe(404);
   });
 
   it("should not update the post by unauthorized user", async () => {
-    const res = await req.put(SETTINGS.PATHS.POSTS + `/${newPostId}`).send({
-      title: "string",
-      shortDescription: "string",
-      content: "string",
-      blogId,
-    });
+    const res = await req.put(SETTINGS.PATHS.POSTS + `/${newPostId}`).send({});
 
     expect(res.status).toBe(401);
   });
 
   it("should not create new post by unauthorized user", async () => {
-    const res = await req.post(SETTINGS.PATHS.POSTS).send({
-      title: "string",
-      shortDescription: "string",
-      content: "string",
-      blogId,
-    });
+    const res = await req.post(SETTINGS.PATHS.POSTS).send({});
 
     expect(res.status).toBe(401);
   });
@@ -169,9 +166,7 @@ describe("/posts", () => {
   });
 
   it("should not delete the post by incorrect id", async () => {
-    const res = await req
-      .delete(SETTINGS.PATHS.POSTS + "/22")
-      .set("Authorization", `Basic ${encodedCredentials}`);
+    const res = await req.delete(SETTINGS.PATHS.POSTS + "/22").set(basicAuth);
 
     expect(res.status).toBe(404);
   });
@@ -179,7 +174,7 @@ describe("/posts", () => {
   it("should delete the post", async () => {
     const res = await req
       .delete(SETTINGS.PATHS.POSTS + `/${newPostId}`)
-      .set("Authorization", `Basic ${encodedCredentials}`);
+      .set(basicAuth);
 
     expect(res.status).toBe(204);
   });

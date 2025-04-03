@@ -1,16 +1,16 @@
 import { MongoClient } from "mongodb";
-import { encodedCredentials } from "../src/middlewares/auth-validator";
 import { SETTINGS } from "../src/settings";
-import { req } from "./test-helpers";
-import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
+import { basicAuth, defaultPagination, req } from "./test-helpers";
+import { runDb } from "../src/db/mongodb/mongodb";
 
 describe("/blogs", () => {
   let client: MongoClient;
+
   beforeAll(async () => {
     // Создаем новое тестовое соединение
     client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
     // Очищаем коллекции
-    await clearCollections();
+    await req.delete(SETTINGS.PATHS.TESTS + "/all-data").expect(204);
   });
 
   afterAll(async () => {
@@ -23,49 +23,51 @@ describe("/blogs", () => {
     const res = await req.get(SETTINGS.PATHS.BLOGS);
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("items");
-    expect(res.body).toHaveProperty("page");
-    expect(res.body).toHaveProperty("totalCount");
-    expect(res.body.items.length).toBe(0);
+    expect(res.body).toEqual(defaultPagination);
   });
 
   let newBlogId = "";
   it("should create new blog", async () => {
-    const res = await req
-      .post(SETTINGS.PATHS.BLOGS)
-      .set("Authorization", `Basic ${encodedCredentials}`)
-      .send({
-        name: "test-blog",
-        description: "for tests",
-        websiteUrl:
-          "https://prCzBUZX3K470uTKkNarDsYVFRAuTgO69cNATgDtBoH69Z3H.X93fa_hi1VVPvCJLchzT29V245-7s3ET5UsFtWYTT.c",
-      });
+    const res = await req.post(SETTINGS.PATHS.BLOGS).set(basicAuth).send({
+      name: "test-blog",
+      description: "for tests",
+      websiteUrl: "https://prCzB",
+    });
     newBlogId = res.body.id;
+
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty("id");
-    expect(res.body).toHaveProperty("description");
-    expect(res.body).toHaveProperty("websiteUrl");
+    expect(res.body).toEqual({
+      id: expect.any(String),
+      name: "test-blog",
+      description: "for tests",
+      websiteUrl: "https://prCzB",
+      createdAt: expect.any(String),
+      isMembership: false,
+    });
   });
 
   it("should return a blog by id", async () => {
     const res = await req.get(SETTINGS.PATHS.BLOGS + `/${newBlogId}`);
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty("id");
-    expect(res.body).toHaveProperty("description");
-    expect(res.body).toHaveProperty("websiteUrl");
-    expect(res.body).toHaveProperty("name");
+    expect(res.body).toEqual({
+      id: newBlogId,
+      name: "test-blog",
+      description: "for tests",
+      websiteUrl: "https://prCzB",
+      createdAt: expect.any(String),
+      isMembership: false,
+    });
   });
 
   it("should update the blog", async () => {
     const res = await req
       .put(SETTINGS.PATHS.BLOGS + `/${newBlogId}`)
-      .set("Authorization", `Basic ${encodedCredentials}`)
+      .set(basicAuth)
       .send({
         name: "string",
         description: "string",
-        websiteUrl:
-          "https://CFmtGHgSrdK8RAi17yWDxkrSSDfIhNhEeoRyfrni-qLwAczJc1se-ZON5AHM9zbzrAwbn2gVR37SF2i8seXTNpsmD.9L",
+        websiteUrl: "https://CFhjd",
       });
 
     expect(res.status).toBe(204);
@@ -77,16 +79,13 @@ describe("/blogs", () => {
     );
 
     expect(res.status).toBe(200);
-    expect(res.body.items.length).toBe(0);
-    expect(res.body).toHaveProperty("items");
-    expect(res.body).toHaveProperty("page");
-    expect(res.body).toHaveProperty("totalCount");
+    expect(res.body).toEqual(defaultPagination);
   });
 
   it("should create new post for a specific blog", async () => {
     const res = await req
       .post(SETTINGS.PATHS.BLOGS + `/${newBlogId}` + "/posts")
-      .set("Authorization", `Basic ${encodedCredentials}`)
+      .set(basicAuth)
       .send({
         title: "new post",
         shortDescription: "description of new post",
@@ -95,22 +94,22 @@ describe("/blogs", () => {
       });
 
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty("shortDescription");
-    expect(res.body).toHaveProperty("id");
-    expect(res.body).toHaveProperty("title");
-    expect(res.body).toHaveProperty("content");
+    expect(res.body).toEqual({
+      id: expect.any(String),
+      title: "new post",
+      shortDescription: "description of new post",
+      content: "hi",
+      blogId: newBlogId,
+      blogName: expect.any(String),
+      createdAt: expect.any(String),
+    });
   });
 
   it("should not create new post for a specific blog with incorrect blogId", async () => {
     const res = await req
-      .post(SETTINGS.PATHS.BLOGS + `/22` + "/posts")
-      .set("Authorization", `Basic ${encodedCredentials}`)
-      .send({
-        title: "new post",
-        shortDescription: "description of new post",
-        content: "hi",
-        blogId: "22",
-      });
+      .post(SETTINGS.PATHS.BLOGS + "/22/posts")
+      .set(basicAuth)
+      .send({});
 
     expect(res.status).toBe(404);
   });
@@ -118,7 +117,7 @@ describe("/blogs", () => {
   it("should not create new post for a specific blog with incorrect input values", async () => {
     const res = await req
       .post(SETTINGS.PATHS.BLOGS + `/${newBlogId}` + "/posts")
-      .set("Authorization", `Basic ${encodedCredentials}`)
+      .set(basicAuth)
       .send({
         title: "",
         shortDescription: 29,
@@ -132,12 +131,7 @@ describe("/blogs", () => {
   it("should not create new post for a specific blog without authorization", async () => {
     const res = await req
       .post(SETTINGS.PATHS.BLOGS + `/${newBlogId}` + "/posts")
-      .send({
-        title: "asd",
-        shortDescription: "dasd",
-        content: "hi",
-        blogId: newBlogId,
-      });
+      .send({});
 
     expect(res.status).toBe(401);
   });
@@ -151,48 +145,33 @@ describe("/blogs", () => {
   it("should not update the blog with incorrect input values", async () => {
     const res = await req
       .put(SETTINGS.PATHS.BLOGS + `/${newBlogId}`)
-      .set("Authorization", `Basic ${encodedCredentials}`)
+      .set(basicAuth)
       .send({
         name: "",
         description: 22,
-        websiteUrl:
-          "https://7yBv92fgGo0t8xC3fw0diQSX_pM5.1JBYMWGV_S16tDf.bRumPCkBd3AU9593hmWkAtecZy9O1gU4wAbmwbzGkSOHlL4",
+        websiteUrl: "not_an_url",
       });
 
     expect(res.status).toBe(400);
   });
 
   it("should not create new blog with incorrect input values", async () => {
-    const res = await req
-      .post(SETTINGS.PATHS.BLOGS)
-      .set("Authorization", `Basic ${encodedCredentials}`)
-      .send({
-        name: 22,
-        description: 10,
-        websiteUrl:
-          "https://7yBv92fgGo0t8xC3fw0diQSX_pM5.1JBYMWGV_S16tDf.bRumPCkBd3AU9593hmWkAtecZy9O1gU4wAbmwbzGkSOHlL4",
-      });
+    const res = await req.post(SETTINGS.PATHS.BLOGS).set(basicAuth).send({
+      name: 22,
+      description: 10,
+      websiteUrl: "not_an_url",
+    });
     expect(res.status).toBe(400);
   });
 
   it("should not update the blog by unauthorized user", async () => {
-    const res = await req.put(SETTINGS.PATHS.BLOGS + `/${newBlogId}`).send({
-      name: "string",
-      description: "string",
-      websiteUrl:
-        "https://7yBv92fgGo0t8xC3fw0diQSX_pM5.1JBYMWGV_S16tDf.bRumPCkBd3AU9593hmWkAtecZy9O1gU4wAbmwbzGkSOHlL4",
-    });
+    const res = await req.put(SETTINGS.PATHS.BLOGS + `/${newBlogId}`).send({});
 
     expect(res.status).toBe(401);
   });
 
   it("should not create new blog by unauthorized user", async () => {
-    const res = await req.post(SETTINGS.PATHS.BLOGS).send({
-      name: "string",
-      description: "string",
-      websiteUrl:
-        "https://7yBv92fgGo0t8xC3fw0diQSX_pM5.1JBYMWGV_S16tDf.bRumPCkBd3AU9593hmWkAtecZy9O1gU4wAbmwbzGkSOHlL4",
-    });
+    const res = await req.post(SETTINGS.PATHS.BLOGS).send({});
 
     expect(res.status).toBe(401);
   });
@@ -212,21 +191,14 @@ describe("/blogs", () => {
   it("should not update the blog with incorrect id", async () => {
     const res = await req
       .put(SETTINGS.PATHS.BLOGS + "/22")
-      .set("Authorization", `Basic ${encodedCredentials}`)
-      .send({
-        name: "string",
-        description: "string",
-        websiteUrl:
-          "https://CFmtGHgSrdK8RAi17yWDxkrSSDfIhNhEeoRyfrni-qLwAczJc1se-ZON5AHM9zbzrAwbn2gVR37SF2i8seXTNpsmD.9L",
-      });
+      .set(basicAuth)
+      .send({});
 
     expect(res.status).toBe(404);
   });
 
   it("should not delete the blog with incorrect id", async () => {
-    const res = await req
-      .delete(SETTINGS.PATHS.BLOGS + "/22")
-      .set("Authorization", `Basic ${encodedCredentials}`);
+    const res = await req.delete(SETTINGS.PATHS.BLOGS + "/22").set(basicAuth);
 
     expect(res.status).toBe(404);
   });
@@ -234,7 +206,7 @@ describe("/blogs", () => {
   it("should delete the blog", async () => {
     const res = await req
       .delete(SETTINGS.PATHS.BLOGS + `/${newBlogId}`)
-      .set("Authorization", `Basic ${encodedCredentials}`);
+      .set(basicAuth);
 
     expect(res.status).toBe(204);
   });

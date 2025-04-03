@@ -11,8 +11,8 @@ export const jwtService = {
   },
   verifyToken(token: string) {
     try {
-      const verified = jwt.verify(token, SETTINGS.JWT_SECRET) as JwtPayload;
-      return verified.userId;
+      const payload = jwt.verify(token, SETTINGS.JWT_SECRET) as JwtPayload;
+      return payload.userId;
     } catch (error) {
       return null;
     }

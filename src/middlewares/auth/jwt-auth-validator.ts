@@ -25,9 +25,9 @@ export const jwtAuthGuard = (
   const verifiedUser = jwtService.verifyToken(token);
 
   if (!verifiedUser) {
-    console.log("no verified");
+    console.log("not verified");
     res.sendStatus(401);
     return;
   }
-  // Add user to request
+  // Add user to request + next()
 };
