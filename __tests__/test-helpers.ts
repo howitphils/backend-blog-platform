@@ -13,3 +13,19 @@ export const defaultPagination = {
   totalCount: 0,
   items: [],
 };
+
+export const createUserDto = ({
+  login,
+  email,
+  password,
+}: {
+  login?: string;
+  email?: string;
+  password?: string;
+}) => {
+  return {
+    login: login ?? "new-user",
+    email: email ?? "example@gmail.com",
+    password: password ?? "asdzxcqewq",
+  };
+};
