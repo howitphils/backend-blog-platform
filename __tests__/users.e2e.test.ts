@@ -25,6 +25,31 @@ describe("/users", () => {
     console.log("Connection closed");
   });
 
+  // describe("get Users", () => {
+  //   beforeAll(async () => {
+  //     await createUsersInDb(10);
+  //   });
+
+  //   afterAll(async () => {
+  //     await req.delete(SETTINGS.PATHS.TESTS + "/all-data").expect(204);
+  //   });
+
+  //   it("should return all users", async () => {
+  //     const res = await req
+  //       .get(SETTINGS.PATHS.USERS + "?pageNumber=2&pageSize=2")
+  //       .set(basicAuth)
+  //       .expect(200);
+
+  //     expect(res.body).toEqual({
+  //       pagesCount: 0,
+  //       page: 1,
+  //       pageSize: 10,
+  //       totalCount: 0,
+  //       items: [],
+  //     });
+  //   });
+  // });
+
   it("should return all users", async () => {
     const res = await req.get(SETTINGS.PATHS.USERS).set(basicAuth).expect(200);
 

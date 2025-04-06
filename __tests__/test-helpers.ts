@@ -1,7 +1,7 @@
 import { agent } from "supertest";
 import { app } from "../src/app";
 import { encodedCredentials } from "../src/middlewares/auth/basic-auth-validator";
-import { userDtoType } from "../src/types/users-types";
+import { userDtoType, UserViewModel } from "../src/types/users-types";
 import { SETTINGS } from "../src/settings";
 
 export const req = agent(app);
@@ -20,20 +20,31 @@ export const createUserDto = ({ login, email, password }: userDtoType) => {
   return {
     login: login ?? "new-user",
     email: email ?? "example@gmail.com",
-    password: password ?? "asdzxcqewq",
+    password: password ?? "string",
   };
 };
 
-export const createUserInDb = async (user: userDtoType) => {
-  await req.post(SETTINGS.PATHS.USERS).set(basicAuth).send(user).expect(201);
+export const createNewUserInDb = async (
+  user: userDtoType
+): Promise<UserViewModel> => {
+  const res = await req
+    .post(SETTINGS.PATHS.USERS)
+    .set(basicAuth)
+    .send(user)
+    .expect(201);
+
+  return res.body;
 };
 
 export const createUsersInDb = async (count: number) => {
+  const users: UserViewModel[] = [];
   for (let i = 1; i <= count; i++) {
-    await createUserInDb({
+    const user = await createNewUserInDb({
       login: `user${i}`,
       email: `users${i}@gmail.com`,
       password: `users${i}`,
     });
+    users.push(user);
   }
+  return users;
 };
