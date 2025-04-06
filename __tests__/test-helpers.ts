@@ -4,7 +4,7 @@ import { encodedCredentials } from "../src/middlewares/auth/basic-auth-validator
 import { UserDtoType, UserViewModel } from "../src/types/users-types";
 import { SETTINGS } from "../src/settings";
 import { BlogDtoType, BlogViewModel } from "../src/types/blogs-types";
-import { PostDtoType } from "../src/types/posts-types";
+import { PostDtoType, PostViewModel } from "../src/types/posts-types";
 
 export const req = agent(app);
 
@@ -88,4 +88,19 @@ export const createPostDto = ({
     content: content ?? "new-content",
     shortDescription: shortDescription ?? "new-short-description",
   };
+};
+
+export const createNewPostInDb = async (
+  post?: PostDtoType
+): Promise<PostViewModel> => {
+  if (!post) {
+    post = createPostDto({});
+  }
+  const res = await req
+    .post(SETTINGS.PATHS.BLOGS)
+    .set(basicAuth)
+    .send(post)
+    .expect(201);
+
+  return res.body;
 };

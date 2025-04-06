@@ -1,79 +1,79 @@
 import { MongoClient } from "mongodb";
 import { runDb } from "../src/db/mongodb/mongodb";
 import { SETTINGS } from "../src/settings";
-import { basicAuth, defaultPagination, req } from "./test-helpers";
+import {
+  basicAuth,
+  createNewBlogInDb,
+  createNewPostInDb,
+  createPostDto,
+  defaultPagination,
+  req,
+} from "./test-helpers";
 
 describe("/posts", () => {
   let client: MongoClient;
-  let blogId = "";
 
   beforeAll(async () => {
-    // Создаем новое тестовое соединение
     client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+  });
 
-    // Очищаем коллекции
+  beforeEach(async () => {
     await req.delete(SETTINGS.PATHS.TESTS + "/all-data").expect(204);
-
-    // Создаем тестовый блог
-    const res = await req.post(SETTINGS.PATHS.BLOGS).set(basicAuth).send({
-      name: "for tests",
-      description: "testing blog",
-      websiteUrl: "https://4fd52G",
-    });
-
-    blogId = res.body.id;
-
-    expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty("name");
-    expect(res.body).toHaveProperty("id");
   });
 
   afterAll(async () => {
-    // Закрываем коннект с дб
     await client.close();
     console.log("Connection closed");
   });
 
   it("should return all posts", async () => {
-    const res = await req.get(SETTINGS.PATHS.POSTS);
+    const res = await req.get(SETTINGS.PATHS.POSTS).expect(200);
 
-    expect(res.status).toBe(200);
     expect(res.body).toEqual(defaultPagination);
   });
 
-  let newPostId = "";
   it("should create new post", async () => {
-    const res = await req.post(SETTINGS.PATHS.POSTS).set(basicAuth).send({
-      title: "new post",
-      shortDescription: "description of new post",
-      content: "hi",
-      blogId,
-    });
+    const blogDb = await createNewBlogInDb();
+    const newPostDto = createPostDto({});
 
-    newPostId = res.body.id;
+    const res = await req
+      .post(SETTINGS.PATHS.POSTS)
+      .set(basicAuth)
+      .send({
+        ...newPostDto,
+        blogId: blogDb.id,
+      })
+      .expect(201);
 
-    expect(res.status).toBe(201);
     expect(res.body).toEqual({
       id: expect.any(String),
-      title: "new post",
-      shortDescription: "description of new post",
-      content: "hi",
-      blogId: blogId,
+      title: newPostDto.title,
+      shortDescription: newPostDto.shortDescription,
+      content: newPostDto.content,
+      blogId: blogDb.id,
       blogName: expect.any(String),
       createdAt: expect.any(String),
     });
+
+    const postsRes = await req.get(SETTINGS.PATHS.POSTS).expect(200);
+
+    expect(postsRes.body.items.length).toBe(1);
   });
 
   it("should return a post by id", async () => {
-    const res = await req.get(SETTINGS.PATHS.POSTS + `/${newPostId}`);
+    const blogDb = await createNewBlogInDb();
+    const postDb = await createNewPostInDb();
 
-    expect(res.status).toBe(200);
+    const res = await req
+      .get(SETTINGS.PATHS.POSTS + `/${postDb.id}`)
+      .expect(200);
+
     expect(res.body).toEqual({
-      id: newPostId,
-      title: "new post",
-      shortDescription: "description of new post",
-      content: "hi",
-      blogId: blogId,
+      id: postDb.id,
+      title: postDb.title,
+      shortDescription: postDb.shortDescription,
+      content: postDb.content,
+      blogId: postDb.blogId,
       blogName: expect.any(String),
       createdAt: expect.any(String),
     });
