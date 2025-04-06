@@ -20,7 +20,7 @@ describe("/users", () => {
   });
 
   afterAll(async () => {
-    // Закрываем коннект с дб
+    // Закрываем коннект с бд
     await client.close();
     console.log("Connection closed");
   });
@@ -33,31 +33,31 @@ describe("/users", () => {
 
   let userId = "";
   it("should create a user", async () => {
-    const newUser = createUserDto({});
+    const newUserDto = createUserDto({});
 
     const res = await req
       .post(SETTINGS.PATHS.USERS)
       .set(basicAuth)
-      .send(newUser)
+      .send(newUserDto)
       .expect(201);
 
     userId = res.body.id;
 
     expect(res.body).toEqual({
       id: expect.any(String),
-      login: newUser.login,
-      email: newUser.email,
+      login: newUserDto.login,
+      email: newUserDto.email,
       createdAt: expect.any(String),
     });
   });
 
   it("should not create a user with duplicated login", async () => {
-    const newUser = createUserDto({ email: "exadas@mail.ru" });
+    const newUserDto = createUserDto({ email: "exadas@mail.ru" });
 
     const res = await req
       .post(SETTINGS.PATHS.USERS)
       .set(basicAuth)
-      .send(newUser)
+      .send(newUserDto)
       .expect(400);
 
     expect(res.body).toEqual({
@@ -71,12 +71,50 @@ describe("/users", () => {
   });
 
   it("should not create a user with duplicated email", async () => {
-    const newUser = createUserDto({ login: "new-user2" });
+    const newUserDto = createUserDto({ login: "new-user2" });
 
     const res = await req
       .post(SETTINGS.PATHS.USERS)
       .set(basicAuth)
-      .send(newUser)
+      .send(newUserDto)
+      .expect(400);
+
+    expect(res.body).toEqual({
+      errorsMessages: [
+        {
+          field: "email",
+          message: expect.any(String),
+        },
+      ],
+    });
+  });
+
+  it("should not create a user with incorrect login", async () => {
+    const newUserDto = createUserDto({ login: "" });
+
+    const res = await req
+      .post(SETTINGS.PATHS.USERS)
+      .set(basicAuth)
+      .send(newUserDto)
+      .expect(400);
+
+    expect(res.body).toEqual({
+      errorsMessages: [
+        {
+          field: "login",
+          message: expect.any(String),
+        },
+      ],
+    });
+  });
+
+  it("should not create a user with incorrect email", async () => {
+    const newUserDto = createUserDto({ email: "" });
+
+    const res = await req
+      .post(SETTINGS.PATHS.USERS)
+      .set(basicAuth)
+      .send(newUserDto)
       .expect(400);
 
     expect(res.body).toEqual({
