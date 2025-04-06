@@ -36,7 +36,7 @@ export type UsersMapedQueryType = {
   pageSize: number;
 };
 
-export type userDtoType = {
+export type UserDtoType = {
   login?: string;
   email?: string;
   password?: string;

@@ -44,3 +44,9 @@ export type PaginationType<T> = {
   totalCount: number;
   items: T[];
 };
+
+export type BlogDtoType = {
+  name?: string;
+  description?: string;
+  websiteUrl?: string;
+};

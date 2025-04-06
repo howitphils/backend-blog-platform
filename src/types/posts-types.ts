@@ -43,3 +43,9 @@ export type PostForBlogInputModel = {
   shortDescription: string;
   content: string;
 };
+
+export type PostDtoType = {
+  title?: string;
+  shortDescription?: string;
+  content?: string;
+};

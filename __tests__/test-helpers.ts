@@ -1,8 +1,10 @@
 import { agent } from "supertest";
 import { app } from "../src/app";
 import { encodedCredentials } from "../src/middlewares/auth/basic-auth-validator";
-import { userDtoType, UserViewModel } from "../src/types/users-types";
+import { UserDtoType, UserViewModel } from "../src/types/users-types";
 import { SETTINGS } from "../src/settings";
+import { BlogDtoType, BlogViewModel } from "../src/types/blogs-types";
+import { PostDtoType } from "../src/types/posts-types";
 
 export const req = agent(app);
 
@@ -16,7 +18,7 @@ export const defaultPagination = {
   items: [],
 };
 
-export const createUserDto = ({ login, email, password }: userDtoType) => {
+export const createUserDto = ({ login, email, password }: UserDtoType) => {
   return {
     login: login ?? "new-user",
     email: email ?? "example@gmail.com",
@@ -25,7 +27,7 @@ export const createUserDto = ({ login, email, password }: userDtoType) => {
 };
 
 export const createNewUserInDb = async (
-  user: userDtoType
+  user: UserDtoType
 ): Promise<UserViewModel> => {
   const res = await req
     .post(SETTINGS.PATHS.USERS)
@@ -47,4 +49,43 @@ export const createUsersInDb = async (count: number) => {
     users.push(user);
   }
   return users;
+};
+
+export const createBlogDto = ({
+  name,
+  description,
+  websiteUrl,
+}: BlogDtoType) => {
+  return {
+    name: name ?? "test-blog",
+    description: description ?? "for tests",
+    websiteUrl: websiteUrl ?? "https://for_tests",
+  };
+};
+
+export const createNewBlogInDb = async (
+  blog?: BlogDtoType
+): Promise<BlogViewModel> => {
+  if (!blog) {
+    blog = createBlogDto({});
+  }
+  const res = await req
+    .post(SETTINGS.PATHS.BLOGS)
+    .set(basicAuth)
+    .send(blog)
+    .expect(201);
+
+  return res.body;
+};
+
+export const createPostDto = ({
+  title,
+  content,
+  shortDescription,
+}: PostDtoType) => {
+  return {
+    title: title ?? "new-title",
+    content: content ?? "new-content",
+    shortDescription: shortDescription ?? "new-short-description",
+  };
 };
