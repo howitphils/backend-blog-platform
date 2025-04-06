@@ -24,6 +24,10 @@ export const postsController = {
   async createPost(req: Request<{}, {}, PostInputModel>, res: Response) {
     // Создаем новый пост
     const createdId = await postsService.createNewPost(req.body);
+    if (!createdId) {
+      res.sendStatus(404);
+      return;
+    }
     // Получаем созданный пост
     const newPost = await postsQueryRepository.getPostById(createdId);
     res.status(201).json(newPost);
