@@ -65,14 +65,6 @@ export const blogsController = {
     req: Request<{ id: ObjectId }, {}, PostForBlogInputModel>,
     res: Response
   ) {
-    // Проверка на существование блога
-    const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
-    // Если блог не найден, отправляем 404
-    if (!targetBlog) {
-      res.sendStatus(404);
-      return;
-    }
-
     const newPostInputValues: PostInputModel = {
       blogId: req.params.id.toString(),
       content: req.body.content,
@@ -82,6 +74,11 @@ export const blogsController = {
 
     // Если блог существует - создаем новый пост
     const newPostId = await postsService.createNewPost(newPostInputValues);
+
+    if (!newPostId) {
+      res.sendStatus(404);
+      return;
+    }
     // Получаем созданный пост по id
     const newPost = await postsQueryRepository.getPostById(newPostId);
     res.status(201).json(newPost);

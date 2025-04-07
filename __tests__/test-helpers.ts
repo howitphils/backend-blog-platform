@@ -27,8 +27,11 @@ export const createUserDto = ({ login, email, password }: UserDtoType) => {
 };
 
 export const createNewUserInDb = async (
-  user: UserDtoType
+  user?: UserDtoType
 ): Promise<UserViewModel> => {
+  if (!user) {
+    user = createUserDto({});
+  }
   const res = await req
     .post(SETTINGS.PATHS.USERS)
     .set(basicAuth)

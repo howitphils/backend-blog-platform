@@ -1,27 +1,24 @@
-import { MongoClient } from "mongodb";
-import { runDb } from "../src/db/mongodb/mongodb";
+import { db } from "./../src/db/mongodb/mongo";
 import { SETTINGS } from "../src/settings";
 import {
   basicAuth,
+  createNewUserInDb,
   createUserDto,
   defaultPagination,
   req,
 } from "./test-helpers";
 
 describe("/users", () => {
-  let client: MongoClient;
-
   beforeAll(async () => {
-    // Создаем новое тестовое соединение
-    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+    await db.run(SETTINGS.MONGO_URL);
+  });
 
-    // Очищаем коллекции
-    await req.delete(SETTINGS.PATHS.TESTS + "/all-data").expect(204);
+  beforeEach(async () => {
+    await db.clear(SETTINGS.TEST_DB_NAME);
   });
 
   afterAll(async () => {
-    // Закрываем коннект с бд
-    await client.close();
+    await db.close();
     console.log("Connection closed");
   });
 
@@ -56,7 +53,6 @@ describe("/users", () => {
     expect(res.body).toEqual(defaultPagination);
   });
 
-  let userId = "";
   it("should create a user", async () => {
     const newUserDto = createUserDto({});
 
@@ -65,8 +61,6 @@ describe("/users", () => {
       .set(basicAuth)
       .send(newUserDto)
       .expect(201);
-
-    userId = res.body.id;
 
     expect(res.body).toEqual({
       id: expect.any(String),
@@ -153,15 +147,18 @@ describe("/users", () => {
   });
 
   it("should delete the user", async () => {
+    const newUser = await createNewUserInDb();
     await req
-      .delete(SETTINGS.PATHS.USERS + `/${userId}`)
+      .delete(SETTINGS.PATHS.USERS + `/${newUser.id}`)
       .set(basicAuth)
       .expect(204);
   });
 
   it("should not delete not existing user", async () => {
+    const newUser = await createNewUserInDb();
+
     await req
-      .delete(SETTINGS.PATHS.USERS + "/22")
+      .delete(SETTINGS.PATHS.USERS + `/${newUser.id + 22}`)
       .set(basicAuth)
       .expect(404);
   });

@@ -1,25 +1,18 @@
-import { MongoClient } from "mongodb";
-import { runDb } from "../src/db/mongodb/mongodb";
+import { db } from "./../src/db/mongodb/mongo";
 import { SETTINGS } from "../src/settings";
 import { createNewUserInDb, createUserDto, req } from "./test-helpers";
 
 describe("/auth", () => {
-  let client: MongoClient;
-
   beforeAll(async () => {
-    // Создаем новое тестовое соединение
-    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
-
-    await req.delete(SETTINGS.PATHS.TESTS + "/all-data").expect(204);
+    await db.run(SETTINGS.MONGO_URL);
   });
 
-  afterEach(async () => {
-    await req.delete(SETTINGS.PATHS.TESTS + "/all-data").expect(204);
+  beforeEach(async () => {
+    await db.clear(SETTINGS.TEST_DB_NAME);
   });
 
   afterAll(async () => {
-    // Закрываем коннект с бд
-    await client.close();
+    await db.close();
     console.log("Connection closed");
   });
 
@@ -41,27 +34,26 @@ describe("/auth", () => {
   });
 
   it("it should not login a not existing user", async () => {
-    const newUser = createUserDto({});
-    await createNewUserInDb(newUser);
+    await createNewUserInDb();
 
     await req
       .post(SETTINGS.PATHS.AUTH + "/login")
       .send({
-        loginOrEmail: "incorrect",
+        loginOrEmail: "random",
         password: "string",
       })
       .expect(401);
   });
 
   it("it should not login a user with incorrect input values", async () => {
-    const newUser = createUserDto({});
-    await createNewUserInDb(newUser);
+    await createNewUserInDb();
 
-    const res = await req.post(SETTINGS.PATHS.AUTH + "/login").send({
-      loginOrEmail: 221,
-      password: false,
-    });
-
-    expect(res.status).toBe(400);
+    await req
+      .post(SETTINGS.PATHS.AUTH + "/login")
+      .send({
+        loginOrEmail: 221,
+        password: false,
+      })
+      .expect(400);
   });
 });

@@ -1,4 +1,3 @@
-import { MongoClient } from "mongodb";
 import { SETTINGS } from "../src/settings";
 import {
   basicAuth,
@@ -8,21 +7,19 @@ import {
   defaultPagination,
   req,
 } from "./test-helpers";
-import { runDb } from "../src/db/mongodb/mongodb";
+import { db } from "../src/db/mongodb/mongo";
 
 describe("/blogs", () => {
-  let client: MongoClient;
-
   beforeAll(async () => {
-    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+    await db.run(SETTINGS.MONGO_URL);
   });
 
   beforeEach(async () => {
-    await req.delete(SETTINGS.PATHS.TESTS + "/all-data").expect(204);
+    await db.clear(SETTINGS.TEST_DB_NAME);
   });
 
   afterAll(async () => {
-    await client.close();
+    await db.close();
     console.log("Connection closed");
   });
 
