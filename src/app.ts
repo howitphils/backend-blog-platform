@@ -6,6 +6,7 @@ import { postsRouter } from "./routers/posts-router";
 import { testsRouter } from "./routers/tests-router";
 import { usersRouter } from "./routers/users-router";
 import { authRouter } from "./routers/auth-router";
+import { commentsRouter } from "./routers/comments-router";
 
 export const app = express();
 
@@ -17,6 +18,7 @@ app.use(SETTINGS.PATHS.POSTS, postsRouter);
 app.use(SETTINGS.PATHS.TESTS, testsRouter);
 app.use(SETTINGS.PATHS.USERS, usersRouter);
 app.use(SETTINGS.PATHS.AUTH, authRouter);
+app.use(SETTINGS.PATHS.COMMENTS, commentsRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello, Friend!");

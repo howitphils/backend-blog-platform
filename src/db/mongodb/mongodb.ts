@@ -3,10 +3,12 @@ import { Collection, MongoClient } from "mongodb";
 import { SETTINGS } from "../../settings";
 import { BlogDbType } from "../../types/blogs-types";
 import { UserDbType } from "../../types/users-types";
+import { CommentDbModel } from "../../types/comments-types";
 
 export let blogsCollection: Collection<BlogDbType>;
 export let postsCollection: Collection<PostDbType>;
 export let usersCollection: Collection<UserDbType>;
+export let commentsCollection: Collection<CommentDbModel>;
 
 export const runDb = async (url: string, dbName: string | undefined) => {
   const client = new MongoClient(url);
@@ -20,6 +22,10 @@ export const runDb = async (url: string, dbName: string | undefined) => {
   );
   usersCollection = db.collection<UserDbType>(
     SETTINGS.COLLECTIONS.USERS_COLLECTION_NAME
+  );
+
+  commentsCollection = db.collection<CommentDbModel>(
+    SETTINGS.COLLECTIONS.COMMENTS_COLLECTION_NAME
   );
 
   try {
@@ -36,4 +42,5 @@ export const clearCollections = async () => {
   await blogsCollection.deleteMany({});
   await postsCollection.deleteMany({});
   await usersCollection.deleteMany({});
+  await commentsCollection.deleteMany({});
 };

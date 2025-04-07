@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { jwtService } from "../../application/jwtService";
 
 export const jwtAuthGuard = (
-  req: Request,
+  req: Request<{}>,
   res: Response,
   next: NextFunction
 ) => {
