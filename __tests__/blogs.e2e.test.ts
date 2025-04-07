@@ -3,23 +3,27 @@ import {
   basicAuth,
   createBlogDto,
   createNewBlogInDb,
-  createPostDto,
+  createPostForBlogDto,
   defaultPagination,
   req,
 } from "./test-helpers";
-import { db } from "../src/db/mongodb/mongo";
+// import { db } from "../src/db/mongodb/mongo";
+import { MongoClient } from "mongodb";
+import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
 
 describe("/blogs", () => {
+  let client: MongoClient;
+
   beforeAll(async () => {
-    await db.run(SETTINGS.MONGO_URL);
+    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
   });
 
   beforeEach(async () => {
-    await db.clear(SETTINGS.TEST_DB_NAME);
+    await clearCollections();
   });
 
   afterAll(async () => {
-    await db.close();
+    await client.close();
     console.log("Connection closed");
   });
 
@@ -110,7 +114,7 @@ describe("/blogs", () => {
 
   it(" + should create new post for a specific blog", async () => {
     const blogDb = await createNewBlogInDb();
-    const newPostDto = createPostDto({});
+    const newPostDto = createPostForBlogDto({});
 
     const res = await req
       .post(SETTINGS.PATHS.BLOGS + `/${blogDb.id}` + "/posts")
@@ -132,7 +136,7 @@ describe("/blogs", () => {
   });
 
   it(" - should not create new post for a specific blog with incorrect blogId", async () => {
-    const newPostDto = createPostDto({});
+    const newPostDto = createPostForBlogDto({});
 
     await req
       .post(SETTINGS.PATHS.BLOGS + "/22/posts")
@@ -144,7 +148,7 @@ describe("/blogs", () => {
   it(" - should not create new post for a specific blog with incorrect input values", async () => {
     const blogDb = await createNewBlogInDb();
 
-    const newPostDto = createPostDto({
+    const newPostDto = createPostForBlogDto({
       title: "",
     });
 
@@ -157,7 +161,7 @@ describe("/blogs", () => {
 
   it(" - should not create new post for a specific blog without authorization", async () => {
     const blogDb = await createNewBlogInDb();
-    const postDto = createPostDto({});
+    const postDto = createPostForBlogDto({});
 
     await req
       .post(SETTINGS.PATHS.BLOGS + `/${blogDb.id}` + "/posts")

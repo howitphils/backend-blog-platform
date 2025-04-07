@@ -4,7 +4,11 @@ import { encodedCredentials } from "../src/middlewares/auth/basic-auth-validator
 import { UserDtoType, UserViewModel } from "../src/types/users-types";
 import { SETTINGS } from "../src/settings";
 import { BlogDtoType, BlogViewModel } from "../src/types/blogs-types";
-import { PostDtoType, PostViewModel } from "../src/types/posts-types";
+import {
+  PostDtoType,
+  PostForBlogDtoType,
+  PostViewModel,
+} from "../src/types/posts-types";
 
 export const req = agent(app);
 
@@ -81,11 +85,11 @@ export const createNewBlogInDb = async (
   return res.body;
 };
 
-export const createPostDto = ({
+export const createPostForBlogDto = ({
   title,
   content,
   shortDescription,
-}: PostDtoType) => {
+}: PostForBlogDtoType) => {
   return {
     title: title ?? "new-title",
     content: content ?? "new-content",
@@ -93,17 +97,43 @@ export const createPostDto = ({
   };
 };
 
+export const createPostDto = ({
+  title,
+  content,
+  shortDescription,
+  blogId,
+}: PostDtoType) => {
+  return {
+    title: title ?? "new-title",
+    content: content ?? "new-content",
+    shortDescription: shortDescription ?? "new-short-description",
+    blogId,
+  };
+};
+
 export const createNewPostInDb = async (
-  post?: PostDtoType
+  post?: PostForBlogDtoType | PostDtoType
 ): Promise<PostViewModel> => {
   if (!post) {
-    post = createPostDto({});
+    post = createPostForBlogDto({});
   }
   const res = await req
-    .post(SETTINGS.PATHS.BLOGS)
+    .post(SETTINGS.PATHS.POSTS)
     .set(basicAuth)
     .send(post)
     .expect(201);
 
   return res.body;
+};
+
+export const createPostDtobHelper = async () => {
+  const blogDb = await createNewBlogInDb();
+  return createPostDto({ blogId: blogDb.id });
+};
+
+export const createPostInDbHelper = async () => {
+  const postDto = await createPostDtobHelper();
+  const postDb = await createNewPostInDb(postDto);
+
+  return postDb;
 };

@@ -1,4 +1,4 @@
-import { db } from "./../src/db/mongodb/mongo";
+// import { db } from "./../src/db/mongodb/mongo";
 import { SETTINGS } from "../src/settings";
 import {
   basicAuth,
@@ -7,18 +7,22 @@ import {
   defaultPagination,
   req,
 } from "./test-helpers";
+import { MongoClient } from "mongodb";
+import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
 
 describe("/users", () => {
+  let client: MongoClient;
+
   beforeAll(async () => {
-    await db.run(SETTINGS.MONGO_URL);
+    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
   });
 
   beforeEach(async () => {
-    await db.clear(SETTINGS.TEST_DB_NAME);
+    await clearCollections();
   });
 
   afterAll(async () => {
-    await db.close();
+    await client.close();
     console.log("Connection closed");
   });
 
@@ -71,6 +75,7 @@ describe("/users", () => {
   });
 
   it("should not create a user with duplicated login", async () => {
+    await createNewUserInDb();
     const newUserDto = createUserDto({ email: "exadas@mail.ru" });
 
     const res = await req
@@ -90,6 +95,7 @@ describe("/users", () => {
   });
 
   it("should not create a user with duplicated email", async () => {
+    await createNewUserInDb();
     const newUserDto = createUserDto({ login: "new-user2" });
 
     const res = await req
@@ -148,6 +154,7 @@ describe("/users", () => {
 
   it("should delete the user", async () => {
     const newUser = await createNewUserInDb();
+
     await req
       .delete(SETTINGS.PATHS.USERS + `/${newUser.id}`)
       .set(basicAuth)

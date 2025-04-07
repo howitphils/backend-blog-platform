@@ -1,6 +1,10 @@
 import { ObjectId } from "mongodb";
 import { BlogDbType, BlogInputModel } from "../../../../types/blogs-types";
+// import { SETTINGS } from "../../../../settings";
+// import { db } from "../../mongo";
 import { blogsCollection } from "../../mongodb";
+
+// const blogsCollection = db.getCollections(SETTINGS.DB_NAME).blogsCollection;
 
 export const blogsRepository = {
   // Создание нового блога

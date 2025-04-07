@@ -1,6 +1,10 @@
 import { ObjectId } from "mongodb";
 import { PostDbType, PostInputModel } from "../../../../types/posts-types";
+// import { db } from "../../mongo";
+// import { SETTINGS } from "../../../../settings";
 import { postsCollection } from "../../mongodb";
+
+// const postsCollection = db.getCollections(SETTINGS.DB_NAME).postsCollection;
 
 export const postsRepository = {
   // Получение всех постов

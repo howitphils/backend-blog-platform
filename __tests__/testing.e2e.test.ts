@@ -1,14 +1,18 @@
-import { db } from "./../src/db/mongodb/mongo";
+// import { db } from "./../src/db/mongodb/mongo";
 import { SETTINGS } from "../src/settings";
 import { req } from "./test-helpers";
+import { runDb } from "../src/db/mongodb/mongodb";
+import { MongoClient } from "mongodb";
 
 describe("/testing", () => {
+  let client: MongoClient;
+
   beforeAll(async () => {
-    await db.run(SETTINGS.MONGO_URL);
+    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
   });
 
   afterAll(async () => {
-    await db.close();
+    await client.close();
     console.log("Connection closed");
   });
 

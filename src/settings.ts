@@ -12,7 +12,7 @@ export const SETTINGS = {
   },
   ADMIN: process.env.ADMIN || "admin:qwerty",
   MONGO_URL: process.env.MONGO_URL || "mongodb://localhost:27017",
-  DB_NAME: process.env.DB_NAME,
+  DB_NAME: process.env.DB_NAME || "blog-platform-dev",
   TEST_DB_NAME: "test-db",
   COLLECTIONS: {
     BLOGS_COLLECTION_NAME: "blogs",

@@ -1,6 +1,10 @@
 import { ObjectId, WithId } from "mongodb";
-import { usersCollection } from "../../mongodb";
 import { UserDbType } from "../../../../types/users-types";
+import { usersCollection } from "../../mongodb";
+// import { db } from "../../mongo";
+// import { SETTINGS } from "../../../../settings";
+
+// const usersCollection = db.getCollections(SETTINGS.DB_NAME).usersCollection;
 
 export const usersRepository = {
   // Создание нового юзера

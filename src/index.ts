@@ -1,9 +1,9 @@
 import { app } from "./app";
-import { db } from "./db/mongodb/mongo";
+import { runDb } from "./db/mongodb/mongodb";
 import { SETTINGS } from "./settings";
 
 const startApp = async () => {
-  await db.run(SETTINGS.MONGO_URL);
+  await runDb(SETTINGS.MONGO_URL, SETTINGS.DB_NAME);
   app.listen(SETTINGS.PORT, () => {
     console.log(`Listening on port: ${SETTINGS.PORT}`);
   });
