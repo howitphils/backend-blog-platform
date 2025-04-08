@@ -2,6 +2,7 @@ import {
   BlogsMapedQueryType,
   BlogsRequestQueryType,
 } from "../../types/blogs-types";
+import { CommentsRequestQueryType } from "../../types/comments-types";
 import {
   PostsMapedQueryType,
   PostsRequestQueryType,
@@ -54,6 +55,19 @@ export const mapUsersQueryParams = (
   return {
     searchEmailTerm: searchEmailTerm ? searchEmailTerm : null,
     searchLoginTerm: searchLoginTerm ? searchLoginTerm : null,
+    pageNumber: pageNumber ? +pageNumber : 1,
+    pageSize: pageSize ? +pageSize : 10,
+    sortBy: sortBy ? sortBy : "createdAt",
+    sortDirection: sortDirection === "asc" ? sortDirection : "desc",
+  };
+};
+
+export const mapCommentsQueryParams = (
+  queryParams: CommentsRequestQueryType
+): PostsMapedQueryType => {
+  const { pageNumber, pageSize, sortBy, sortDirection } = queryParams;
+
+  return {
     pageNumber: pageNumber ? +pageNumber : 1,
     pageSize: pageSize ? +pageSize : 10,
     sortBy: sortBy ? sortBy : "createdAt",

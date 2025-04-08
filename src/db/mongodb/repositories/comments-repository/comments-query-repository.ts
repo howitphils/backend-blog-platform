@@ -1,71 +1,39 @@
-import { commentsCollection, usersCollection } from "../../mongodb";
+import { commentsCollection } from "../../mongodb";
 import { PaginationType } from "../../../../types/blogs-types";
-import {
-  UserDbType,
-  UsersMapedQueryType,
-  UserViewModel,
-} from "../../../../types/users-types";
 import { ObjectId, WithId } from "mongodb";
 import {
   CommentDbModel,
+  CommentsMapedQueryType,
   CommentViewModel,
 } from "../../../../types/comments-types";
 
 export const commentsQueryRepository = {
-  // Получение всех юзеров с учетом query параметров
-  // async getAllUsers(
-  //   filters: UsersMapedQueryType
-  // ): Promise<PaginationType<UserViewModel>> {
-  //   const {
-  //     pageNumber,
-  //     pageSize,
-  //     sortBy,
-  //     sortDirection,
-  //     searchEmailTerm,
-  //     searchLoginTerm,
-  //   } = filters;
+  // Получение всех комментариев с учетом query параметров
+  async getAllCommentsForPost(
+    filters: CommentsMapedQueryType,
+    postId: string
+  ): Promise<PaginationType<CommentViewModel>> {
+    const { pageNumber, pageSize, sortBy, sortDirection } = filters;
 
-  //   // Cоздаем фильтр
-  //   const createFilter = () => {
-  //     if (searchEmailTerm && searchLoginTerm) {
-  //       return {
-  //         $or: [
-  //           {
-  //             email: { $regex: searchEmailTerm, $options: "i" },
-  //           },
-  //           {
-  //             login: { $regex: searchLoginTerm, $options: "i" },
-  //           },
-  //         ],
-  //       };
-  //     } else if (searchEmailTerm) {
-  //       return { email: { $regex: searchEmailTerm, $options: "i" } };
-  //     } else if (searchLoginTerm) {
-  //       return { login: { $regex: searchLoginTerm, $options: "i" } };
-  //     } else {
-  //       return {};
-  //     }
-  //   };
+    // Получаем посты с учетом query параметров
+    const comments = await commentsCollection
+      .find({ postId })
+      .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
+      .skip((pageNumber - 1) * pageSize)
+      .limit(pageSize)
+      .toArray();
 
-  //   // Получаем юзеров с учетом query параметров
-  //   const users = await usersCollection
-  //     .find(createFilter())
-  //     .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
-  //     .skip((pageNumber - 1) * pageSize)
-  //     .limit(pageSize)
-  //     .toArray();
+    // Получаем число всех постов
+    const totalCount = await commentsCollection.countDocuments({ postId });
 
-  //   // Получаем число всех юзеров
-  //   const totalCount = await usersCollection.countDocuments(createFilter());
-
-  //   return {
-  //     page: pageNumber,
-  //     pagesCount: Math.ceil(totalCount / pageSize),
-  //     pageSize: pageSize,
-  //     totalCount,
-  //     items: users.map(this._mapFromDbToViewModel),
-  //   };
-  // },
+    return {
+      page: pageNumber,
+      pagesCount: Math.ceil(totalCount / pageSize),
+      pageSize: pageSize,
+      totalCount,
+      items: comments.map(this._mapFromDbToViewModel),
+    };
+  },
 
   async getCommentById(_id: ObjectId): Promise<CommentViewModel | null> {
     const targetComment = await commentsCollection.findOne({ _id });

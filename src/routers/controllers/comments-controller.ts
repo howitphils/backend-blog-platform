@@ -20,6 +20,8 @@ export const commentsController = {
     req: Request<{ id: ObjectId }, {}, CommentInputModel, {}, UserId>,
     res: Response
   ) {
+    // Проверка пользователя
+
     const isUpdated = await commentsService.updateComment(
       req.params.id,
       req.body
@@ -32,6 +34,8 @@ export const commentsController = {
     res.sendStatus(204);
   },
   async deleteComment(req: Request<{ id: ObjectId }>, res: Response) {
+    // Проверка пользователя
+
     const isDeleted = await commentsService.deleteComment(req.params.id);
 
     if (!isDeleted) {

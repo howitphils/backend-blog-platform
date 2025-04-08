@@ -1,9 +1,16 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import { PostInputModel, PostsRequestQueryType } from "../../types/posts-types";
-import { mapPostsQueryParams } from "./utils";
+import { mapCommentsQueryParams, mapPostsQueryParams } from "./utils";
 import { postsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
 import { postsService } from "../../services/posts-service";
+import { commentsService } from "../../services/comments-service";
+import {
+  CommentInputModel,
+  CommentsRequestQueryType,
+  CreateCommentDto,
+} from "../../types/comments-types";
+import { commentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
 
 export const postsController = {
   // Получение постов
@@ -20,6 +27,24 @@ export const postsController = {
     res.status(200).json(posts);
   },
 
+  async getComments(
+    req: Request<{ id: ObjectId }, {}, {}, CommentsRequestQueryType>,
+    res: Response
+  ) {
+    // Преобразуем query параметры в нужный формат
+    const mapedQueryParams = mapCommentsQueryParams(req.query);
+
+    const convertedPostId = req.params.id.toString();
+
+    // Получаем комментарии из бд
+    const comments = await commentsQueryRepository.getAllCommentsForPost(
+      mapedQueryParams,
+      convertedPostId
+    );
+
+    res.status(200).json(comments);
+  },
+
   // Создание поста
   async createPost(req: Request<{}, {}, PostInputModel>, res: Response) {
     // Создаем новый пост
@@ -31,6 +56,37 @@ export const postsController = {
     // Получаем созданный пост
     const newPost = await postsQueryRepository.getPostById(createdId);
     res.status(201).json(newPost);
+  },
+
+  // Создание комментария
+  async createComment(
+    req: Request<{ id: ObjectId }, {}, CommentInputModel>,
+    res: Response
+  ) {
+    const userId = req.user?.id;
+    if (!userId) {
+      // Заменить на 500
+      res.sendStatus(401);
+      return;
+    }
+    const postId = req.params.id;
+    const commentBody = req.body;
+
+    const createCommentDto: CreateCommentDto = {
+      userId,
+      postId,
+      commentBody,
+    };
+
+    // Создаем новый комментарий
+    const createdId = await commentsService.createNewComment(createCommentDto);
+    if (!createdId) {
+      res.sendStatus(404);
+      return;
+    }
+    // Получаем созданный комментарий
+    const newComment = await commentsQueryRepository.getCommentById(createdId);
+    res.status(201).json(newComment);
   },
 
   // Получение поста по айди

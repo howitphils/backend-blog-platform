@@ -5,6 +5,7 @@ import { Router } from "express";
 import { authGuard } from "../middlewares/auth/basic-auth-validator";
 import { postsController } from "./controllers/posts-controller";
 import { validateParamsId } from "../middlewares/validateParamsId";
+import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 
 export const postsRouter = Router();
 
@@ -13,6 +14,17 @@ postsRouter.get("/", postsController.getPosts);
 
 // Получение поста по айди
 postsRouter.get("/:id", validateParamsId, postsController.getPostById);
+
+// Получение комментариев по айди поста
+postsRouter.get("/:id/comments", validateParamsId, postsController.getComments);
+
+// Создание комментария к посту
+postsRouter.post(
+  "/:id/comments",
+  jwtAuthGuard,
+  validateParamsId,
+  postsController.createComment
+);
 
 // Создание поста
 postsRouter.post(

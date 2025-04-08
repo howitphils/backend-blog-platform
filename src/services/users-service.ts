@@ -62,6 +62,10 @@ export const usersService = {
     }
   },
 
+  async getUserById(id: ObjectId): Promise<WithId<UserDbType> | null> {
+    return usersRepository.getUserById(id);
+  },
+
   // Удаление юзера
   async deleteUser(id: ObjectId): Promise<boolean> {
     return usersRepository.deleteUser(id);

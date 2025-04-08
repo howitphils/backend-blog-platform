@@ -30,7 +30,7 @@ export const postsQueryRepository = {
       pagesCount: Math.ceil(totalCount / pageSize),
       pageSize: pageSize,
       totalCount,
-      items: posts.map(this.mapFromDbToViewModel),
+      items: posts.map(this._mapFromDbToViewModel),
     };
   },
 
@@ -59,7 +59,7 @@ export const postsQueryRepository = {
       pagesCount: Math.ceil(totalCount / pageSize),
       pageSize: pageSize,
       totalCount,
-      items: posts.map(this.mapFromDbToViewModel),
+      items: posts.map(this._mapFromDbToViewModel),
     };
   },
 
@@ -71,11 +71,11 @@ export const postsQueryRepository = {
       return null;
     }
     // Если пост найден, преобразуем его в формат, который ожидает клиент
-    return this.mapFromDbToViewModel(post);
+    return this._mapFromDbToViewModel(post);
   },
 
   // Преобразование поста из формата базы данных в формат, который ожидает клиент
-  mapFromDbToViewModel(post: WithId<PostDbType>): PostViewModel {
+  _mapFromDbToViewModel(post: WithId<PostDbType>): PostViewModel {
     return {
       id: post._id.toString(),
       blogId: post.blogId,

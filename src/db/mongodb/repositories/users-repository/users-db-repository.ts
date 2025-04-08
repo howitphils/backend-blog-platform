@@ -31,6 +31,7 @@ export const usersRepository = {
     });
   },
 
+  // Отдельный метод для проверки на существование пользователя с таким email/login
   async getUserByCredentials(
     login: string,
     email: string
@@ -41,5 +42,9 @@ export const usersRepository = {
         { login: { $regex: login, $options: "i" } },
       ],
     });
+  },
+
+  async getUserById(_id: ObjectId): Promise<WithId<UserDbType> | null> {
+    return usersCollection.findOne({ _id });
   },
 };

@@ -1,22 +1,42 @@
 import { ObjectId } from "mongodb";
 
 import { blogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
-import { CommentInputModel } from "../types/comments-types";
+import {
+  CommentDbModel,
+  CommentInputModel,
+  CreateCommentDto,
+} from "../types/comments-types";
+import { commentsRepository } from "../db/mongodb/repositories/comments-repository/comments-db-repository";
+import { postsService } from "./posts-service";
+import { usersService } from "./users-service";
 
 export const commentsService = {
-  // async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {
-  //   // Создаем новый блог
-  //   const newBlog: BlogDbType = {
-  //     name: blog.name,
-  //     description: blog.description,
-  //     websiteUrl: blog.websiteUrl,
-  //     createdAt: new Date().toISOString(),
-  //     isMembership: false,
-  //   };
+  async createNewComment(dto: CreateCommentDto): Promise<ObjectId | null> {
+    // Проверка на существование поста
+    const targetPost = await postsService.getPostById(dto.postId);
+    if (!targetPost) {
+      return null;
+    }
 
-  //   // Возвращаем id созданного блога
-  //   return blogsRepository.createNewBlog(newBlog);
-  // },
+    const targetUser = await usersService.getUserById(new ObjectId(dto.userId));
+    if (!targetUser) {
+      return null;
+    }
+
+    // Создаем новый комментарий
+    const newComment: CommentDbModel = {
+      content: dto.commentBody.content,
+      commentatorInfo: {
+        userId: dto.userId,
+        userLogin: targetUser.login,
+      },
+      createdAt: new Date().toISOString(),
+      postId: dto.postId.toString(),
+    };
+
+    // Возвращаем id созданного комментария
+    return commentsRepository.createComment(newComment);
+  },
 
   // // Получение блога по айди
   // async getBlogById(_id: ObjectId): Promise<BlogDbType | null> {
