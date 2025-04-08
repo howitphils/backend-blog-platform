@@ -42,7 +42,7 @@ export const commentsService = {
     return commentsRepository.getCommentById(id);
   },
 
-  async updateComment(dto: UpdateCommentDto): Promise<boolean | null> {
+  async updateComment(dto: UpdateCommentDto): Promise<boolean | null | string> {
     const targetComment = await commentsService.getCommentById(dto.commentId);
 
     if (!targetComment) {
@@ -50,19 +50,19 @@ export const commentsService = {
     }
 
     if (dto.userId !== targetComment.commentatorInfo.userId) {
-      return null;
+      return "null";
     }
 
     return commentsRepository.updateComment(dto.commentId, dto.commentBody);
   },
 
-  async deleteComment(dto: DeleteCommentDto): Promise<boolean | null> {
+  async deleteComment(dto: DeleteCommentDto): Promise<boolean | null | string> {
     const targetComment = await commentsService.getCommentById(dto.commentId);
     if (!targetComment) {
       return null;
     }
     if (targetComment.commentatorInfo.userId !== dto.userId) {
-      return null;
+      return "null";
     }
 
     return commentsRepository.deleteComment(dto.commentId);

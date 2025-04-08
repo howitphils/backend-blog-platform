@@ -54,6 +54,11 @@ export const commentsController = {
       res.sendStatus(404);
       return;
     }
+    if (isUpdated === "null") {
+      res.sendStatus(403);
+      return;
+    }
+
     res.sendStatus(204);
   },
 
@@ -79,6 +84,12 @@ export const commentsController = {
       res.sendStatus(404);
       return;
     }
+
+    if (isDeleted === "null") {
+      res.sendStatus(403);
+      return;
+    }
+
     res.sendStatus(204);
   },
 };
