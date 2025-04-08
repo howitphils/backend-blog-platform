@@ -37,14 +37,6 @@ export type BlogsMapedQueryType = {
   pageSize: number;
 };
 
-export type PaginationType<T> = {
-  pagesCount: number;
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  items: T[];
-};
-
 export type BlogDtoType = {
   name?: string;
   description?: string;

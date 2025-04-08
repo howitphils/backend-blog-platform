@@ -1,11 +1,11 @@
 import {
   BlogViewModel,
   BlogsMapedQueryType,
-  PaginationType,
 } from "../../../../types/blogs-types";
 import { ObjectId, WithId } from "mongodb";
 import { BlogDbType } from "../../../../types/blogs-types";
 import { blogsCollection } from "../../mongodb";
+import { PaginationType } from "../../../../types/pagination";
 
 export const blogsQueryRepository = {
   // Получение всех блогов

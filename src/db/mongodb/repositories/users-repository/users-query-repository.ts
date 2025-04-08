@@ -1,11 +1,11 @@
 import { usersCollection } from "../../mongodb";
-import { PaginationType } from "../../../../types/blogs-types";
 import {
   UserDbType,
   UsersMapedQueryType,
   UserViewModel,
 } from "../../../../types/users-types";
 import { ObjectId, WithId } from "mongodb";
+import { PaginationType } from "../../../../types/pagination";
 
 export const usersQueryRepository = {
   // Получение всех юзеров с учетом query параметров

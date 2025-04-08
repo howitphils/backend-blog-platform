@@ -1,11 +1,11 @@
 import { commentsCollection } from "../../mongodb";
-import { PaginationType } from "../../../../types/blogs-types";
 import { ObjectId, WithId } from "mongodb";
 import {
   CommentDbModel,
   CommentsMapedQueryType,
   CommentViewModel,
 } from "../../../../types/comments-types";
+import { PaginationType } from "../../../../types/pagination";
 
 export const commentsQueryRepository = {
   // Получение всех комментариев с учетом query параметров

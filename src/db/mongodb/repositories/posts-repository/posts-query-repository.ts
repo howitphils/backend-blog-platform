@@ -5,7 +5,7 @@ import {
   PostViewModel,
 } from "../../../../types/posts-types";
 import { postsCollection } from "../../mongodb";
-import { PaginationType } from "../../../../types/blogs-types";
+import { PaginationType } from "../../../../types/pagination";
 
 export const postsQueryRepository = {
   // Получение всех постов с учетом query параметров
