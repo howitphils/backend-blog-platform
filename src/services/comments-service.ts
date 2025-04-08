@@ -1,10 +1,10 @@
 import { ObjectId } from "mongodb";
 
-import { blogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
 import {
   CommentDbModel,
-  CommentInputModel,
   CreateCommentDto,
+  DeleteCommentDto,
+  UpdateCommentDto,
 } from "../types/comments-types";
 import { commentsRepository } from "../db/mongodb/repositories/comments-repository/comments-db-repository";
 import { postsService } from "./posts-service";
@@ -42,14 +42,29 @@ export const commentsService = {
     return commentsRepository.getCommentById(id);
   },
 
-  async updateComment(
-    _id: ObjectId,
-    comment: CommentInputModel
-  ): Promise<boolean> {
-    // return blogsRepository.updateBlog(_id, blog);
+  async updateComment(dto: UpdateCommentDto): Promise<boolean | null> {
+    const targetComment = await commentsService.getCommentById(dto.commentId);
+
+    if (!targetComment) {
+      return null;
+    }
+
+    if (dto.userId !== targetComment.commentatorInfo.userId) {
+      return null;
+    }
+
+    return commentsRepository.updateComment(dto.commentId, dto.commentBody);
   },
 
-  async deleteComment(_id: ObjectId): Promise<boolean> {
-    return commentsRepository.deleteComment(_id);
+  async deleteComment(dto: DeleteCommentDto): Promise<boolean | null> {
+    const targetComment = await commentsService.getCommentById(dto.commentId);
+    if (!targetComment) {
+      return null;
+    }
+    if (targetComment.commentatorInfo.userId !== dto.userId) {
+      return null;
+    }
+
+    return commentsRepository.deleteComment(dto.commentId);
   },
 };

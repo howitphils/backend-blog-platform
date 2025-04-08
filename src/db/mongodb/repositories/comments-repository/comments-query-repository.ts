@@ -41,7 +41,7 @@ export const commentsQueryRepository = {
     return this._mapFromDbToViewModel(targetComment);
   },
 
-  // Преобразование юзера из формата базы данных в формат, который ожидает клиент
+  // Преобразование комментарий из формата базы данных в формат, который ожидает клиент
   _mapFromDbToViewModel(comment: WithId<CommentDbModel>): CommentViewModel {
     const { _id, commentatorInfo, content, createdAt } = comment;
     return {

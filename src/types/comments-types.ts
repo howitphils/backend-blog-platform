@@ -42,3 +42,14 @@ export type CreateCommentDto = {
   postId: ObjectId;
   commentBody: CommentInputModel;
 };
+
+export type UpdateCommentDto = {
+  userId: string;
+  commentId: ObjectId;
+  commentBody: CommentInputModel;
+};
+
+export type DeleteCommentDto = {
+  userId: string;
+  commentId: ObjectId;
+};

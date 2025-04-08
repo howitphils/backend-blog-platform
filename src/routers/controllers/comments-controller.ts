@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import { UserId } from "../../types/users-types";
 import { commentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
-import { CommentInputModel } from "../../types/comments-types";
+import {
+  CommentInputModel,
+  DeleteCommentDto,
+  UpdateCommentDto,
+} from "../../types/comments-types";
 import { commentsService } from "../../services/comments-service";
 
 export const commentsController = {
@@ -20,12 +24,21 @@ export const commentsController = {
     req: Request<{ id: ObjectId }, {}, CommentInputModel, {}, UserId>,
     res: Response
   ) {
-    // Проверка пользователя
+    const userId = req.user?.id;
+    if (!userId) {
+      res.sendStatus(401);
+      return;
+    }
+    const commentId = req.params.id;
+    const commentBody = req.body;
 
-    const isUpdated = await commentsService.updateComment(
-      req.params.id,
-      req.body
-    );
+    const updateCommentDto: UpdateCommentDto = {
+      userId,
+      commentId,
+      commentBody,
+    };
+
+    const isUpdated = await commentsService.updateComment(updateCommentDto);
 
     if (!isUpdated) {
       res.sendStatus(404);
@@ -34,9 +47,19 @@ export const commentsController = {
     res.sendStatus(204);
   },
   async deleteComment(req: Request<{ id: ObjectId }>, res: Response) {
-    // Проверка пользователя
+    const userId = req.user?.id;
+    if (!userId) {
+      res.sendStatus(401);
+      return;
+    }
+    const commentId = req.params.id;
 
-    const isDeleted = await commentsService.deleteComment(req.params.id);
+    const deleteCommentDto: DeleteCommentDto = {
+      userId,
+      commentId,
+    };
+
+    const isDeleted = await commentsService.deleteComment(deleteCommentDto);
 
     if (!isDeleted) {
       res.sendStatus(404);
