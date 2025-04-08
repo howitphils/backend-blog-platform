@@ -4,10 +4,6 @@ import {
   CommentDbModel,
   CommentInputModel,
 } from "../../../../types/comments-types";
-// import { db } from "../../mongo";
-// import { SETTINGS } from "../../../../settings";
-
-// const usersCollection = db.getCollections(SETTINGS.DB_NAME).usersCollection;
 
 export const commentsRepository = {
   async createComment(comment: CommentDbModel): Promise<ObjectId> {

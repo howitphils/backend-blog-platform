@@ -13,6 +13,9 @@ import {
 export const req = agent(app);
 
 export const basicAuth = { authorization: `Basic ${encodedCredentials}` };
+export const jwtAuth = (token: string) => ({
+  authorization: `Bearer ${token}`,
+});
 
 export const defaultPagination = {
   pagesCount: 0,
@@ -133,7 +136,20 @@ export const createPostDtobHelper = async () => {
 
 export const createPostInDbHelper = async () => {
   const postDto = await createPostDtobHelper();
-  const postDb = await createNewPostInDb(postDto);
+  return createNewPostInDb(postDto);
+};
 
-  return postDb;
+export const getAccessToken = async (user?: UserDtoType) => {
+  if (!user) {
+    user = createUserDto({});
+  }
+  await createNewUserInDb(user);
+  const res = await req
+    .post(SETTINGS.PATHS.AUTH + "/login")
+    .send({
+      loginOrEmail: user.login,
+      password: user.password,
+    })
+    .expect(200);
+  return res.body.accessToken;
 };

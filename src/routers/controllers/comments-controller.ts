@@ -7,6 +7,7 @@ import { UserId } from "../../types/users-types";
 import { commentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
 import {
   CommentInputModel,
+  CommentViewModel,
   DeleteCommentDto,
   UpdateCommentDto,
 } from "../../types/comments-types";
@@ -15,7 +16,10 @@ import { RequestWithParams } from "../../types/requests-types";
 import { ParamsId } from "../../types/common-types";
 
 export const commentsController = {
-  async getCommentById(req: RequestWithParams<ParamsId>, res: Response) {
+  async getCommentById(
+    req: RequestWithParams<ParamsId>,
+    res: Response<CommentViewModel>
+  ) {
     const targetComment = await commentsQueryRepository.getCommentById(
       req.params.id
     );
