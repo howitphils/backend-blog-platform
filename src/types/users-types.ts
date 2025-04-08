@@ -41,3 +41,7 @@ export type UserDtoType = {
   email?: string;
   password?: string;
 };
+
+export type UserId = {
+  id: string;
+};

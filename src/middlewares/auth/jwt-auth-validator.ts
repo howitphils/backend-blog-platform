@@ -1,5 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction, Request } from "express";
 import { jwtService } from "../../application/jwtService";
+
+// type RequestWithUserId<U extends { id: string }> = Request<{}, {}, {}, {}, U>;
 
 export const jwtAuthGuard = (
   req: Request<{}>,
@@ -29,5 +31,8 @@ export const jwtAuthGuard = (
     res.sendStatus(401);
     return;
   }
-  // Add user to request + next()
+
+  req.user = { id: verifiedUser.userId };
+
+  next();
 };

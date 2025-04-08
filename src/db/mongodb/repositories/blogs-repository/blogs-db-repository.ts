@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { BlogDbType, BlogInputModel } from "../../../../types/blogs-types";
 // import { SETTINGS } from "../../../../settings";
 // import { db } from "../../mongo";
@@ -14,7 +14,7 @@ export const blogsRepository = {
   },
 
   // Получение блога по айди
-  async getBlogById(_id: ObjectId): Promise<BlogDbType | null> {
+  async getBlogById(_id: ObjectId): Promise<WithId<BlogDbType> | null> {
     return blogsCollection.findOne({ _id });
   },
 

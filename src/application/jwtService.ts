@@ -9,10 +9,9 @@ export const jwtService = {
     });
     return token;
   },
-  verifyToken(token: string): ObjectId | null {
+  verifyToken(token: string) {
     try {
-      const payload = jwt.verify(token, SETTINGS.JWT_SECRET) as JwtPayload;
-      return payload.userId;
+      return jwt.verify(token, SETTINGS.JWT_SECRET) as JwtPayload;
     } catch (error) {
       return null;
     }
