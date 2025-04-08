@@ -9,6 +9,7 @@ export const postsRepository = {
   getAllPosts: () => {
     return db.posts;
   },
+
   createNewPost: (post: PostInputModel): PostViewModel => {
     const newPost: PostViewModel = {
       ...post,
@@ -19,11 +20,13 @@ export const postsRepository = {
     db.posts.unshift(newPost);
     return newPost;
   },
+
   getPostById: (id: string) => {
     const targetPostIndex = findIndexByIdHelper(id);
     if (targetPostIndex === -1) return null;
     return db.posts[targetPostIndex];
   },
+
   updatePost: (id: string, post: PostInputModel) => {
     const targetPostIndex = findIndexByIdHelper(id);
     if (targetPostIndex === -1) return null;
@@ -33,6 +36,7 @@ export const postsRepository = {
     });
     return db.posts[targetPostIndex];
   },
+
   deletePost: (id: string) => {
     const targetPostIndex = findIndexByIdHelper(id);
     if (targetPostIndex === -1) return null;

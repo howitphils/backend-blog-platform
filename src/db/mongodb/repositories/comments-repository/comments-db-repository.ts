@@ -1,6 +1,9 @@
 import { ObjectId, WithId } from "mongodb";
 import { commentsCollection } from "../../mongodb";
-import { CommentDbModel } from "../../../../types/comments-types";
+import {
+  CommentDbModel,
+  CommentInputModel,
+} from "../../../../types/comments-types";
 // import { db } from "../../mongo";
 // import { SETTINGS } from "../../../../settings";
 
@@ -15,6 +18,17 @@ export const commentsRepository = {
   async deleteComment(_id: ObjectId): Promise<boolean> {
     const deleteResult = await commentsCollection.deleteOne({ _id });
     return deleteResult.deletedCount === 1;
+  },
+
+  async updateComment(
+    _id: ObjectId,
+    comment: CommentInputModel
+  ): Promise<boolean> {
+    const updateResult = await commentsCollection.updateOne(
+      { _id },
+      { $set: { ...comment } }
+    );
+    return updateResult.matchedCount === 1;
   },
 
   async getCommentById(_id: ObjectId): Promise<WithId<CommentDbModel> | null> {

@@ -31,6 +31,14 @@ export const postsController = {
     req: Request<{ id: ObjectId }, {}, {}, CommentsRequestQueryType>,
     res: Response
   ) {
+    // Получаем пост по id из запроса
+    const targetPost = await postsQueryRepository.getPostById(req.params.id);
+    // Если пост не найден, отправляем 404
+    if (!targetPost) {
+      res.sendStatus(404);
+      return;
+    }
+
     // Преобразуем query параметры в нужный формат
     const mapedQueryParams = mapCommentsQueryParams(req.query);
 

@@ -38,10 +38,9 @@ export const commentsService = {
     return commentsRepository.createComment(newComment);
   },
 
-  // // Получение блога по айди
-  // async getBlogById(_id: ObjectId): Promise<BlogDbType | null> {
-  //   return blogsRepository.getBlogById(_id);
-  // },
+  async getCommentById(id: ObjectId): Promise<CommentDbModel | null> {
+    return commentsRepository.getCommentById(id);
+  },
 
   async updateComment(
     _id: ObjectId,
@@ -51,6 +50,6 @@ export const commentsService = {
   },
 
   async deleteComment(_id: ObjectId): Promise<boolean> {
-    return blogsRepository.deleteBlog(_id);
+    return commentsRepository.deleteComment(_id);
   },
 };
