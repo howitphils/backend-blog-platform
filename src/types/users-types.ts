@@ -45,3 +45,9 @@ export type UserDtoType = {
 export type UserId = {
   id: string;
 };
+
+export type meModel = {
+  email: string;
+  login: string;
+  userId: string;
+};
