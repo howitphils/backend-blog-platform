@@ -1,10 +1,11 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { LoginInputModel } from "../../types/login-types";
 import { usersService } from "../../services/users-service";
 import { jwtService } from "../../application/jwtService";
+import { RequestWithBody } from "../../types/requests-types";
 
 export const authController = {
-  async checkUser(req: Request<{}, {}, LoginInputModel>, res: Response) {
+  async checkUser(req: RequestWithBody<LoginInputModel>, res: Response) {
     const { loginOrEmail, password } = req.body;
 
     const user = await usersService.checkUser({

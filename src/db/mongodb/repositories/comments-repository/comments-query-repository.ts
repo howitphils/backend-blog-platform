@@ -5,7 +5,7 @@ import {
   CommentsMapedQueryType,
   CommentViewModel,
 } from "../../../../types/comments-types";
-import { PaginationType } from "../../../../types/pagination";
+import { PaginationType } from "../../../../types/common-types";
 
 export const commentsQueryRepository = {
   // Получение всех комментариев с учетом query параметров

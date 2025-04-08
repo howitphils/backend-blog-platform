@@ -1,33 +1,36 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { ObjectId } from "mongodb";
+import { mapUsersQueryParams } from "./utils";
+import { usersService } from "../../services/users-service";
+
 import {
   UserInputModel,
   UsersRequestQueryType,
   UserViewModel,
 } from "../../types/users-types";
 import { usersQueryRepository } from "../../db/mongodb/repositories/users-repository/users-query-repository";
-import { usersService } from "../../services/users-service";
-import { mapUsersQueryParams } from "./utils";
-import { PaginationType } from "../../types/blogs-types";
+import { PaginationType, ParamsId } from "../../types/common-types";
+import {
+  RequestWithBody,
+  RequestWithParams,
+  RequestWithQuery,
+} from "../../types/requests-types";
 
 export const usersController = {
   // Получение юзеров
   async getUsers(
-    req: Request<{}, {}, {}, UsersRequestQueryType>,
+    req: RequestWithQuery<UsersRequestQueryType>,
     res: Response<PaginationType<UserViewModel>>
   ) {
-    // Преобразуем query параметры в нужный формат
     const mapedQueryParams = mapUsersQueryParams(req.query);
 
-    // Получаем юзеров из бд
     const users = await usersQueryRepository.getAllUsers(mapedQueryParams);
 
     res.status(200).json(users);
   },
 
   // Создание юзера
-  async createUser(req: Request<{}, {}, UserInputModel>, res: Response) {
-    // Создаем нового юзера
+  async createUser(req: RequestWithBody<UserInputModel>, res: Response) {
     const createResult = await usersService.createNewUser(req.body);
 
     // Если пришел объект с ошибкой
@@ -45,10 +48,9 @@ export const usersController = {
   },
 
   // Удаление юзера
-  async deleteUser(req: Request<{ id: ObjectId }>, res: Response) {
-    // Удаляем юзера
+  async deleteUser(req: RequestWithParams<ParamsId>, res: Response) {
     const isDeleted = await usersService.deleteUser(req.params.id);
-    // Если юзер не найден, возвращаем 404
+
     if (!isDeleted) {
       res.sendStatus(404);
       return;

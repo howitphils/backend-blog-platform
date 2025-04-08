@@ -5,7 +5,7 @@ import {
   UserViewModel,
 } from "../../../../types/users-types";
 import { ObjectId, WithId } from "mongodb";
-import { PaginationType } from "../../../../types/pagination";
+import { PaginationType } from "../../../../types/common-types";
 
 export const usersQueryRepository = {
   // Получение всех юзеров с учетом query параметров

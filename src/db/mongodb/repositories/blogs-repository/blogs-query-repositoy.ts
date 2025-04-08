@@ -5,7 +5,7 @@ import {
 import { ObjectId, WithId } from "mongodb";
 import { BlogDbType } from "../../../../types/blogs-types";
 import { blogsCollection } from "../../mongodb";
-import { PaginationType } from "../../../../types/pagination";
+import { PaginationType } from "../../../../types/common-types";
 
 export const blogsQueryRepository = {
   // Получение всех блогов
