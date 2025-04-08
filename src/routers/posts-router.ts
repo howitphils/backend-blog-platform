@@ -6,6 +6,7 @@ import { authGuard } from "../middlewares/auth/basic-auth-validator";
 import { postsController } from "./controllers/posts-controller";
 import { validateParamsId } from "../middlewares/validateParamsId";
 import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
+import { commentsBodyValidators } from "../middlewares/body-validations/comments-body-validators";
 
 export const postsRouter = Router();
 
@@ -23,6 +24,8 @@ postsRouter.post(
   "/:id/comments",
   jwtAuthGuard,
   validateParamsId,
+  commentsBodyValidators,
+  bodyValidationResult,
   postsController.createComment
 );
 
