@@ -4,6 +4,7 @@ import { usersRepository } from "../db/mongodb/repositories/users-repository/use
 import { LoginInputModel } from "../types/login-types";
 import bcrypt from "bcryptjs";
 import { OutputErrorsType } from "../types/output-errors-types";
+import { bcryptService } from "../application/bcryptService";
 
 export const usersService = {
   // Создание нового юзера
@@ -29,7 +30,7 @@ export const usersService = {
       };
     }
 
-    const passHash = await bcrypt.hash(password, 8);
+    const passHash = await bcryptService.createHasn(password);
 
     const newUser: UserDbType = {
       email: user.email,
@@ -49,6 +50,7 @@ export const usersService = {
     const targetUser = await usersRepository.getUserByLoginOrEmail(
       loginOrEmail
     );
+
     if (!targetUser) {
       return null;
     }
