@@ -74,8 +74,7 @@ export const postsController = {
   ) {
     const userId = req.user?.id;
     if (!userId) {
-      // Заменить на 500
-      res.sendStatus(401);
+      res.sendStatus(500);
       return;
     }
     const postId = req.params.id;

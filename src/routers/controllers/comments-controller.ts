@@ -14,6 +14,7 @@ import {
 import { commentsService } from "../../services/comments-service";
 import { RequestWithParams } from "../../types/requests-types";
 import { ParamsId } from "../../types/common-types";
+import { ResultStatus } from "../../types/resultObject-types";
 
 export const commentsController = {
   async getCommentById(
@@ -36,9 +37,10 @@ export const commentsController = {
   ) {
     const userId = req.user?.id;
     if (!userId) {
-      res.sendStatus(401);
+      res.sendStatus(500);
       return;
     }
+
     const commentId = req.params.id;
     const commentBody = req.body;
 
@@ -48,14 +50,20 @@ export const commentsController = {
       commentBody,
     };
 
-    const isUpdated = await commentsService.updateComment(updateCommentDto);
+    const updateResult = await commentsService.updateComment(updateCommentDto);
 
-    if (!isUpdated) {
-      res.sendStatus(404);
+    if (updateResult.status === ResultStatus.NotFound) {
+      res.status(404).json(updateResult.extensions);
       return;
     }
-    if (isUpdated === "null") {
-      res.sendStatus(403);
+
+    if (updateResult.status === ResultStatus.ServerError) {
+      res.sendStatus(500);
+      return;
+    }
+
+    if (updateResult.status === ResultStatus.Forbidden) {
+      res.status(403).json(updateResult.extensions);
       return;
     }
 
@@ -78,15 +86,20 @@ export const commentsController = {
       commentId,
     };
 
-    const isDeleted = await commentsService.deleteComment(deleteCommentDto);
+    const deleteResult = await commentsService.deleteComment(deleteCommentDto);
 
-    if (!isDeleted) {
-      res.sendStatus(404);
+    if (deleteResult.status === ResultStatus.NotFound) {
+      res.status(404).json(deleteResult.extensions);
       return;
     }
 
-    if (isDeleted === "null") {
-      res.sendStatus(403);
+    if (deleteResult.status === ResultStatus.ServerError) {
+      res.sendStatus(500);
+      return;
+    }
+
+    if (deleteResult.status === ResultStatus.Forbidden) {
+      res.status(403).json(deleteResult.extensions);
       return;
     }
 

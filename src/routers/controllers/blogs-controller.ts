@@ -67,14 +67,14 @@ export const blogsController = {
     req: RequestWithParamsAndBody<ParamsId, PostForBlogInputModel>,
     res: Response
   ) {
-    const newPostInputValues: PostInputModel = {
+    const postInputDto: PostInputModel = {
       blogId: req.params.id.toString(),
       content: req.body.content,
       shortDescription: req.body.shortDescription,
       title: req.body.title,
     };
 
-    const newPostId = await postsService.createNewPost(newPostInputValues);
+    const newPostId = await postsService.createNewPost(postInputDto);
 
     if (!newPostId) {
       res.sendStatus(404);

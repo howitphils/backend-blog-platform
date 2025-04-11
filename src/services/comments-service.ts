@@ -9,6 +9,7 @@ import {
 import { commentsRepository } from "../db/mongodb/repositories/comments-repository/comments-db-repository";
 import { postsService } from "./posts-service";
 import { usersService } from "./users-service";
+import { ResultObject, ResultStatus } from "../types/resultObject-types";
 
 export const commentsService = {
   async createNewComment(dto: CreateCommentDto): Promise<ObjectId | null> {
@@ -42,29 +43,87 @@ export const commentsService = {
     return commentsRepository.getCommentById(id);
   },
 
-  async updateComment(dto: UpdateCommentDto): Promise<boolean | null | string> {
+  async updateComment(
+    dto: UpdateCommentDto
+  ): Promise<ResultObject<boolean | null>> {
     const targetComment = await commentsService.getCommentById(dto.commentId);
 
     if (!targetComment) {
-      return null;
+      return {
+        status: ResultStatus.NotFound,
+        errorMessage: "Comment is not found",
+        extensions: [{ field: "commentId", message: "Wrong commentId" }],
+        data: null,
+      };
     }
 
     if (dto.userId !== targetComment.commentatorInfo.userId) {
-      return "null";
+      return {
+        status: ResultStatus.Forbidden,
+        errorMessage: "Forbidden",
+        extensions: [{ field: "userId", message: "Wrong userId" }],
+        data: null,
+      };
     }
 
-    return commentsRepository.updateComment(dto.commentId, dto.commentBody);
+    const isUpdated = await commentsRepository.updateComment(
+      dto.commentId,
+      dto.commentBody
+    );
+
+    if (!isUpdated) {
+      return {
+        status: ResultStatus.ServerError,
+        errorMessage: "Server error",
+        extensions: [],
+        data: null,
+      };
+    }
+
+    return {
+      status: ResultStatus.NoContent,
+      extensions: [],
+      data: true,
+    };
   },
 
-  async deleteComment(dto: DeleteCommentDto): Promise<boolean | null | string> {
+  async deleteComment(
+    dto: DeleteCommentDto
+  ): Promise<ResultObject<boolean | null>> {
     const targetComment = await commentsService.getCommentById(dto.commentId);
     if (!targetComment) {
-      return null;
-    }
-    if (targetComment.commentatorInfo.userId !== dto.userId) {
-      return "null";
+      return {
+        status: ResultStatus.NotFound,
+        errorMessage: "Comment is not found",
+        extensions: [{ field: "commentId", message: "Wrong commentId" }],
+        data: null,
+      };
     }
 
-    return commentsRepository.deleteComment(dto.commentId);
+    if (dto.userId !== targetComment.commentatorInfo.userId) {
+      return {
+        status: ResultStatus.Forbidden,
+        errorMessage: "Forbidden",
+        extensions: [{ field: "userId", message: "Wrong userId" }],
+        data: null,
+      };
+    }
+
+    const isDeleted = await commentsRepository.deleteComment(dto.commentId);
+
+    if (!isDeleted) {
+      return {
+        status: ResultStatus.ServerError,
+        errorMessage: "Server error",
+        extensions: [],
+        data: null,
+      };
+    }
+
+    return {
+      status: ResultStatus.NoContent,
+      extensions: [],
+      data: true,
+    };
   },
 };
