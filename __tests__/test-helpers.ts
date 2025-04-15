@@ -13,6 +13,7 @@ import {
 export const req = agent(app);
 
 export const basicAuth = { authorization: `Basic ${encodedCredentials}` };
+
 export const jwtAuth = (token: string) => ({
   authorization: `Bearer ${token}`,
 });
@@ -152,4 +153,10 @@ export const getAccessToken = async (user?: UserDtoType) => {
     })
     .expect(200);
   return res.body.accessToken;
+};
+
+export const createContentDto = (content?: string) => {
+  return {
+    content: content ?? "stringstringstringst",
+  };
 };

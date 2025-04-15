@@ -135,6 +135,7 @@ export const postsController = {
       res.sendStatus(404);
       return;
     }
+
     res.sendStatus(204);
   },
 };

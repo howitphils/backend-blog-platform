@@ -1,3 +1,4 @@
+import { HttpStatuses } from "./../src/types/http-statuses";
 import { MongoClient } from "mongodb";
 import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
 import { SETTINGS } from "../src/settings";
@@ -28,7 +29,9 @@ describe("/blogs", () => {
     });
 
     it("should return all blogs", async () => {
-      const res = await req.get(SETTINGS.PATHS.BLOGS).expect(200);
+      const res = await req
+        .get(SETTINGS.PATHS.BLOGS)
+        .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
     });
@@ -46,7 +49,7 @@ describe("/blogs", () => {
         .post(SETTINGS.PATHS.BLOGS)
         .set(basicAuth)
         .send(newBlogDto)
-        .expect(201);
+        .expect(HttpStatuses.Created);
 
       expect(res.body).toEqual({
         id: expect.any(String),
@@ -63,21 +66,38 @@ describe("/blogs", () => {
     });
 
     it("should not create new blog with incorrect input values", async () => {
-      const newBlogDto = createBlogDto({
+      const minInvalidBlogDto = createBlogDto({
         name: "",
+        description: "",
+        websiteUrl: "daszc",
+      });
+
+      const maxInvalidBlogDto = createBlogDto({
+        name: "a".repeat(16),
+        description: "b".repeat(501),
+        websiteUrl: "c".repeat(101),
       });
 
       await req
         .post(SETTINGS.PATHS.BLOGS)
         .set(basicAuth)
-        .send(newBlogDto)
-        .expect(400);
+        .send(minInvalidBlogDto)
+        .expect(HttpStatuses.BadRequest);
+
+      await req
+        .post(SETTINGS.PATHS.BLOGS)
+        .set(basicAuth)
+        .send(maxInvalidBlogDto)
+        .expect(HttpStatuses.BadRequest);
     });
 
     it("should not create new blog by unauthorized user", async () => {
       const newBlogDto = createBlogDto({});
 
-      await req.post(SETTINGS.PATHS.BLOGS).send(newBlogDto).expect(401);
+      await req
+        .post(SETTINGS.PATHS.BLOGS)
+        .send(newBlogDto)
+        .expect(HttpStatuses.Unauthorized);
     });
   });
 
@@ -93,7 +113,7 @@ describe("/blogs", () => {
 
       const res = await req
         .get(SETTINGS.PATHS.BLOGS + `/${blogDb.id}`)
-        .expect(200);
+        .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
         id: blogDb.id,
@@ -106,7 +126,9 @@ describe("/blogs", () => {
     });
 
     it("should not get the blog by the incorrect id", async () => {
-      await req.get(SETTINGS.PATHS.BLOGS + `/${blogId + 22}`).expect(404);
+      await req
+        .get(SETTINGS.PATHS.BLOGS + `/${blogId + 22}`)
+        .expect(HttpStatuses.NotFound);
     });
   });
 
@@ -131,11 +153,11 @@ describe("/blogs", () => {
         .put(SETTINGS.PATHS.BLOGS + `/${blogDb.id}`)
         .set(basicAuth)
         .send(updatedBlogDto)
-        .expect(204);
+        .expect(HttpStatuses.NoContent);
 
       const res = await req
         .get(SETTINGS.PATHS.BLOGS + `/${blogDb.id}`)
-        .expect(200);
+        .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
         id: blogDb.id,
@@ -148,15 +170,29 @@ describe("/blogs", () => {
     });
 
     it("should not update the blog with incorrect input values", async () => {
-      const newBlogDto = createBlogDto({
+      const minInvalidBlogDto = createBlogDto({
         name: "",
+        description: "",
+        websiteUrl: "daszc",
+      });
+
+      const maxInvalidBlogDto = createBlogDto({
+        name: "a".repeat(16),
+        description: "b".repeat(501),
+        websiteUrl: "c".repeat(101),
       });
 
       await req
         .put(SETTINGS.PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
-        .send(newBlogDto)
-        .expect(400);
+        .send(minInvalidBlogDto)
+        .expect(HttpStatuses.BadRequest);
+
+      await req
+        .put(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+        .set(basicAuth)
+        .send(maxInvalidBlogDto)
+        .expect(HttpStatuses.BadRequest);
     });
 
     it("should not update the blog with incorrect id", async () => {
@@ -168,7 +204,7 @@ describe("/blogs", () => {
         .put(SETTINGS.PATHS.BLOGS + `/${blogId + 22}`)
         .set(basicAuth)
         .send(newBlogDto)
-        .expect(404);
+        .expect(HttpStatuses.BadRequest);
     });
 
     it("should not update the blog by unauthorized user", async () => {
@@ -179,7 +215,7 @@ describe("/blogs", () => {
       await req
         .put(SETTINGS.PATHS.BLOGS + `/${blogId}`)
         .send(newBlogDto)
-        .expect(401);
+        .expect(HttpStatuses.Unauthorized);
     });
   });
 
@@ -193,13 +229,15 @@ describe("/blogs", () => {
 
       const res = await req
         .get(SETTINGS.PATHS.BLOGS + `/${blogDb.id}` + "/posts")
-        .expect(200);
+        .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
     });
 
     it("should not return all posts for a specific blog with incorrect blogId", async () => {
-      await req.get(SETTINGS.PATHS.BLOGS + "/22" + "/posts").expect(404);
+      await req
+        .get(SETTINGS.PATHS.BLOGS + "/22" + "/posts")
+        .expect(HttpStatuses.NotFound);
     });
   });
 
@@ -219,7 +257,7 @@ describe("/blogs", () => {
         .post(SETTINGS.PATHS.BLOGS + `/${blogDb.id}` + "/posts")
         .set(basicAuth)
         .send(newPostDto)
-        .expect(201);
+        .expect(HttpStatuses.Created);
 
       expect(res.body).toEqual({
         id: expect.any(String),
@@ -231,7 +269,9 @@ describe("/blogs", () => {
         createdAt: expect.any(String),
       });
 
-      await req.get(SETTINGS.PATHS.POSTS + `/${res.body.id}`).expect(200);
+      await req
+        .get(SETTINGS.PATHS.POSTS + `/${res.body.id}`)
+        .expect(HttpStatuses.Success);
     });
 
     it("should not create new post for a specific blog with incorrect blogId", async () => {

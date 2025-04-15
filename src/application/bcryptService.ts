@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs/umd/types";
+import bcrypt from "bcryptjs";
 
 export const bcryptService = {
   async createHasn(password: string) {
