@@ -15,6 +15,7 @@ import {
 } from "./test-helpers";
 import { MongoClient } from "mongodb";
 import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
+import { HttpStatuses } from "../src/types/http-statuses";
 
 describe("/posts", () => {
   let client: MongoClient;
@@ -53,7 +54,7 @@ describe("/posts", () => {
       const dbPost = await createPostInDbHelper();
 
       const res = await req
-        .get(SETTINGS.PATHS.POSTS + `${dbPost.id}` + "/comments")
+        .get(SETTINGS.PATHS.POSTS + `/${dbPost.id}` + "/comments")
         .expect(200);
 
       expect(res.body).toEqual(defaultPagination);
@@ -77,7 +78,7 @@ describe("/posts", () => {
       postId = dbPost.id;
 
       const res = await req
-        .post(SETTINGS.PATHS.POSTS + `${postId}` + "/comments")
+        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send({ content: "content" })
         .expect(201);
@@ -98,13 +99,13 @@ describe("/posts", () => {
       const contentDtoMax = createContentDto("d".repeat(301));
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `${postId}` + "/comments")
+        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDtoMin)
         .expect(400);
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `${postId}` + "/comments")
+        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDtoMax)
         .expect(400);
@@ -114,16 +115,16 @@ describe("/posts", () => {
       const contentDto = createContentDto();
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `${postId}` + "/comments")
+        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
         .send(contentDto)
-        .expect(401);
+        .expect(HttpStatuses.Unauthorized);
     });
 
     it("should not create a new comment for not existing post", async () => {
       const contentDto = createContentDto();
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `${postId + 12}` + "/comments")
+        .post(SETTINGS.PATHS.POSTS + `/${postId + 12}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDto)
         .expect(404);
@@ -296,35 +297,39 @@ describe("/posts", () => {
   });
 
   describe("delete post", () => {
+    let postId = "";
+
+    beforeAll(async () => {
+      const postDb = await createPostInDbHelper();
+      postId = postDb.id;
+    });
+
     afterAll(async () => {
       await clearCollections();
     });
 
-    let postId = "";
-
     it("should not delete the post by unauthorized user", async () => {
-      const postDb = await createPostInDbHelper();
-      postId = postDb.id;
-
-      await req.delete(SETTINGS.PATHS.POSTS + `/${postId}`).expect(401);
+      await req
+        .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .expect(HttpStatuses.Unauthorized);
     });
 
     it("should not delete the post by incorrect id", async () => {
       await req
         .delete(SETTINGS.PATHS.POSTS + `/${postId + 22}`)
         .set(basicAuth)
-        .expect(404);
+        .expect(HttpStatuses.NotFound);
     });
 
     it("should delete the post", async () => {
-      const res = await req
+      await req
         .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
         .set(basicAuth)
-        .expect(204);
+        .expect(HttpStatuses.NoContent);
 
-      console.log(res.body);
-
-      await req.get(SETTINGS.PATHS.POSTS + `/${postId}`).expect(404);
+      await req
+        .get(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .expect(HttpStatuses.NotFound);
     });
   });
 });

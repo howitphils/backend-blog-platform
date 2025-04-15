@@ -204,7 +204,7 @@ describe("/blogs", () => {
         .put(SETTINGS.PATHS.BLOGS + `/${blogId + 22}`)
         .set(basicAuth)
         .send(newBlogDto)
-        .expect(HttpStatuses.BadRequest);
+        .expect(HttpStatuses.NotFound);
     });
 
     it("should not update the blog by unauthorized user", async () => {
@@ -281,19 +281,33 @@ describe("/blogs", () => {
         .post(SETTINGS.PATHS.BLOGS + "/22/posts")
         .set(basicAuth)
         .send(newPostDto)
-        .expect(404);
+        .expect(HttpStatuses.NotFound);
     });
 
     it("should not create new post for a specific blog with incorrect input values", async () => {
-      const newPostDto = createPostForBlogDto({
+      const invalidPostDtoMin = createPostForBlogDto({
         title: "",
+        content: "",
+        shortDescription: "",
+      });
+
+      const invalidPostDtoMax = createPostForBlogDto({
+        title: "a".repeat(31),
+        content: "b".repeat(101),
+        shortDescription: "c".repeat(1001),
       });
 
       await req
         .post(SETTINGS.PATHS.BLOGS + `/${blogId}` + "/posts")
         .set(basicAuth)
-        .send(newPostDto)
-        .expect(400);
+        .send(invalidPostDtoMin)
+        .expect(HttpStatuses.BadRequest);
+
+      await req
+        .post(SETTINGS.PATHS.BLOGS + `/${blogId}` + "/posts")
+        .set(basicAuth)
+        .send(invalidPostDtoMax)
+        .expect(HttpStatuses.BadRequest);
     });
 
     it("should not create new post for a specific blog without authorization", async () => {
@@ -302,41 +316,45 @@ describe("/blogs", () => {
       await req
         .post(SETTINGS.PATHS.BLOGS + `/${blogId}` + "/posts")
         .send(postDto)
-        .expect(401);
+        .expect(HttpStatuses.Unauthorized);
     });
   });
 
   describe("delete blog", () => {
+    let blogId = "";
+
+    beforeAll(async () => {
+      const blogDb = await createNewBlogInDb();
+      blogId = blogDb.id;
+    });
+
     afterAll(async () => {
       await clearCollections();
     });
 
-    let blogId = "";
-
     it("should not delete the blog by unauthorized user", async () => {
-      const blogDb = await createNewBlogInDb();
-      blogId = blogDb.id;
-
-      await req.delete(SETTINGS.PATHS.BLOGS + `/${blogId}`).expect(401);
+      await req
+        .delete(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+        .expect(HttpStatuses.Unauthorized);
     });
 
     it("should not delete the blog with incorrect id", async () => {
       await req
         .delete(SETTINGS.PATHS.BLOGS + `/${blogId + 22}`)
         .set(basicAuth)
-        .expect(404);
+        .expect(HttpStatuses.NotFound);
     });
 
     it("should delete the blog", async () => {
       await req
         .delete(SETTINGS.PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
-        .expect(204);
+        .expect(HttpStatuses.NoContent);
 
       await req
         .delete(SETTINGS.PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
-        .expect(404);
+        .expect(HttpStatuses.NotFound);
     });
   });
 });

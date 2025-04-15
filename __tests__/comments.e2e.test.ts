@@ -10,6 +10,7 @@ import {
 } from "./test-helpers";
 import { MongoClient } from "mongodb";
 import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
+import { HttpStatuses } from "../src/types/http-statuses";
 
 describe("/comments", () => {
   let client: MongoClient;
@@ -34,7 +35,7 @@ describe("/comments", () => {
     const res = await req
       .get(`${SETTINGS.PATHS.POSTS}/${dbPost.id}/comments`)
       .set(jwtAuth(token))
-      .expect(200);
+      .expect(HttpStatuses.Success);
 
     expect(res.body).toEqual(defaultPagination);
   });
@@ -49,7 +50,7 @@ describe("/comments", () => {
       .post(`${SETTINGS.PATHS.POSTS}/${dbPost.id}/comments`)
       .set(jwtAuth(token))
       .send({ content: "hello, world!" })
-      .expect(201);
+      .expect(HttpStatuses.Created);
 
     console.log(res.body);
 
