@@ -39,7 +39,9 @@ describe("/posts", () => {
     });
 
     it("should return all posts", async () => {
-      const res = await req.get(SETTINGS.PATHS.POSTS).expect(200);
+      const res = await req
+        .get(SETTINGS.PATHS.POSTS)
+        .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
     });
@@ -55,7 +57,7 @@ describe("/posts", () => {
 
       const res = await req
         .get(SETTINGS.PATHS.POSTS + `/${dbPost.id}` + "/comments")
-        .expect(200);
+        .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
     });
@@ -81,7 +83,7 @@ describe("/posts", () => {
         .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send({ content: "content" })
-        .expect(201);
+        .expect(HttpStatuses.Created);
 
       expect(res.body).toEqual({
         id: expect.any(String),
@@ -102,13 +104,13 @@ describe("/posts", () => {
         .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDtoMin)
-        .expect(400);
+        .expect(HttpStatuses.BadRequest);
 
       await req
         .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDtoMax)
-        .expect(400);
+        .expect(HttpStatuses.BadRequest);
     });
 
     it("should not create a new comment for unauthorized user", async () => {
@@ -127,7 +129,7 @@ describe("/posts", () => {
         .post(SETTINGS.PATHS.POSTS + `/${postId + 12}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDto)
-        .expect(404);
+        .expect(HttpStatuses.NotFound);
     });
   });
 
@@ -144,7 +146,7 @@ describe("/posts", () => {
         .post(SETTINGS.PATHS.POSTS)
         .set(basicAuth)
         .send(newPostDto)
-        .expect(201);
+        .expect(HttpStatuses.Created);
 
       expect(res.body).toEqual({
         id: expect.any(String),
@@ -156,7 +158,9 @@ describe("/posts", () => {
         createdAt: expect.any(String),
       });
 
-      const postsRes = await req.get(SETTINGS.PATHS.POSTS).expect(200);
+      const postsRes = await req
+        .get(SETTINGS.PATHS.POSTS)
+        .expect(HttpStatuses.Success);
 
       expect(postsRes.body.items.length).toBe(1);
     });
@@ -173,13 +177,16 @@ describe("/posts", () => {
         .post(SETTINGS.PATHS.POSTS)
         .set(basicAuth)
         .send(newPostDto)
-        .expect(400);
+        .expect(HttpStatuses.BadRequest);
     });
 
     it("should not create new post by unauthorized user", async () => {
       const newPostDto = createPostDtobHelper();
 
-      await req.post(SETTINGS.PATHS.POSTS).send(newPostDto).expect(401);
+      await req
+        .post(SETTINGS.PATHS.POSTS)
+        .send(newPostDto)
+        .expect(HttpStatuses.Unauthorized);
     });
   });
 
@@ -196,7 +203,7 @@ describe("/posts", () => {
 
       const res = await req
         .get(SETTINGS.PATHS.POSTS + `/${postId}`)
-        .expect(200);
+        .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
         id: postDb.id,
@@ -210,7 +217,9 @@ describe("/posts", () => {
     });
 
     it("should not return a post by incorrect id", async () => {
-      await req.get(SETTINGS.PATHS.POSTS + `/${postId + 21}`).expect(404);
+      await req
+        .get(SETTINGS.PATHS.POSTS + `/${postId + 21}`)
+        .expect(HttpStatuses.NotFound);
     });
   });
 
@@ -221,6 +230,7 @@ describe("/posts", () => {
 
     let postId = "";
     let blogId = "";
+
     it("should update the post", async () => {
       const postDb = await createPostInDbHelper();
 
@@ -237,11 +247,11 @@ describe("/posts", () => {
         .put(SETTINGS.PATHS.POSTS + `/${postId}`)
         .set(basicAuth)
         .send(updatedPostDto)
-        .expect(204);
+        .expect(HttpStatuses.NoContent);
 
       const updatedPostRes = await req
         .get(SETTINGS.PATHS.POSTS + `/${postId}`)
-        .expect(200);
+        .expect(HttpStatuses.Success);
 
       expect(updatedPostRes.body).toEqual({
         id: postDb.id,
@@ -255,17 +265,31 @@ describe("/posts", () => {
     });
 
     it("should not update the post with incorrect input values", async () => {
-      const updatedPostDto = createPostDto({
+      const invalidPostDtoMin = createPostDto({
         blogId: blogId,
         content: "",
         title: "",
+        shortDescription: "",
+      });
+
+      const invalidPostDtoMax = createPostDto({
+        blogId: blogId,
+        content: "a".repeat(31),
+        title: "b".repeat(101),
+        shortDescription: "c".repeat(1001),
       });
 
       await req
         .put(SETTINGS.PATHS.POSTS + `/${postId}`)
         .set(basicAuth)
-        .send(updatedPostDto)
-        .expect(400);
+        .send(invalidPostDtoMin)
+        .expect(HttpStatuses.BadRequest);
+
+      await req
+        .put(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .set(basicAuth)
+        .send(invalidPostDtoMax)
+        .expect(HttpStatuses.BadRequest);
     });
 
     it("should not update the post by incorrect id", async () => {
@@ -279,7 +303,7 @@ describe("/posts", () => {
         .put(SETTINGS.PATHS.POSTS + `/${blogId + 22}`)
         .set(basicAuth)
         .send(updatedPostDto)
-        .expect(404);
+        .expect(HttpStatuses.NotFound);
     });
 
     it("should not update the post by unauthorized user", async () => {
@@ -292,7 +316,7 @@ describe("/posts", () => {
       await req
         .put(SETTINGS.PATHS.POSTS + `/${postId}`)
         .send(updatedPostDto)
-        .expect(401);
+        .expect(HttpStatuses.Unauthorized);
     });
   });
 
