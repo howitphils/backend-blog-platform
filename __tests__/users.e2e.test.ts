@@ -9,6 +9,7 @@ import {
 } from "./test-helpers";
 import { MongoClient } from "mongodb";
 import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
+import { HttpStatuses } from "../src/types/http-statuses";
 
 describe("/users", () => {
   let client: MongoClient;
@@ -52,7 +53,10 @@ describe("/users", () => {
   // });
 
   it("should return all users", async () => {
-    const res = await req.get(SETTINGS.PATHS.USERS).set(basicAuth).expect(200);
+    const res = await req
+      .get(SETTINGS.PATHS.USERS)
+      .set(basicAuth)
+      .expect(HttpStatuses.Success);
 
     expect(res.body).toEqual(defaultPagination);
   });
@@ -64,7 +68,7 @@ describe("/users", () => {
       .post(SETTINGS.PATHS.USERS)
       .set(basicAuth)
       .send(newUserDto)
-      .expect(201);
+      .expect(HttpStatuses.Created);
 
     expect(res.body).toEqual({
       id: expect.any(String),
@@ -82,7 +86,7 @@ describe("/users", () => {
       .post(SETTINGS.PATHS.USERS)
       .set(basicAuth)
       .send(newUserDto)
-      .expect(400);
+      .expect(HttpStatuses.BadRequest);
 
     expect(res.body).toEqual({
       errorsMessages: [
@@ -102,7 +106,7 @@ describe("/users", () => {
       .post(SETTINGS.PATHS.USERS)
       .set(basicAuth)
       .send(newUserDto)
-      .expect(400);
+      .expect(HttpStatuses.BadRequest);
 
     expect(res.body).toEqual({
       errorsMessages: [
@@ -121,7 +125,7 @@ describe("/users", () => {
       .post(SETTINGS.PATHS.USERS)
       .set(basicAuth)
       .send(newUserDto)
-      .expect(400);
+      .expect(HttpStatuses.BadRequest);
 
     expect(res.body).toEqual({
       errorsMessages: [
@@ -140,7 +144,7 @@ describe("/users", () => {
       .post(SETTINGS.PATHS.USERS)
       .set(basicAuth)
       .send(newUserDto)
-      .expect(400);
+      .expect(HttpStatuses.BadRequest);
 
     expect(res.body).toEqual({
       errorsMessages: [
@@ -158,15 +162,11 @@ describe("/users", () => {
     await req
       .delete(SETTINGS.PATHS.USERS + `/${newUser.id}`)
       .set(basicAuth)
-      .expect(204);
-  });
-
-  it("should not delete not existing user", async () => {
-    const newUser = await createNewUserInDb();
+      .expect(HttpStatuses.NoContent);
 
     await req
-      .delete(SETTINGS.PATHS.USERS + `/${newUser.id + 22}`)
+      .delete(SETTINGS.PATHS.USERS + `/${newUser.id}`)
       .set(basicAuth)
-      .expect(404);
+      .expect(HttpStatuses.NotFound);
   });
 });

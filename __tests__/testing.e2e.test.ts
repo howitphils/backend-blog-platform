@@ -3,6 +3,7 @@ import { SETTINGS } from "../src/settings";
 import { req } from "./test-helpers";
 import { runDb } from "../src/db/mongodb/mongodb";
 import { MongoClient } from "mongodb";
+import { HttpStatuses } from "../src/types/http-statuses";
 
 describe("/testing", () => {
   let client: MongoClient;
@@ -17,6 +18,8 @@ describe("/testing", () => {
   });
 
   it("should remove all data from db", async () => {
-    await req.delete(SETTINGS.PATHS.TESTS + "/all-data").expect(204);
+    await req
+      .delete(SETTINGS.PATHS.TESTS + "/all-data")
+      .expect(HttpStatuses.NoContent);
   });
 });
