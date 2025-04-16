@@ -5,6 +5,7 @@ import {
 } from "express-validator";
 import { ErrorMessageType } from "../types/output-errors-types";
 import { NextFunction, Request, Response } from "express";
+import { HttpStatuses } from "../types/http-statuses";
 
 const createOutputErrors = (errors: ValidationError): ErrorMessageType => {
   // Переприсваиваем тип
@@ -27,7 +28,7 @@ export const bodyValidationResult = (
 
   // Если ошибки есть, возвращаем и отправляем их клиенту
   if (errros.length) {
-    res.status(400).json({ errorsMessages: errros });
+    res.status(HttpStatuses.BadRequest).json({ errorsMessages: errros });
     return;
   }
 

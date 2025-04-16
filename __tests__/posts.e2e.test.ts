@@ -2,6 +2,7 @@
 import { SETTINGS } from "../src/settings";
 import {
   basicAuth,
+  clearCollections,
   createContentDto,
   createNewBlogInDb,
   createNewUserInDb,
@@ -15,7 +16,7 @@ import {
   req,
 } from "./test-helpers";
 import { MongoClient } from "mongodb";
-import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
+import { runDb } from "../src/db/mongodb/mongodb";
 import { HttpStatuses } from "../src/types/http-statuses";
 
 describe("/posts", () => {
@@ -24,10 +25,6 @@ describe("/posts", () => {
   beforeAll(async () => {
     client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
   });
-
-  // beforeEach(async () => {
-  //   await clearCollections();
-  // });
 
   afterAll(async () => {
     await client.close();

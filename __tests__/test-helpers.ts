@@ -169,3 +169,25 @@ export const clearCollections = async () => {
     .delete(SETTINGS.PATHS.TESTS + "/all-data")
     .expect(HttpStatuses.NoContent);
 };
+
+export const createCommentInDb = async () => {
+  const userDto = createUserDto({
+    login: "random",
+    email: "randomemail@email.com",
+  });
+  const dbUser = await createNewUserInDb(userDto);
+
+  const dbPost = await createPostInDbHelper();
+
+  const contentDto = createContentDto({});
+
+  const token = await getAccessToken(userDto);
+
+  const res = await req
+    .post(SETTINGS.PATHS.POSTS + `/${dbPost.id}` + "/comments")
+    .set(jwtAuth(token))
+    .send(contentDto)
+    .expect(HttpStatuses.Created);
+
+  return { comment: res.body, token, user: dbUser };
+};
