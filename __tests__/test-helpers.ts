@@ -9,6 +9,7 @@ import {
   PostForBlogDtoType,
   PostViewModel,
 } from "../src/types/posts-types";
+import { HttpStatuses } from "../src/types/http-statuses";
 
 export const req = agent(app);
 
@@ -143,8 +144,9 @@ export const createPostInDbHelper = async () => {
 export const getAccessToken = async (user?: UserDtoType) => {
   if (!user) {
     user = createUserDto({});
+    await createNewUserInDb(user);
   }
-  await createNewUserInDb(user);
+
   const res = await req
     .post(SETTINGS.PATHS.AUTH + "/login")
     .send({
@@ -152,11 +154,18 @@ export const getAccessToken = async (user?: UserDtoType) => {
       password: user.password,
     })
     .expect(200);
+
   return res.body.accessToken;
 };
 
-export const createContentDto = (content?: string) => {
+export const createContentDto = ({ content }: { content?: string }) => {
   return {
     content: content ?? "stringstringstringst",
   };
+};
+
+export const clearCollections = async () => {
+  await req
+    .delete(SETTINGS.PATHS.TESTS + "/all-data")
+    .expect(HttpStatuses.NoContent);
 };

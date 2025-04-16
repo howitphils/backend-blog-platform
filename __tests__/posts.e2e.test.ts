@@ -8,6 +8,7 @@ import {
   createPostDto,
   createPostDtobHelper,
   createPostInDbHelper,
+  createUserDto,
   defaultPagination,
   getAccessToken,
   jwtAuth,
@@ -24,9 +25,9 @@ describe("/posts", () => {
     client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
   });
 
-  beforeEach(async () => {
-    await clearCollections();
-  });
+  // beforeEach(async () => {
+  //   await clearCollections();
+  // });
 
   afterAll(async () => {
     await client.close();
@@ -72,22 +73,24 @@ describe("/posts", () => {
     let postId = "";
 
     it("should return a new comment", async () => {
+      const userDto = createUserDto({});
+      const dbUser = await createNewUserInDb(userDto);
       const dbPost = await createPostInDbHelper();
-      const dbUser = await createNewUserInDb();
-      const contentDto = createContentDto();
+      const contentDto = createContentDto({});
 
-      token = await getAccessToken(dbUser);
+      token = await getAccessToken(userDto);
+
       postId = dbPost.id;
 
       const res = await req
         .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
         .set(jwtAuth(token))
-        .send({ content: "content" })
+        .send(contentDto)
         .expect(HttpStatuses.Created);
 
       expect(res.body).toEqual({
         id: expect.any(String),
-        content: contentDto,
+        content: contentDto.content,
         commentatorInfo: {
           userId: dbUser.id,
           userLogin: dbUser.login,
@@ -97,8 +100,8 @@ describe("/posts", () => {
     });
 
     it("should not create a new comment with incorrect body", async () => {
-      const contentDtoMin = createContentDto("d".repeat(19));
-      const contentDtoMax = createContentDto("d".repeat(301));
+      const contentDtoMin = createContentDto({ content: "d".repeat(19) });
+      const contentDtoMax = createContentDto({ content: "d".repeat(301) });
 
       await req
         .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
@@ -114,7 +117,7 @@ describe("/posts", () => {
     });
 
     it("should not create a new comment for unauthorized user", async () => {
-      const contentDto = createContentDto();
+      const contentDto = createContentDto({});
 
       await req
         .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
@@ -123,7 +126,7 @@ describe("/posts", () => {
     });
 
     it("should not create a new comment for not existing post", async () => {
-      const contentDto = createContentDto();
+      const contentDto = createContentDto({});
 
       await req
         .post(SETTINGS.PATHS.POSTS + `/${postId + 12}` + "/comments")

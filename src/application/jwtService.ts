@@ -5,7 +5,7 @@ import { SETTINGS } from "../settings";
 export const jwtService = {
   createJwt(userId: ObjectId) {
     const token = jwt.sign({ userId }, SETTINGS.JWT_SECRET, {
-      expiresIn: "2h",
+      expiresIn: "24h",
     });
     return token;
   },
