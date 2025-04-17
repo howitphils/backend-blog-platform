@@ -78,8 +78,6 @@ describe("/users", () => {
         .send(newUserDto)
         .expect(HttpStatuses.Created);
 
-      console.log("created user: ", res.body);
-
       expect(res.body).toEqual({
         id: expect.any(String),
         login: newUserDto.login,
@@ -90,8 +88,6 @@ describe("/users", () => {
 
     it("should not create a user with duplicated login", async () => {
       const newUserDto = createUserDto({ email: "unique-email@mail.ru" });
-
-      console.log(newUserDto);
 
       const res = await req
         .post(SETTINGS.PATHS.USERS)

@@ -1,7 +1,6 @@
 import { Response, NextFunction, Request } from "express";
 import { jwtService } from "../../application/jwtService";
-
-// type RequestWithUserId<U extends { id: string }> = Request<{}, {}, {}, {}, U>;
+import { HttpStatuses } from "../../types/http-statuses";
 
 export const jwtAuthGuard = (
   req: Request<{}>,
@@ -11,7 +10,7 @@ export const jwtAuthGuard = (
   if (!req.headers.authorization) {
     console.log("no headers");
 
-    res.sendStatus(401);
+    res.sendStatus(HttpStatuses.Unauthorized);
     return;
   }
 
@@ -20,7 +19,7 @@ export const jwtAuthGuard = (
   if (authType !== "Bearer") {
     console.log("wrong type");
 
-    res.sendStatus(401);
+    res.sendStatus(HttpStatuses.Unauthorized);
     return;
   }
 
@@ -28,7 +27,7 @@ export const jwtAuthGuard = (
 
   if (!verifiedUser) {
     console.log("not verified");
-    res.sendStatus(401);
+    res.sendStatus(HttpStatuses.Unauthorized);
     return;
   }
 
