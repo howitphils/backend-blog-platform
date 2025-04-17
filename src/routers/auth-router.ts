@@ -12,7 +12,7 @@ authRouter.post(
   "/login",
   loginBodyValidators,
   bodyValidationResult,
-  authController.checkUser
+  authController.loginUser
 );
 // Логинизация
 authRouter.get("/me", jwtAuthGuard, authController.getMyInfo);

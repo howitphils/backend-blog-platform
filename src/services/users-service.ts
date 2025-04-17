@@ -2,7 +2,6 @@ import { ObjectId, WithId } from "mongodb";
 import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { LoginInputModel } from "../types/login-types";
-import bcrypt from "bcryptjs";
 import { OutputErrorsType } from "../types/output-errors-types";
 import { bcryptService } from "../application/bcryptService";
 
@@ -38,11 +37,12 @@ export const usersService = {
       passHash,
       createdAt: new Date().toISOString(),
     };
+
     return usersRepository.createNewUser(newUser);
   },
 
   // Проверка на существование юзера
-  async checkUser(
+  async validateUser(
     credentials: LoginInputModel
   ): Promise<WithId<UserDbType> | null> {
     const { loginOrEmail, password } = credentials;
@@ -51,17 +51,14 @@ export const usersService = {
       loginOrEmail
     );
 
-    if (!targetUser) {
-      return null;
-    }
+    if (!targetUser) return null;
 
-    const isCorrect = await bcrypt.compare(password, targetUser.passHash);
+    const isCorrect = await bcryptService.compareHash(
+      password,
+      targetUser.passHash
+    );
 
-    if (isCorrect) {
-      return targetUser;
-    } else {
-      return null;
-    }
+    return isCorrect ? targetUser : null;
   },
 
   async getUserById(id: ObjectId): Promise<WithId<UserDbType> | null> {

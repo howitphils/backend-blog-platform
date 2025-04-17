@@ -46,7 +46,7 @@ export type UserId = {
   id: string;
 };
 
-export type meModel = {
+export type MeModel = {
   email: string;
   login: string;
   userId: string;

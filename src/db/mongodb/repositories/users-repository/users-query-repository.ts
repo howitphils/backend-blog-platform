@@ -1,5 +1,6 @@
 import { usersCollection } from "../../mongodb";
 import {
+  MeModel,
   UserDbType,
   UsersMapedQueryType,
   UserViewModel,
@@ -66,7 +67,15 @@ export const usersQueryRepository = {
   async getUserById(_id: ObjectId): Promise<UserViewModel | null> {
     const targetUser = await usersCollection.findOne({ _id });
     if (!targetUser) return null;
+
     return this._mapFromDbToViewModel(targetUser);
+  },
+
+  async getMyInfo(_id: ObjectId): Promise<MeModel | null> {
+    const targetUser = await usersCollection.findOne({ _id });
+    if (!targetUser) return null;
+
+    return this._createMeModel(targetUser);
   },
 
   // Преобразование юзера из формата базы данных в формат, который ожидает клиент
@@ -77,6 +86,13 @@ export const usersQueryRepository = {
       login: login,
       email: email,
       createdAt: createdAt,
+    };
+  },
+  _createMeModel(user: WithId<UserDbType>): MeModel {
+    return {
+      userId: user._id.toString(),
+      email: user.email,
+      login: user.login,
     };
   },
 };
