@@ -3,10 +3,12 @@ import {
   BlogsRequestQueryType,
 } from "../../types/blogs-types";
 import { CommentsRequestQueryType } from "../../types/comments-types";
+import { HttpStatuses } from "../../types/http-statuses";
 import {
   PostsMapedQueryType,
   PostsRequestQueryType,
 } from "../../types/posts-types";
+import { ResultStatus } from "../../types/resultObject-types";
 import {
   UsersMapedQueryType,
   UsersRequestQueryType,
@@ -73,4 +75,26 @@ export const mapCommentsQueryParams = (
     sortBy: sortBy ? sortBy : "createdAt",
     sortDirection: sortDirection === "asc" ? sortDirection : "desc",
   };
+};
+
+export const convertToHttpCode = (
+  status: keyof typeof ResultStatus
+): number => {
+  switch (status) {
+    case "BadRequest":
+      return HttpStatuses.BadRequest;
+    case "Forbidden":
+      return HttpStatuses.Forbidden;
+    case "NoContent":
+      return HttpStatuses.NoContent;
+    case "NotFound":
+      return HttpStatuses.NotFound;
+    case "Success":
+      return HttpStatuses.Success;
+    case "Unauthorized":
+      return HttpStatuses.Unauthorized;
+
+    default:
+      return HttpStatuses.ServerError;
+  }
 };

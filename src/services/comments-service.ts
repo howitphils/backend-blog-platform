@@ -13,7 +13,6 @@ import { ResultObject, ResultStatus } from "../types/resultObject-types";
 
 export const commentsService = {
   async createNewComment(dto: CreateCommentDto): Promise<ObjectId | null> {
-    // Проверка на существование поста
     const targetPost = await postsService.getPostById(dto.postId);
     if (!targetPost) {
       return null;
@@ -24,7 +23,6 @@ export const commentsService = {
       return null;
     }
 
-    // Создаем новый комментарий
     const newComment: CommentDbModel = {
       content: dto.commentBody.content,
       commentatorInfo: {
@@ -35,7 +33,6 @@ export const commentsService = {
       postId: dto.postId.toString(),
     };
 
-    // Возвращаем id созданного комментария
     return commentsRepository.createComment(newComment);
   },
 
@@ -66,19 +63,7 @@ export const commentsService = {
       };
     }
 
-    const isUpdated = await commentsRepository.updateComment(
-      dto.commentId,
-      dto.commentBody
-    );
-
-    if (!isUpdated) {
-      return {
-        status: ResultStatus.ServerError,
-        errorMessage: "Server error",
-        extensions: [],
-        data: null,
-      };
-    }
+    await commentsRepository.updateComment(dto.commentId, dto.commentBody);
 
     return {
       status: ResultStatus.NoContent,
@@ -91,6 +76,7 @@ export const commentsService = {
     dto: DeleteCommentDto
   ): Promise<ResultObject<boolean | null>> {
     const targetComment = await commentsService.getCommentById(dto.commentId);
+
     if (!targetComment) {
       return {
         status: ResultStatus.NotFound,
@@ -103,22 +89,13 @@ export const commentsService = {
     if (dto.userId !== targetComment.commentatorInfo.userId) {
       return {
         status: ResultStatus.Forbidden,
-        errorMessage: "Forbidden",
+        errorMessage: "Forbidden action",
         extensions: [{ field: "userId", message: "Wrong userId" }],
         data: null,
       };
     }
 
-    const isDeleted = await commentsRepository.deleteComment(dto.commentId);
-
-    if (!isDeleted) {
-      return {
-        status: ResultStatus.ServerError,
-        errorMessage: "Server error",
-        extensions: [],
-        data: null,
-      };
-    }
+    await commentsRepository.deleteComment(dto.commentId);
 
     return {
       status: ResultStatus.NoContent,

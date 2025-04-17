@@ -15,6 +15,8 @@ import { commentsService } from "../../services/comments-service";
 import { RequestWithParams } from "../../types/requests-types";
 import { ParamsId } from "../../types/common-types";
 import { ResultStatus } from "../../types/resultObject-types";
+import { HttpStatuses } from "../../types/http-statuses";
+import { convertToHttpCode } from "./utils";
 
 export const commentsController = {
   async getCommentById(
@@ -25,10 +27,10 @@ export const commentsController = {
       req.params.id
     );
     if (!targetComment) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
-    res.status(200).json(targetComment);
+    res.status(HttpStatuses.Success).json(targetComment);
   },
 
   async updateComment(
@@ -37,7 +39,7 @@ export const commentsController = {
   ) {
     const userId = req.user?.id;
     if (!userId) {
-      res.sendStatus(500);
+      res.sendStatus(HttpStatuses.ServerError);
       return;
     }
 
@@ -52,34 +54,27 @@ export const commentsController = {
 
     const updateResult = await commentsService.updateComment(updateCommentDto);
 
-    if (updateResult.status === ResultStatus.NotFound) {
-      res.status(404).json(updateResult.extensions);
+    if (updateResult.status !== ResultStatus.Success) {
+      res
+        .status(convertToHttpCode(updateResult.status))
+        .json(updateResult.extensions);
       return;
     }
 
-    if (updateResult.status === ResultStatus.ServerError) {
-      res.sendStatus(500);
-      return;
-    }
-
-    if (updateResult.status === ResultStatus.Forbidden) {
-      res.status(403).json(updateResult.extensions);
-      return;
-    }
-
-    res.sendStatus(204);
+    res.sendStatus(HttpStatuses.NoContent);
   },
 
   async deleteComment(
     req: RequestWithParamsAndUserId<ParamsId, UserId>,
     res: Response
   ) {
+    const commentId = req.params.id;
     const userId = req.user?.id;
+
     if (!userId) {
-      res.sendStatus(401);
+      res.sendStatus(HttpStatuses.ServerError);
       return;
     }
-    const commentId = req.params.id;
 
     const deleteCommentDto: DeleteCommentDto = {
       userId,
@@ -88,21 +83,13 @@ export const commentsController = {
 
     const deleteResult = await commentsService.deleteComment(deleteCommentDto);
 
-    if (deleteResult.status === ResultStatus.NotFound) {
-      res.status(404).json(deleteResult.extensions);
+    if (deleteResult.status !== ResultStatus.Success) {
+      res
+        .status(convertToHttpCode(deleteResult.status))
+        .json(deleteResult.extensions);
       return;
     }
 
-    if (deleteResult.status === ResultStatus.ServerError) {
-      res.sendStatus(500);
-      return;
-    }
-
-    if (deleteResult.status === ResultStatus.Forbidden) {
-      res.status(403).json(deleteResult.extensions);
-      return;
-    }
-
-    res.sendStatus(204);
+    res.sendStatus(HttpStatuses.NoContent);
   },
 };

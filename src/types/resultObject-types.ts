@@ -14,7 +14,7 @@ type ExtensionType = {
 };
 
 export type ResultObject<T = null> = {
-  status: ResultStatus;
+  status: keyof typeof ResultStatus;
   errorMessage?: string;
   extensions: ExtensionType[];
   data: T;
