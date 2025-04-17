@@ -1,6 +1,10 @@
 import { Response } from "express";
 import { PostInputModel, PostsRequestQueryType } from "../../types/posts-types";
-import { mapCommentsQueryParams, mapPostsQueryParams } from "./utils";
+import {
+  convertToHttpCode,
+  mapCommentsQueryParams,
+  mapPostsQueryParams,
+} from "./utils";
 import { postsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
 import { postsService } from "../../services/posts-service";
 import { commentsService } from "../../services/comments-service";
@@ -18,6 +22,7 @@ import {
   RequestWithQuery,
 } from "../../types/requests-types";
 import { ParamsId } from "../../types/common-types";
+import { ObjectId } from "mongodb";
 
 export const postsController = {
   // Получение постов
@@ -80,22 +85,24 @@ export const postsController = {
     const postId = req.params.id;
     const commentBody = req.body;
 
-    // Собираем входные данные
     const createCommentDto: CreateCommentDto = {
       userId,
       postId,
       commentBody,
     };
 
-    // Создаем комментарий
-    const createdId = await commentsService.createNewComment(createCommentDto);
-    if (!createdId) {
-      res.sendStatus(404);
+    const createResult = await commentsService.createNewComment(
+      createCommentDto
+    );
+
+    if (createResult.status !== "Success") {
+      res.sendStatus(convertToHttpCode(createResult.status));
       return;
     }
 
-    // Получаем созданный комментарий
-    const newComment = await commentsQueryRepository.getCommentById(createdId);
+    const newComment = await commentsQueryRepository.getCommentById(
+      createResult.data as ObjectId
+    );
 
     res.status(201).json(newComment);
   },

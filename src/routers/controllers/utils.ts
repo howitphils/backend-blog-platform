@@ -85,8 +85,6 @@ export const convertToHttpCode = (
       return HttpStatuses.BadRequest;
     case "Forbidden":
       return HttpStatuses.Forbidden;
-    case "NoContent":
-      return HttpStatuses.NoContent;
     case "NotFound":
       return HttpStatuses.NotFound;
     case "Success":

@@ -12,15 +12,28 @@ import { usersService } from "./users-service";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
 
 export const commentsService = {
-  async createNewComment(dto: CreateCommentDto): Promise<ObjectId | null> {
+  async createNewComment(
+    dto: CreateCommentDto
+  ): Promise<ResultObject<ObjectId | null>> {
     const targetPost = await postsService.getPostById(dto.postId);
+
     if (!targetPost) {
-      return null;
+      return {
+        status: ResultStatus.NotFound,
+        errorMessage: "Post for this comment does not exist",
+        extensions: [{ field: "postId", message: "incorrect postId" }],
+        data: null,
+      };
     }
 
     const targetUser = await usersService.getUserById(new ObjectId(dto.userId));
     if (!targetUser) {
-      return null;
+      return {
+        status: ResultStatus.NotFound,
+        errorMessage: "User is not found",
+        extensions: [{ field: "userId", message: "incorrect userId" }],
+        data: null,
+      };
     }
 
     const newComment: CommentDbModel = {
@@ -33,17 +46,42 @@ export const commentsService = {
       postId: dto.postId.toString(),
     };
 
-    return commentsRepository.createComment(newComment);
+    const newCommentId = await commentsRepository.createComment(newComment);
+
+    return {
+      status: ResultStatus.Success,
+      extensions: [],
+      data: newCommentId,
+    };
   },
 
-  async getCommentById(id: ObjectId): Promise<CommentDbModel | null> {
-    return commentsRepository.getCommentById(id);
+  async getCommentById(
+    id: ObjectId
+  ): Promise<ResultObject<CommentDbModel | null>> {
+    const comment = await commentsRepository.getCommentById(id);
+
+    if (!comment) {
+      return {
+        status: ResultStatus.NotFound,
+        errorMessage: "Comment is not found",
+        extensions: [{ field: "commentId", message: "Wrong commentId" }],
+        data: null,
+      };
+    }
+
+    return {
+      status: ResultStatus.Success,
+      extensions: [],
+      data: comment,
+    };
   },
 
   async updateComment(
     dto: UpdateCommentDto
   ): Promise<ResultObject<boolean | null>> {
-    const targetComment = await commentsService.getCommentById(dto.commentId);
+    const targetComment = await commentsRepository.getCommentById(
+      dto.commentId
+    );
 
     if (!targetComment) {
       return {
@@ -66,7 +104,7 @@ export const commentsService = {
     await commentsRepository.updateComment(dto.commentId, dto.commentBody);
 
     return {
-      status: ResultStatus.NoContent,
+      status: ResultStatus.Success,
       extensions: [],
       data: true,
     };
@@ -75,7 +113,9 @@ export const commentsService = {
   async deleteComment(
     dto: DeleteCommentDto
   ): Promise<ResultObject<boolean | null>> {
-    const targetComment = await commentsService.getCommentById(dto.commentId);
+    const targetComment = await commentsRepository.getCommentById(
+      dto.commentId
+    );
 
     if (!targetComment) {
       return {
@@ -98,7 +138,7 @@ export const commentsService = {
     await commentsRepository.deleteComment(dto.commentId);
 
     return {
-      status: ResultStatus.NoContent,
+      status: ResultStatus.Success,
       extensions: [],
       data: true,
     };
