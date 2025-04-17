@@ -15,9 +15,9 @@ import {
   RequestWithParams,
   RequestWithQuery,
 } from "../../types/requests-types";
+import { HttpStatuses } from "../../types/http-statuses";
 
 export const usersController = {
-  // Получение юзеров
   async getUsers(
     req: RequestWithQuery<UsersRequestQueryType>,
     res: Response<PaginationType<UserViewModel>>
@@ -26,35 +26,31 @@ export const usersController = {
 
     const users = await usersQueryRepository.getAllUsers(mapedQueryParams);
 
-    res.status(200).json(users);
+    res.status(HttpStatuses.Success).json(users);
   },
 
-  // Создание юзера
   async createUser(req: RequestWithBody<UserInputModel>, res: Response) {
     const createResult = await usersService.createNewUser(req.body);
 
-    // Если пришел объект с ошибкой
     if (!ObjectId.isValid(createResult.toString())) {
-      res.status(400).json(createResult);
+      res.status(HttpStatuses.BadRequest).json(createResult);
       return;
     }
 
-    // Получаем созданного юзера по айди
     const newUser = await usersQueryRepository.getUserById(
       createResult as ObjectId
     );
 
-    res.status(201).json(newUser);
+    res.status(HttpStatuses.Created).json(newUser);
   },
 
-  // Удаление юзера
   async deleteUser(req: RequestWithParams<ParamsId>, res: Response) {
     const isDeleted = await usersService.deleteUser(req.params.id);
 
     if (!isDeleted) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
-    res.sendStatus(204);
+    res.sendStatus(HttpStatuses.NoContent);
   },
 };
