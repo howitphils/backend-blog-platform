@@ -19,18 +19,17 @@ import {
   RequestWithQuery,
 } from "../../types/requests-types";
 import { ParamsId } from "../../types/common-types";
+import { HttpStatuses } from "../../types/http-statuses";
 
 export const blogsController = {
-  // Получение всех блогов
   async getBlogs(req: RequestWithQuery<BlogsRequestQueryType>, res: Response) {
     const mapedQueryParams = mapBlogsQueryParams(req.query);
 
     const blogs = await blogsQueryRepository.getAllBlogs(mapedQueryParams);
 
-    res.status(200).json(blogs);
+    res.status(HttpStatuses.Success).json(blogs);
   },
 
-  // Получение всех постов конкретного блога
   async getPostsByBlogId(
     req: RequestWithParamsAndQuery<ParamsId, PostsRequestQueryType>,
     res: Response
@@ -38,31 +37,28 @@ export const blogsController = {
     const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
 
     if (!targetBlog) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
 
     const mapedQueryParams = mapPostsQueryParams(req.query);
-    // Преобразуем id из req.params из ObjectId в строку
     const convertedId = req.params.id.toString();
 
     const posts = await postsQueryRepository.getAllPostsByBlogId(
       convertedId,
       mapedQueryParams
     );
-    res.status(200).json(posts);
+    res.status(HttpStatuses.Success).json(posts);
   },
 
-  // Создание нового блога
   async createBlog(req: RequestWithBody<BlogInputModel>, res: Response) {
     const createdBlogId = await blogsService.createNewBlog(req.body);
 
     const newBlog = await blogsQueryRepository.getBlogById(createdBlogId);
 
-    res.status(201).json(newBlog);
+    res.status(HttpStatuses.Created).json(newBlog);
   },
 
-  // Создание нового поста для блога
   async createPostForBlog(
     req: RequestWithParamsAndBody<ParamsId, PostForBlogInputModel>,
     res: Response
@@ -77,27 +73,26 @@ export const blogsController = {
     const newPostId = await postsService.createNewPost(postInputDto);
 
     if (!newPostId) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
 
     const newPost = await postsQueryRepository.getPostById(newPostId);
-    res.status(201).json(newPost);
+
+    res.status(HttpStatuses.Created).json(newPost);
   },
 
-  // Получение блога по айди
   async getBlogById(req: RequestWithParams<ParamsId>, res: Response) {
     const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
 
     if (!targetBlog) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
 
-    res.status(200).json(targetBlog);
+    res.status(HttpStatuses.Success).json(targetBlog);
   },
 
-  // Обновление блога
   async updateBlog(
     req: RequestWithParamsAndBody<ParamsId, BlogInputModel>,
     res: Response
@@ -105,21 +100,20 @@ export const blogsController = {
     const isUpdated = await blogsService.updateBlog(req.params.id, req.body);
 
     if (!isUpdated) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
 
-    res.sendStatus(204);
+    res.sendStatus(HttpStatuses.NoContent);
   },
 
-  // Удаление блога
   async deleteBlog(req: RequestWithParams<ParamsId>, res: Response) {
     const isDeleted = await blogsService.deleteBlog(req.params.id);
 
     if (!isDeleted) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
-    res.sendStatus(204);
+    res.sendStatus(HttpStatuses.NoContent);
   },
 };

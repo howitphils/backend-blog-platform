@@ -32,6 +32,7 @@ export const authController = {
       res.sendStatus(HttpStatuses.ServerError);
       return;
     }
+
     const myInfo = await usersQueryRepository.getMyInfo(new ObjectId(userId));
 
     if (!myInfo) {
