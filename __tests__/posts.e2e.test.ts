@@ -7,7 +7,6 @@ import {
   createNewBlogInDb,
   createNewUserInDb,
   createPostDto,
-  createPostDtobHelper,
   createPostInDbHelper,
   createUserDto,
   defaultPagination,
@@ -138,9 +137,12 @@ describe("/posts", () => {
       await clearCollections();
     });
 
+    let blogId = "";
     it("should create new post", async () => {
       const blogDb = await createNewBlogInDb();
-      const newPostDto = createPostDto({ blogId: blogDb.id });
+      blogId = blogDb.id;
+
+      const newPostDto = createPostDto({ blogId });
 
       const res = await req
         .post(SETTINGS.PATHS.POSTS)
@@ -166,11 +168,11 @@ describe("/posts", () => {
     });
 
     it("should not create new post with incorrect input values", async () => {
-      const blogDb = await createNewBlogInDb();
       const newPostDto = createPostDto({
-        blogId: blogDb.id,
-        content: "",
-        shortDescription: "",
+        blogId: blogId,
+        content: "a".repeat(31),
+        shortDescription: "b".repeat(101),
+        title: "c".repeat(1001),
       });
 
       await req
@@ -180,14 +182,40 @@ describe("/posts", () => {
         .expect(HttpStatuses.BadRequest);
     });
 
+    // it("should not create new post with incorrect blogId", async () => {
+    //   const newPostDto = createPostDto({
+    //     blogId: "28",
+    //   });
+
+    //   await req
+    //     .post(SETTINGS.PATHS.POSTS)
+    //     .set(basicAuth)
+    //     .send(newPostDto)
+    //     .expect(HttpStatuses.BadRequest);
+    // });
+
     it("should not create new post by unauthorized user", async () => {
-      const newPostDto = createPostDtobHelper();
+      const newPostDto = createPostDto({ blogId });
 
       await req
         .post(SETTINGS.PATHS.POSTS)
         .send(newPostDto)
         .expect(HttpStatuses.Unauthorized);
     });
+
+    // it("should not create new post if blog does not exist", async () => {
+    //   await clearCollections();
+
+    //   const newPostDto = createPostDto({
+    //     blogId,
+    //   });
+
+    //   await req
+    //     .post(SETTINGS.PATHS.POSTS)
+    //     .set(basicAuth)
+    //     .send(newPostDto)
+    //     .expect(HttpStatuses.NotFound);
+    // });
   });
 
   describe("get post by id", () => {

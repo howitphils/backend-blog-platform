@@ -59,11 +59,6 @@ export const postsController = {
   async createPost(req: RequestWithBody<PostInputModel>, res: Response) {
     const createdId = await postsService.createNewPost(req.body);
 
-    if (!createdId) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
-    }
-
     const newPost = await postsQueryRepository.getPostById(createdId);
 
     res.status(HttpStatuses.Created).json(newPost);

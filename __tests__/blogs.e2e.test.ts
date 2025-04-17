@@ -254,7 +254,7 @@ describe("/blogs", () => {
       blogId = blogDb.id;
 
       const res = await req
-        .post(SETTINGS.PATHS.BLOGS + `/${blogDb.id}` + "/posts")
+        .post(SETTINGS.PATHS.BLOGS + `/${blogId}` + "/posts")
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.Created);

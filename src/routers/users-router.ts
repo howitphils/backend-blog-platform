@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { authGuard } from "../middlewares/auth/basic-auth-validator";
-import { validateParamsId } from "../middlewares/validateParamsId";
+import { validateParamsId } from "../middlewares/validate-paramsId";
 import { usersController } from "./controllers/users-controller";
 import { userBodyValidators } from "../middlewares/body-validations/users-body-validators";
 import { bodyValidationResult } from "../middlewares/validation-result";

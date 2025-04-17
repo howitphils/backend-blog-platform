@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { SETTINGS } from "../../settings";
+import { HttpStatuses } from "../../types/http-statuses";
 
 // Кодируем логин и пароль в base64
 export const encodedCredentials = Buffer.from(SETTINGS.ADMIN).toString(
@@ -16,7 +17,7 @@ export const authGuard = (
 
   // Если заголовок Authorization отсутствует, возвращаем статус 401
   if (!auth) {
-    res.sendStatus(401);
+    res.sendStatus(HttpStatuses.Unauthorized);
     return;
   }
 
@@ -25,13 +26,13 @@ export const authGuard = (
 
   // Если тип авторизации не Basic, возвращаем статус 401
   if (authType !== "Basic") {
-    res.sendStatus(401);
+    res.sendStatus(HttpStatuses.Unauthorized);
     return;
   }
 
   // Если токен не равен закодированным логину и паролю, возвращаем статус 401
   if (authToken !== encodedCredentials) {
-    res.sendStatus(401);
+    res.sendStatus(HttpStatuses.Unauthorized);
     return;
   }
 

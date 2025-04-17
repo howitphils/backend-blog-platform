@@ -4,7 +4,7 @@ import { Router } from "express";
 
 import { authGuard } from "../middlewares/auth/basic-auth-validator";
 import { postsController } from "./controllers/posts-controller";
-import { validateParamsId } from "../middlewares/validateParamsId";
+import { validateParamsId } from "../middlewares/validate-paramsId";
 import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 import { commentsBodyValidators } from "../middlewares/body-validations/comments-body-validators";
 

@@ -2,17 +2,19 @@ import { ObjectId } from "mongodb";
 import { postsRepository } from "../db/mongodb/repositories/posts-repository/posts-db-repository";
 import { PostDbType, PostInputModel } from "../types/posts-types";
 import { blogsService } from "./blogs-service";
+import { CustomError } from "../middlewares/error-handler";
+import { HttpStatuses } from "../types/http-statuses";
 
 export const postsService = {
   // Создание нового поста
-  async createNewPost(post: PostInputModel): Promise<ObjectId | null> {
+  async createNewPost(post: PostInputModel): Promise<ObjectId> {
+    if (!ObjectId.isValid(post.blogId)) {
+      throw new CustomError("Invalid blogId", HttpStatuses.BadRequest);
+    }
+
     const targetBlog = await blogsService.getBlogById(
       new ObjectId(post.blogId)
     );
-
-    if (!targetBlog) {
-      return null;
-    }
 
     const newPost: PostDbType = {
       blogId: post.blogId,

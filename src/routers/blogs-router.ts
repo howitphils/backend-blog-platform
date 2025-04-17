@@ -4,7 +4,7 @@ import { blogsBodyValidator } from "../middlewares/body-validations/blogs-body-v
 import { authGuard } from "../middlewares/auth/basic-auth-validator";
 import { bodyValidationResult } from "../middlewares/validation-result";
 import { blogsController } from "./controllers/blogs-controller";
-import { validateParamsId } from "../middlewares/validateParamsId";
+import { validateParamsId } from "../middlewares/validate-paramsId";
 import { postsBodyValidator } from "../middlewares/body-validations/posts-body-validators";
 
 export const blogsRouter = Router();

@@ -4,7 +4,7 @@ import { bodyValidationResult } from "../middlewares/validation-result";
 import { commentsController } from "./controllers/comments-controller";
 import { commentsBodyValidators } from "../middlewares/body-validations/comments-body-validators";
 import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
-import { validateParamsId } from "../middlewares/validateParamsId";
+import { validateParamsId } from "../middlewares/validate-paramsId";
 
 export const commentsRouter = Router();
 

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ObjectId } from "mongodb";
+import { HttpStatuses } from "../types/http-statuses";
 
 // Валидация параметра id в запросе на наличие валидного ObjectId
 export const validateParamsId = (
@@ -12,7 +13,7 @@ export const validateParamsId = (
 
   // Проверка на валидный ObjectId
   if (!ObjectId.isValid(incomingId)) {
-    res.sendStatus(404);
+    res.sendStatus(HttpStatuses.NotFound);
     return;
   }
 
