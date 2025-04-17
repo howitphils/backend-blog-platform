@@ -78,6 +78,8 @@ describe("/users", () => {
         .send(newUserDto)
         .expect(HttpStatuses.Created);
 
+      console.log("created user: ", res.body);
+
       expect(res.body).toEqual({
         id: expect.any(String),
         login: newUserDto.login,
@@ -88,6 +90,8 @@ describe("/users", () => {
 
     it("should not create a user with duplicated login", async () => {
       const newUserDto = createUserDto({ email: "unique-email@mail.ru" });
+
+      console.log(newUserDto);
 
       const res = await req
         .post(SETTINGS.PATHS.USERS)
@@ -106,7 +110,7 @@ describe("/users", () => {
     });
 
     it("should not create a user with duplicated email", async () => {
-      const newUserDto = createUserDto({ login: "random-login" });
+      const newUserDto = createUserDto({ login: "unique" });
 
       const res = await req
         .post(SETTINGS.PATHS.USERS)
@@ -196,16 +200,35 @@ describe("/users", () => {
   });
 
   describe("delete user", () => {
-    it("should delete the user", async () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    let userId = "";
+
+    it("should not delete the user without authorization", async () => {
       const newUser = await createNewUserInDb();
 
+      userId = newUser.id;
+
       await req
-        .delete(SETTINGS.PATHS.USERS + `/${newUser.id}`)
+        .delete(SETTINGS.PATHS.USERS + `/${userId}`)
+        .expect(HttpStatuses.Unauthorized);
+    });
+    it("should not delete not existing user", async () => {
+      await req
+        .delete(SETTINGS.PATHS.USERS + `/${userId + 21}`)
+        .set(basicAuth)
+        .expect(HttpStatuses.NotFound);
+    });
+    it("should delete the user", async () => {
+      await req
+        .delete(SETTINGS.PATHS.USERS + `/${userId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NoContent);
 
       await req
-        .delete(SETTINGS.PATHS.USERS + `/${newUser.id}`)
+        .delete(SETTINGS.PATHS.USERS + `/${userId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NotFound);
     });

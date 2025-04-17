@@ -11,7 +11,7 @@ export const usersService = {
   async createNewUser(
     user: UserInputModel
   ): Promise<OutputErrorsType | ObjectId> {
-    const { email, login, password } = user;
+    const { login, email, password } = user;
 
     const existingUser = await usersRepository.getUserByCredentials(
       login,
@@ -68,7 +68,6 @@ export const usersService = {
     return usersRepository.getUserById(id);
   },
 
-  // Удаление юзера
   async deleteUser(id: ObjectId): Promise<boolean> {
     return usersRepository.deleteUser(id);
   },
