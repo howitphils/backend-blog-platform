@@ -23,18 +23,17 @@ import {
 } from "../../types/requests-types";
 import { ParamsId } from "../../types/common-types";
 import { ObjectId } from "mongodb";
+import { HttpStatuses } from "../../types/http-statuses";
 
 export const postsController = {
-  // Получение постов
   async getPosts(req: RequestWithQuery<PostsRequestQueryType>, res: Response) {
     const mapedQueryParams = mapPostsQueryParams(req.query);
 
     const posts = await postsQueryRepository.getAllPosts(mapedQueryParams);
 
-    res.status(200).json(posts);
+    res.status(HttpStatuses.Success).json(posts);
   },
 
-  // Получение комментариев поста
   async getComments(
     req: RequestWithParamsAndQuery<ParamsId, CommentsRequestQueryType>,
     res: Response
@@ -42,11 +41,10 @@ export const postsController = {
     const targetPost = await postsQueryRepository.getPostById(req.params.id);
 
     if (!targetPost) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
 
-    // Маппинг входных данных
     const mapedQueryParams = mapCommentsQueryParams(req.query);
     const convertedPostId = req.params.id.toString();
 
@@ -55,31 +53,29 @@ export const postsController = {
       convertedPostId
     );
 
-    res.status(200).json(comments);
+    res.status(HttpStatuses.Success).json(comments);
   },
 
-  // Создание поста
   async createPost(req: RequestWithBody<PostInputModel>, res: Response) {
     const createdId = await postsService.createNewPost(req.body);
 
     if (!createdId) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
 
     const newPost = await postsQueryRepository.getPostById(createdId);
 
-    res.status(201).json(newPost);
+    res.status(HttpStatuses.Created).json(newPost);
   },
 
-  // Создание комментария
   async createComment(
     req: RequestWithParamsAndBody<ParamsId, CommentInputModel>,
     res: Response
   ) {
     const userId = req.user?.id;
     if (!userId) {
-      res.sendStatus(500);
+      res.sendStatus(HttpStatuses.ServerError);
       return;
     }
     const postId = req.params.id;
@@ -96,7 +92,9 @@ export const postsController = {
     );
 
     if (createResult.status !== "Success") {
-      res.sendStatus(convertToHttpCode(createResult.status));
+      res
+        .sendStatus(convertToHttpCode(createResult.status))
+        .json(createResult.extensions);
       return;
     }
 
@@ -104,22 +102,20 @@ export const postsController = {
       createResult.data as ObjectId
     );
 
-    res.status(201).json(newComment);
+    res.status(HttpStatuses.Created).json(newComment);
   },
 
-  // Получение поста по айди
   async getPostById(req: RequestWithParams<ParamsId>, res: Response) {
     const targetPost = await postsQueryRepository.getPostById(req.params.id);
 
     if (!targetPost) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
 
-    res.status(200).json(targetPost);
+    res.status(HttpStatuses.Success).json(targetPost);
   },
 
-  // Обновление поста
   async updatePost(
     req: RequestWithParamsAndBody<ParamsId, PostInputModel>,
     res: Response
@@ -127,22 +123,21 @@ export const postsController = {
     const isUpdated = await postsService.updatePost(req.params.id, req.body);
 
     if (!isUpdated) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
 
-    res.sendStatus(204);
+    res.sendStatus(HttpStatuses.NoContent);
   },
 
-  // Удаление поста
   async deletePost(req: RequestWithParams<ParamsId>, res: Response) {
     const isDeleted = await postsService.deletePost(req.params.id);
 
     if (!isDeleted) {
-      res.sendStatus(404);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
 
-    res.sendStatus(204);
+    res.sendStatus(HttpStatuses.NoContent);
   },
 };
