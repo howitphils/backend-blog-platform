@@ -34,12 +34,7 @@ export const blogsController = {
     req: RequestWithParamsAndQuery<ParamsId, PostsRequestQueryType>,
     res: Response
   ) {
-    const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
-
-    if (!targetBlog) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
-    }
+    await blogsService.getBlogById(req.params.id);
 
     const mapedQueryParams = mapPostsQueryParams(req.query);
     const convertedId = req.params.id.toString();
@@ -48,6 +43,7 @@ export const blogsController = {
       convertedId,
       mapedQueryParams
     );
+
     res.status(HttpStatuses.Success).json(posts);
   },
 
@@ -72,11 +68,6 @@ export const blogsController = {
 
     const newPostId = await postsService.createNewPost(postInputDto);
 
-    if (!newPostId) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
-    }
-
     const newPost = await postsQueryRepository.getPostById(newPostId);
 
     res.status(HttpStatuses.Created).json(newPost);
@@ -86,7 +77,7 @@ export const blogsController = {
     const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
 
     if (!targetBlog) {
-      res.sendStatus(HttpStatuses.NotFound);
+      res.status(HttpStatuses.NotFound);
       return;
     }
 
@@ -97,23 +88,12 @@ export const blogsController = {
     req: RequestWithParamsAndBody<ParamsId, BlogInputModel>,
     res: Response
   ) {
-    const isUpdated = await blogsService.updateBlog(req.params.id, req.body);
-
-    if (!isUpdated) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
-    }
-
+    await blogsService.updateBlog(req.params.id, req.body);
     res.sendStatus(HttpStatuses.NoContent);
   },
 
   async deleteBlog(req: RequestWithParams<ParamsId>, res: Response) {
-    const isDeleted = await blogsService.deleteBlog(req.params.id);
-
-    if (!isDeleted) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
-    }
+    await blogsService.deleteBlog(req.params.id);
     res.sendStatus(HttpStatuses.NoContent);
   },
 };

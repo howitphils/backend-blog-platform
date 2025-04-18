@@ -19,10 +19,13 @@ export const blogsRepository = {
   },
 
   // Обновление блога
-  async updateBlog(_id: ObjectId, blog: BlogInputModel): Promise<boolean> {
+  async updateBlog(
+    _id: ObjectId,
+    updatedBlog: BlogInputModel
+  ): Promise<boolean> {
     const updateResult = await blogsCollection.updateOne(
       { _id },
-      { $set: { ...blog } }
+      { $set: { ...updatedBlog } }
     );
 
     return updateResult.matchedCount === 1;

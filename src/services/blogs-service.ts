@@ -18,19 +18,36 @@ export const blogsService = {
     return blogsRepository.createNewBlog(newBlog);
   },
 
-  async getBlogById(_id: ObjectId): Promise<WithId<BlogDbType>> {
-    const blog = await blogsRepository.getBlogById(_id);
+  async getBlogById(id: ObjectId): Promise<WithId<BlogDbType>> {
+    const blog = await blogsRepository.getBlogById(id);
+
     if (!blog) {
       throw new CustomError("Blog does not exist", HttpStatuses.NotFound);
     }
+
     return blog;
   },
 
-  async updateBlog(_id: ObjectId, blog: BlogInputModel): Promise<boolean> {
-    return blogsRepository.updateBlog(_id, blog);
+  async updateBlog(
+    id: ObjectId,
+    updatedBlog: BlogInputModel
+  ): Promise<boolean> {
+    const targetBlog = await blogsRepository.getBlogById(id);
+
+    if (!targetBlog) {
+      throw new CustomError("Blog does not exist", HttpStatuses.NotFound);
+    }
+
+    return blogsRepository.updateBlog(id, updatedBlog);
   },
 
-  async deleteBlog(_id: ObjectId): Promise<boolean> {
-    return blogsRepository.deleteBlog(_id);
+  async deleteBlog(id: ObjectId): Promise<boolean> {
+    const targetBlog = await blogsRepository.getBlogById(id);
+
+    if (!targetBlog) {
+      throw new CustomError("Blog does not exist", HttpStatuses.NotFound);
+    }
+
+    return blogsRepository.deleteBlog(id);
   },
 };

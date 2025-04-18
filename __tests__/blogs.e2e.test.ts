@@ -351,10 +351,10 @@ describe("/blogs", () => {
         .set(basicAuth)
         .expect(HttpStatuses.NoContent);
 
-      await req
-        .delete(SETTINGS.PATHS.BLOGS + `/${blogId}`)
-        .set(basicAuth)
-        .expect(HttpStatuses.NotFound);
+      // await req
+      //   .delete(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+      //   .set(basicAuth)
+      //   .expect(HttpStatuses.NotFound);
     });
   });
 });

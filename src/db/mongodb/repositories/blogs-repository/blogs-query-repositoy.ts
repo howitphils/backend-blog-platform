@@ -8,7 +8,6 @@ import { blogsCollection } from "../../mongodb";
 import { PaginationType } from "../../../../types/common-types";
 
 export const blogsQueryRepository = {
-  // Получение всех блогов
   async getAllBlogs(
     filters: BlogsMapedQueryType
   ): Promise<PaginationType<BlogViewModel>> {
@@ -45,7 +44,6 @@ export const blogsQueryRepository = {
     };
   },
 
-  // Получение блога по айди
   async getBlogById(_id: ObjectId): Promise<BlogViewModel | null> {
     const targetBlog = await blogsCollection.findOne({ _id });
     if (targetBlog) {
