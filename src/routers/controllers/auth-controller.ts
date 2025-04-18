@@ -1,25 +1,20 @@
 import { Request, Response } from "express";
 import { LoginInputModel } from "../../types/login-types";
-import { usersService } from "../../services/users-service";
 import { jwtService } from "../../application/jwtService";
 import { RequestWithBody } from "../../types/requests-types";
 import { usersQueryRepository } from "../../db/mongodb/repositories/users-repository/users-query-repository";
 import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
+import { authService } from "../../services/auth-service";
 
 export const authController = {
   async loginUser(req: RequestWithBody<LoginInputModel>, res: Response) {
     const { loginOrEmail, password } = req.body;
 
-    const user = await usersService.validateUser({
+    const user = await authService.validateUser({
       loginOrEmail,
       password,
     });
-
-    if (!user) {
-      res.sendStatus(HttpStatuses.Unauthorized);
-      return;
-    }
 
     const token = jwtService.createJwt(user._id);
 
