@@ -38,12 +38,7 @@ export const postsController = {
     req: RequestWithParamsAndQuery<ParamsId, CommentsRequestQueryType>,
     res: Response
   ) {
-    const targetPost = await postsQueryRepository.getPostById(req.params.id);
-
-    if (!targetPost) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
-    }
+    await postsService.getPostById(req.params.id);
 
     const mapedQueryParams = mapCommentsQueryParams(req.query);
     const convertedPostId = req.params.id.toString();
@@ -60,6 +55,11 @@ export const postsController = {
     const createdId = await postsService.createNewPost(req.body);
 
     const newPost = await postsQueryRepository.getPostById(createdId);
+
+    if (!newPost) {
+      res.sendStatus(HttpStatuses.NotFound);
+      return;
+    }
 
     res.status(HttpStatuses.Created).json(newPost);
   },
@@ -115,24 +115,12 @@ export const postsController = {
     req: RequestWithParamsAndBody<ParamsId, PostInputModel>,
     res: Response
   ) {
-    const isUpdated = await postsService.updatePost(req.params.id, req.body);
-
-    if (!isUpdated) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
-    }
-
+    await postsService.updatePost(req.params.id, req.body);
     res.sendStatus(HttpStatuses.NoContent);
   },
 
   async deletePost(req: RequestWithParams<ParamsId>, res: Response) {
-    const isDeleted = await postsService.deletePost(req.params.id);
-
-    if (!isDeleted) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
-    }
-
+    await postsService.deletePost(req.params.id);
     res.sendStatus(HttpStatuses.NoContent);
   },
 };

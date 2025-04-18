@@ -77,7 +77,7 @@ export const blogsController = {
     const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
 
     if (!targetBlog) {
-      res.status(HttpStatuses.NotFound);
+      res.sendStatus(HttpStatuses.NotFound);
       return;
     }
 

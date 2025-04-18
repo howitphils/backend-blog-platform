@@ -379,6 +379,11 @@ describe("/posts", () => {
         .set(basicAuth)
         .expect(HttpStatuses.NoContent);
 
+      // await req
+      //   .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
+      //   .set(basicAuth)
+      //   .expect(HttpStatuses.NotFound);
+
       await req
         .get(SETTINGS.PATHS.POSTS + `/${postId}`)
         .expect(HttpStatuses.NotFound);

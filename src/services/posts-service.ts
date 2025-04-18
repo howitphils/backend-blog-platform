@@ -6,7 +6,6 @@ import { CustomError } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 
 export const postsService = {
-  // Создание нового поста
   async createNewPost(post: PostInputModel): Promise<ObjectId> {
     if (!ObjectId.isValid(post.blogId)) {
       throw new CustomError("Invalid blogId", HttpStatuses.BadRequest);
@@ -15,6 +14,10 @@ export const postsService = {
     const targetBlog = await blogsService.getBlogById(
       new ObjectId(post.blogId)
     );
+
+    if (!targetBlog) {
+      throw new CustomError("Blog does not exist", HttpStatuses.NotFound);
+    }
 
     const newPost: PostDbType = {
       blogId: post.blogId,
@@ -28,18 +31,34 @@ export const postsService = {
     return postsRepository.createNewPost(newPost);
   },
 
-  // Получение поста по его ID
-  async getPostById(id: ObjectId): Promise<PostDbType | null> {
-    return postsRepository.getPostById(id);
+  async getPostById(id: ObjectId): Promise<PostDbType> {
+    const post = await postsRepository.getPostById(id);
+    if (!post) {
+      throw new CustomError("Post does not exist", HttpStatuses.NotFound);
+    }
+    return post;
   },
 
-  // Обновление поста
-  async updatePost(id: ObjectId, post: PostInputModel): Promise<boolean> {
-    return postsRepository.updatePost(id, post);
+  async updatePost(
+    id: ObjectId,
+    updatedPost: PostInputModel
+  ): Promise<boolean> {
+    const targetPost = await postsRepository.getPostById(id);
+
+    if (!targetPost) {
+      throw new CustomError("Post does not exist", HttpStatuses.NotFound);
+    }
+
+    return postsRepository.updatePost(id, updatedPost);
   },
 
-  // Удаление поста
   async deletePost(id: ObjectId): Promise<boolean> {
+    const targetPost = await postsRepository.getPostById(id);
+
+    if (!targetPost) {
+      throw new CustomError("Post does not exist", HttpStatuses.NotFound);
+    }
+
     return postsRepository.deletePost(id);
   },
 };
