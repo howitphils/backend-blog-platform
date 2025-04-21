@@ -6,9 +6,15 @@ import { usersQueryRepository } from "../../db/mongodb/repositories/users-reposi
 import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
 import { authService } from "../../services/auth-service";
+import { MeModel, UserInputModel } from "../../types/users-types";
+// import { usersService } from "../../services/users-service";
+import { sendEmailAdapter } from "../../adapters/send-email-adapter";
 
 export const authController = {
-  async loginUser(req: RequestWithBody<LoginInputModel>, res: Response) {
+  async loginUser(
+    req: RequestWithBody<LoginInputModel>,
+    res: Response<{ accessToken: string }>
+  ) {
     const { loginOrEmail, password } = req.body;
 
     const user = await authService.validateUser({
@@ -21,7 +27,7 @@ export const authController = {
     res.status(HttpStatuses.Success).json({ accessToken: token });
   },
 
-  async getMyInfo(req: Request, res: Response) {
+  async getMyInfo(req: Request, res: Response<MeModel>) {
     const userId = req.user?.id;
     if (!userId) {
       res.sendStatus(HttpStatuses.ServerError);
@@ -37,4 +43,27 @@ export const authController = {
 
     res.status(HttpStatuses.Success).json(myInfo);
   },
+
+  async registerUser(req: RequestWithBody<UserInputModel>, res: Response) {
+    // const user = usersService.createNewUser({
+    //   email: req.body.email,
+    //   login: req.body.login,
+    //   password: req.body.password,
+    // });
+
+    try {
+      const info = await sendEmailAdapter.sendEmail(
+        req.body.email,
+        "hello",
+        "first letter"
+      );
+      res.status(HttpStatuses.Success).json(info);
+    } catch (error) {
+      console.error(error);
+      res.sendStatus(HttpStatuses.ServerError);
+    }
+  },
+
+  async confirmRegistration(req: Request, res: Response) {},
+  async resendConfirmation(req: Request, res: Response) {},
 };

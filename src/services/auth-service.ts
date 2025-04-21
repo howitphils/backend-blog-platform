@@ -1,6 +1,6 @@
 import { WithId } from "mongodb";
 import { LoginInputModel } from "../types/login-types";
-import { UserDbType } from "../types/users-types";
+import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { CustomError } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
@@ -35,4 +35,8 @@ export const authService = {
 
     return targetUser;
   },
+
+  async registerUser(user: UserInputModel) {},
+  async confirmRegistration(code: string) {},
+  async resendConfirmationCode(email: string) {},
 };

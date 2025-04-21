@@ -1,5 +1,9 @@
 import { Response } from "express";
-import { PostInputModel, PostsRequestQueryType } from "../../types/posts-types";
+import {
+  PostInputModel,
+  PostsRequestQueryType,
+  PostViewModel,
+} from "../../types/posts-types";
 import {
   convertToHttpCode,
   mapCommentsQueryParams,
@@ -11,6 +15,7 @@ import { commentsService } from "../../services/comments-service";
 import {
   CommentInputModel,
   CommentsRequestQueryType,
+  CommentViewModel,
   CreateCommentDto,
 } from "../../types/comments-types";
 import { commentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
@@ -21,12 +26,16 @@ import {
   RequestWithParamsAndQuery,
   RequestWithQuery,
 } from "../../types/requests-types";
-import { ParamsId } from "../../types/common-types";
+import { PaginationType, ParamsId } from "../../types/common-types";
 import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
+import { ExtensionType } from "../../types/resultObject-types";
 
 export const postsController = {
-  async getPosts(req: RequestWithQuery<PostsRequestQueryType>, res: Response) {
+  async getPosts(
+    req: RequestWithQuery<PostsRequestQueryType>,
+    res: Response<PaginationType<PostViewModel>>
+  ) {
     const mapedQueryParams = mapPostsQueryParams(req.query);
 
     const posts = await postsQueryRepository.getAllPosts(mapedQueryParams);
@@ -36,7 +45,7 @@ export const postsController = {
 
   async getComments(
     req: RequestWithParamsAndQuery<ParamsId, CommentsRequestQueryType>,
-    res: Response
+    res: Response<PaginationType<CommentViewModel>>
   ) {
     await postsService.getPostById(req.params.id);
 
@@ -51,7 +60,10 @@ export const postsController = {
     res.status(HttpStatuses.Success).json(comments);
   },
 
-  async createPost(req: RequestWithBody<PostInputModel>, res: Response) {
+  async createPost(
+    req: RequestWithBody<PostInputModel>,
+    res: Response<PostViewModel>
+  ) {
     const createdId = await postsService.createNewPost(req.body);
 
     const newPost = await postsQueryRepository.getPostById(createdId);
@@ -66,7 +78,7 @@ export const postsController = {
 
   async createComment(
     req: RequestWithParamsAndBody<ParamsId, CommentInputModel>,
-    res: Response
+    res: Response<CommentViewModel | ExtensionType[]>
   ) {
     const userId = req.user?.id;
     if (!userId) {
@@ -97,10 +109,18 @@ export const postsController = {
       createResult.data as ObjectId
     );
 
+    if (!newComment) {
+      res.sendStatus(HttpStatuses.NotFound);
+      return;
+    }
+
     res.status(HttpStatuses.Created).json(newComment);
   },
 
-  async getPostById(req: RequestWithParams<ParamsId>, res: Response) {
+  async getPostById(
+    req: RequestWithParams<ParamsId>,
+    res: Response<PostViewModel>
+  ) {
     const targetPost = await postsQueryRepository.getPostById(req.params.id);
 
     if (!targetPost) {

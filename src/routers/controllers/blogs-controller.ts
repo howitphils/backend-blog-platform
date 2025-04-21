@@ -5,11 +5,16 @@ import { postsQueryRepository } from "../../db/mongodb/repositories/posts-reposi
 import { mapBlogsQueryParams, mapPostsQueryParams } from "./utils";
 import { postsService } from "../../services/posts-service";
 
-import { BlogInputModel, BlogsRequestQueryType } from "../../types/blogs-types";
+import {
+  BlogInputModel,
+  BlogsRequestQueryType,
+  BlogViewModel,
+} from "../../types/blogs-types";
 import {
   PostForBlogInputModel,
   PostInputModel,
   PostsRequestQueryType,
+  PostViewModel,
 } from "../../types/posts-types";
 import {
   RequestWithBody,
@@ -18,11 +23,14 @@ import {
   RequestWithParamsAndQuery,
   RequestWithQuery,
 } from "../../types/requests-types";
-import { ParamsId } from "../../types/common-types";
+import { PaginationType, ParamsId } from "../../types/common-types";
 import { HttpStatuses } from "../../types/http-statuses";
 
 export const blogsController = {
-  async getBlogs(req: RequestWithQuery<BlogsRequestQueryType>, res: Response) {
+  async getBlogs(
+    req: RequestWithQuery<BlogsRequestQueryType>,
+    res: Response<PaginationType<BlogViewModel>>
+  ) {
     const mapedQueryParams = mapBlogsQueryParams(req.query);
 
     const blogs = await blogsQueryRepository.getAllBlogs(mapedQueryParams);
@@ -32,7 +40,7 @@ export const blogsController = {
 
   async getPostsByBlogId(
     req: RequestWithParamsAndQuery<ParamsId, PostsRequestQueryType>,
-    res: Response
+    res: Response<PaginationType<PostViewModel>>
   ) {
     await blogsService.getBlogById(req.params.id);
 
@@ -47,17 +55,25 @@ export const blogsController = {
     res.status(HttpStatuses.Success).json(posts);
   },
 
-  async createBlog(req: RequestWithBody<BlogInputModel>, res: Response) {
+  async createBlog(
+    req: RequestWithBody<BlogInputModel>,
+    res: Response<BlogViewModel>
+  ) {
     const createdBlogId = await blogsService.createNewBlog(req.body);
 
     const newBlog = await blogsQueryRepository.getBlogById(createdBlogId);
+
+    if (!newBlog) {
+      res.sendStatus(HttpStatuses.NotFound);
+      return;
+    }
 
     res.status(HttpStatuses.Created).json(newBlog);
   },
 
   async createPostForBlog(
     req: RequestWithParamsAndBody<ParamsId, PostForBlogInputModel>,
-    res: Response
+    res: Response<PostViewModel>
   ) {
     const postInputDto: PostInputModel = {
       blogId: req.params.id.toString(),
@@ -70,10 +86,18 @@ export const blogsController = {
 
     const newPost = await postsQueryRepository.getPostById(newPostId);
 
+    if (!newPost) {
+      res.sendStatus(HttpStatuses.NotFound);
+      return;
+    }
+
     res.status(HttpStatuses.Created).json(newPost);
   },
 
-  async getBlogById(req: RequestWithParams<ParamsId>, res: Response) {
+  async getBlogById(
+    req: RequestWithParams<ParamsId>,
+    res: Response<BlogViewModel>
+  ) {
     const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
 
     if (!targetBlog) {

@@ -13,7 +13,9 @@ export const validateParamsId = (
 
   // Проверка на валидный ObjectId
   if (!ObjectId.isValid(incomingId)) {
-    res.sendStatus(HttpStatuses.NotFound);
+    res
+      .status(HttpStatuses.BadRequest)
+      .json({ message: "Incorrect id in params" });
     return;
   }
 

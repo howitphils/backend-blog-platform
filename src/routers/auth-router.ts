@@ -14,5 +14,18 @@ authRouter.post(
   bodyValidationResult,
   authController.loginUser
 );
-// Логинизация
+
+// Информация профиля
 authRouter.get("/me", jwtAuthGuard, authController.getMyInfo);
+
+authRouter.post("/registration", authController.registerUser);
+
+authRouter.post(
+  "/registration-confirmation",
+  authController.confirmRegistration
+);
+
+authRouter.post(
+  "/registration-email-resending",
+  authController.resendConfirmation
+);

@@ -41,6 +41,11 @@ export const usersController = {
       createResult as ObjectId
     );
 
+    if (!newUser) {
+      res.sendStatus(HttpStatuses.NotFound);
+      return;
+    }
+
     res.status(HttpStatuses.Created).json(newUser);
   },
 

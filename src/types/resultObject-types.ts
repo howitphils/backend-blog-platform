@@ -7,7 +7,7 @@ export enum ResultStatus {
   ServerError = "ServerError",
 }
 
-type ExtensionType = {
+export type ExtensionType = {
   field: string | null;
   message: string;
 };

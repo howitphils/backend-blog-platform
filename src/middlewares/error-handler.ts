@@ -21,5 +21,7 @@ export const errorHandler = (
     return;
   }
   console.log(JSON.stringify(err));
-  res.sendStatus(500).json({ message: "Unexpected error" });
+  res
+    .sendStatus(HttpStatuses.ServerError)
+    .json({ message: "Unexpected error" });
 };
