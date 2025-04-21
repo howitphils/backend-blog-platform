@@ -7,8 +7,6 @@ import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
 import { authService } from "../../services/auth-service";
 import { MeModel, UserInputModel } from "../../types/users-types";
-// import { usersService } from "../../services/users-service";
-import { sendEmailAdapter } from "../../adapters/send-email-adapter";
 
 export const authController = {
   async loginUser(
@@ -45,23 +43,11 @@ export const authController = {
   },
 
   async registerUser(req: RequestWithBody<UserInputModel>, res: Response) {
-    // const user = usersService.createNewUser({
-    //   email: req.body.email,
-    //   login: req.body.login,
-    //   password: req.body.password,
-    // });
-
-    try {
-      const info = await sendEmailAdapter.sendEmail(
-        req.body.email,
-        "hello",
-        "first letter"
-      );
-      res.status(HttpStatuses.Success).json(info);
-    } catch (error) {
-      console.error(error);
-      res.sendStatus(HttpStatuses.ServerError);
-    }
+    await authService.registerUser({
+      email: req.body.email,
+      login: req.body.login,
+      password: req.body.password,
+    });
   },
 
   async confirmRegistration(req: Request, res: Response) {},

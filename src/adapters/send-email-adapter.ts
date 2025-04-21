@@ -5,20 +5,17 @@ export const sendEmailAdapter = {
     const transporter = nodemailer.createTransport({
       service: "mail.ru",
       auth: {
-        user: "vladislavgromyko@mail.ru",
-        pass: "1839567vlad",
+        user: process.env.NODEMAILER_USERNAME,
+        pass: process.env.NODEMAILER_PASS,
       },
     });
 
-    // send mail with defined transport object
     const info = await transporter.sendMail({
-      from: '"Maddison Foo Koch 👻" <vladislavgromyko@mail.ru>', // sender address
+      from: `"Hello 👻" ${process.env.NODEMAILER_USERNAME}`, // sender address
       to: email, // list of receivers
       subject: subject, // Subject line
       html: message, // html body
     });
-
-    console.log("Message sent: %s", info.messageId);
 
     return info;
   },
