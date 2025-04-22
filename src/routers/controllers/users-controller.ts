@@ -32,11 +32,6 @@ export const usersController = {
   async createUser(req: RequestWithBody<UserInputModel>, res: Response) {
     const createResult = await usersService.createNewUser(req.body);
 
-    if (!ObjectId.isValid(createResult.toString())) {
-      res.status(HttpStatuses.BadRequest).json(createResult);
-      return;
-    }
-
     const newUser = await usersQueryRepository.getUserById(
       createResult as ObjectId
     );

@@ -1,4 +1,4 @@
-import { WithId } from "mongodb";
+import { ObjectId, WithId } from "mongodb";
 import { LoginInputModel } from "../types/login-types";
 import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
@@ -25,7 +25,7 @@ export const authService = {
 
     const isCorrect = await bcryptService.compareHash(
       password,
-      targetUser.passHash
+      targetUser.accountData.passHash
     );
 
     if (!isCorrect) {
@@ -39,10 +39,11 @@ export const authService = {
   },
 
   async registerUser(user: UserInputModel) {
-    await usersService.createNewUser(user);
+    const createResult = await usersService.createNewUser(user);
 
-    await emailManager.sendEmailForRegistration(user.email);
+    await emailManager.sendEmailForRegistration();
   },
+
   async confirmRegistration(code: string) {},
   async resendConfirmationCode(email: string) {},
 };

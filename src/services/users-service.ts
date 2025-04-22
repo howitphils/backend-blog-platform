@@ -1,15 +1,17 @@
 import { ObjectId, WithId } from "mongodb";
 import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
-import { OutputErrorsType } from "../types/output-errors-types";
 import { bcryptService } from "../adapters/bcryptService";
-import { CustomError } from "../middlewares/error-handler";
+import {
+  CustomError,
+  CustomErrorWithObject,
+} from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
+import { v4 } from "uuid";
+import { add } from "date-fns";
 
 export const usersService = {
-  async createNewUser(
-    user: UserInputModel
-  ): Promise<OutputErrorsType | ObjectId> {
+  async createNewUser(user: UserInputModel): Promise<ObjectId> {
     const { login, email, password } = user;
 
     const existingUser = await usersRepository.getUserByCredentials(
@@ -18,24 +20,40 @@ export const usersService = {
     );
 
     if (existingUser) {
-      const field = existingUser.email === email ? "email" : "login";
-      return {
-        errorsMessages: [
-          {
-            field: `${field}`,
-            message: `User with this ${field} already exists`,
-          },
-        ],
-      };
+      const field =
+        existingUser.accountData.email === email ? "email" : "login";
+
+      throw new CustomErrorWithObject(
+        "User already exists",
+        HttpStatuses.BadRequest,
+        {
+          errorsMessages: [
+            {
+              field: `${field}`,
+              message: `User with this ${field} already exists`,
+            },
+          ],
+        }
+      );
     }
 
     const passHash = await bcryptService.createHasn(password);
 
     const newUser: UserDbType = {
-      email: user.email,
-      login: user.login,
-      passHash,
-      createdAt: new Date().toISOString(),
+      accountData: {
+        email: user.email,
+        login: user.login,
+        passHash,
+        createdAt: new Date().toISOString(),
+      },
+      emailConfirmation: {
+        confirmationCode: v4(),
+        expirationDate: add(new Date(), {
+          hours: 2,
+          minutes: 22,
+        }),
+        isConfirmed: false,
+      },
     };
 
     return usersRepository.createNewUser(newUser);

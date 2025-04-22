@@ -18,13 +18,11 @@ export const nodeMailerService = {
       },
     });
 
-    const info = await transporter.sendMail({
+    return transporter.sendMail({
       from: `"Hello 👻" ${process.env.NODEMAILER_USERNAME}`, // sender address
       to: email, // list of receivers
       subject: subject, // Subject line
       html: message, // html body
     });
-
-    return info;
   },
 };

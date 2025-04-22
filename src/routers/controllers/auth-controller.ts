@@ -43,11 +43,13 @@ export const authController = {
   },
 
   async registerUser(req: RequestWithBody<UserInputModel>, res: Response) {
-    await authService.registerUser({
+    const result = await authService.registerUser({
       email: req.body.email,
       login: req.body.login,
       password: req.body.password,
     });
+
+    res.sendStatus(HttpStatuses.NoContent);
   },
 
   async confirmRegistration(req: Request, res: Response) {},
