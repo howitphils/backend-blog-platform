@@ -1,7 +1,15 @@
 import nodemailer from "nodemailer";
 
-export const sendEmailAdapter = {
-  async sendEmail(email: string, message: string, subject: string) {
+export const nodeMailerService = {
+  async sendEmail({
+    email,
+    message,
+    subject,
+  }: {
+    email: string;
+    subject: string;
+    message: string;
+  }) {
     const transporter = nodemailer.createTransport({
       service: "mail.ru",
       auth: {

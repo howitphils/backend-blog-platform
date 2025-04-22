@@ -2,7 +2,7 @@ import { ObjectId, WithId } from "mongodb";
 import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { OutputErrorsType } from "../types/output-errors-types";
-import { bcryptService } from "../application/bcryptService";
+import { bcryptService } from "../adapters/bcryptService";
 import { CustomError } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 

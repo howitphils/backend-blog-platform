@@ -1,5 +1,5 @@
 import { Response, NextFunction, Request } from "express";
-import { jwtService } from "../../application/jwtService";
+import { jwtService } from "../../adapters/jwtService";
 import { HttpStatuses } from "../../types/http-statuses";
 
 export const jwtAuthGuard = (

@@ -12,10 +12,15 @@ export type UserViewModel = {
 };
 
 export type UserDbType = {
-  login: string;
-  email: string;
-  passHash: string;
-  createdAt: string;
+  accountData: {
+    login: string;
+    email: string;
+    passHash: string;
+    createdAt: string;
+  };
+  emailConfirmation: {
+    confirmationCode: string;
+  };
 };
 
 export type UsersRequestQueryType = {

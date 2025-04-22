@@ -4,7 +4,7 @@ import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { CustomError } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
-import { bcryptService } from "../application/bcryptService";
+import { bcryptService } from "../adapters/bcryptService";
 import { usersService } from "./users-service";
 import { emailManager } from "../managers/email-manager";
 
@@ -41,7 +41,7 @@ export const authService = {
   async registerUser(user: UserInputModel) {
     await usersService.createNewUser(user);
 
-    await emailManager.sendEmailForRegister(user.email);
+    await emailManager.sendEmailForRegistration(user.email);
   },
   async confirmRegistration(code: string) {},
   async resendConfirmationCode(email: string) {},

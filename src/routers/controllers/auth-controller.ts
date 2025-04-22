@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { LoginInputModel } from "../../types/login-types";
-import { jwtService } from "../../application/jwtService";
+import { jwtService } from "../../adapters/jwtService";
 import { RequestWithBody } from "../../types/requests-types";
 import { usersQueryRepository } from "../../db/mongodb/repositories/users-repository/users-query-repository";
 import { ObjectId } from "mongodb";
