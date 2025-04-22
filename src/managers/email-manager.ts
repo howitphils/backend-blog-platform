@@ -3,7 +3,7 @@ import { nodeMailerService } from "../adapters/nodemailer-service";
 export const emailManager = {
   async sendEmailForRegistration(email: string, code: string) {
     try {
-      const info = await nodeMailerService.sendEmail({
+      return nodeMailerService.sendEmail({
         email,
         subject: "registration for blog platform",
         message: `<h1>Thank for your registration</h1>
@@ -11,7 +11,6 @@ export const emailManager = {
             <a href='https://somesite.com/confirm-email?code=${code}'>complete registration</a>
         </p>`,
       });
-      return info;
     } catch (error) {
       console.error(error);
       return null;

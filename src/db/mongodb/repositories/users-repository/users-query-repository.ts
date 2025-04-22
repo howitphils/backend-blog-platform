@@ -80,19 +80,20 @@ export const usersQueryRepository = {
 
   // Преобразование юзера из формата базы данных в формат, который ожидает клиент
   _mapFromDbToViewModel(user: WithId<UserDbType>): UserViewModel {
-    const { createdAt, email, login, _id } = user;
+    const { createdAt, email, login } = user.accountData;
     return {
-      id: _id!.toString(),
+      id: user._id!.toString(),
       login: login,
       email: email,
       createdAt: createdAt,
     };
   },
+
   _createMeModel(user: WithId<UserDbType>): MeModel {
     return {
       userId: user._id.toString(),
-      email: user.email,
-      login: user.login,
+      email: user.accountData.email,
+      login: user.accountData.login,
     };
   },
 };

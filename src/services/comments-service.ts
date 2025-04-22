@@ -40,7 +40,7 @@ export const commentsService = {
       content: dto.commentBody.content,
       commentatorInfo: {
         userId: dto.userId,
-        userLogin: targetUser.login,
+        userLogin: targetUser.accountData.login,
       },
       createdAt: new Date().toISOString(),
       postId: dto.postId.toString(),

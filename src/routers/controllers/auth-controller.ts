@@ -43,7 +43,7 @@ export const authController = {
   },
 
   async registerUser(req: RequestWithBody<UserInputModel>, res: Response) {
-    const result = await authService.registerUser({
+    await authService.registerUser({
       email: req.body.email,
       login: req.body.login,
       password: req.body.password,

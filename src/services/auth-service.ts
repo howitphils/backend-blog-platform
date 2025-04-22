@@ -1,4 +1,4 @@
-import { ObjectId, WithId } from "mongodb";
+import { WithId } from "mongodb";
 import { LoginInputModel } from "../types/login-types";
 import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
@@ -39,9 +39,18 @@ export const authService = {
   },
 
   async registerUser(user: UserInputModel) {
-    const createResult = await usersService.createNewUser(user);
+    const createdId = await usersService.createNewUser(user);
+    const targetUser = await usersService.getUserById(createdId);
 
-    await emailManager.sendEmailForRegistration();
+    const sendingResult = await emailManager.sendEmailForRegistration(
+      targetUser.accountData.email,
+      targetUser.emailConfirmation.confirmationCode
+    );
+
+    if (!sendingResult) {
+      await usersService.deleteUser(targetUser._id);
+      throw new CustomError("email was not sent", HttpStatuses.BadRequest);
+    }
   },
 
   async confirmRegistration(code: string) {},
