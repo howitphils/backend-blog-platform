@@ -42,15 +42,18 @@ export const authService = {
     const createdId = await usersService.createNewUser(user);
     const targetUser = await usersService.getUserById(createdId);
 
-    const sendingResult = await emailManager.sendEmailForRegistration(
-      targetUser.accountData.email,
-      targetUser.emailConfirmation.confirmationCode
-    );
-
-    if (!sendingResult) {
+    try {
+      await emailManager.sendEmailForRegistration(
+        targetUser.accountData.email,
+        targetUser.emailConfirmation.confirmationCode
+      );
+    } catch (error) {
       await usersService.deleteUser(targetUser._id);
       throw new CustomError("email was not sent", HttpStatuses.BadRequest);
     }
+
+    // if (!sendingResult) {
+    // }
   },
 
   async confirmRegistration(code: string) {},
