@@ -4,6 +4,7 @@ import {
 } from "../../types/blogs-types";
 import { CommentsRequestQueryType } from "../../types/comments-types";
 import { HttpStatuses } from "../../types/http-statuses";
+import { OutputErrorsType } from "../../types/output-errors-types";
 import {
   PostsMapedQueryType,
   PostsRequestQueryType,
@@ -95,4 +96,13 @@ export const convertToHttpCode = (
     default:
       return HttpStatuses.ServerError;
   }
+};
+
+export const createErrorsObject = (
+  field: string,
+  message: string
+): OutputErrorsType => {
+  return {
+    errorsMessages: [{ field, message }],
+  };
 };

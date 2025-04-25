@@ -2,11 +2,15 @@ import { WithId } from "mongodb";
 import { LoginInputModel } from "../types/login-types";
 import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
-import { CustomError } from "../middlewares/error-handler";
+import {
+  CustomError,
+  CustomErrorWithObject,
+} from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { bcryptService } from "../adapters/bcryptService";
 import { usersService } from "./users-service";
 import { emailManager } from "../managers/email-manager";
+import { createErrorsObject } from "../routers/controllers/utils";
 
 export const authService = {
   // Проверка на существование юзера для логина
@@ -46,7 +50,6 @@ export const authService = {
     );
 
     if (!sendingResult) {
-      await usersService.deleteUser(targetUser._id);
       throw new CustomError(
         "Email was not sent, check input data",
         HttpStatuses.BadRequest
@@ -58,25 +61,60 @@ export const authService = {
     const targetUser = await usersRepository.getUserByConfirmationCode(code);
 
     if (!targetUser) {
-      throw new CustomError(
+      throw new CustomErrorWithObject(
         "Confirmation code is incorrect",
-        HttpStatuses.BadRequest
+        HttpStatuses.BadRequest,
+        createErrorsObject("confirmationCode", "Confirmation code is incorrect")
       );
     }
     if (targetUser.emailConfirmation.expirationDate < new Date()) {
-      throw new CustomError(
+      throw new CustomErrorWithObject(
         "Confirmation code is already expired",
-        HttpStatuses.BadRequest
+        HttpStatuses.BadRequest,
+        createErrorsObject(
+          "confirmationCode",
+          "Confirmation code is already expired"
+        )
       );
     }
     if (targetUser.emailConfirmation.isConfirmed) {
-      throw new CustomError(
+      throw new CustomErrorWithObject(
         "Email is already confirmed",
-        HttpStatuses.BadRequest
+        HttpStatuses.BadRequest,
+        createErrorsObject("confirmationCode", "Email is already confirmed")
       );
     }
 
     return usersRepository.updateIsConfirmedStatus(targetUser._id, true);
   },
-  async resendConfirmationCode(email: string) {},
+  async resendConfirmationCode(email: string) {
+    const user = await usersRepository.getUserByLoginOrEmail(email);
+
+    if (!user) {
+      throw new CustomError(
+        "User with this email does not exist",
+        HttpStatuses.NotFound
+      );
+    }
+
+    if (user.emailConfirmation.isConfirmed) {
+      throw new CustomErrorWithObject(
+        "User with this email does not exist",
+        HttpStatuses.NotFound,
+        createErrorsObject("email", "Email is already confirmed")
+      );
+    }
+
+    const sendingResult = await emailManager.sendEmailForRegistration(
+      email,
+      user.emailConfirmation.confirmationCode
+    );
+
+    if (!sendingResult) {
+      throw new CustomError(
+        "Email was not sent, check input data",
+        HttpStatuses.BadRequest
+      );
+    }
+  },
 };

@@ -9,6 +9,7 @@ import {
 import { HttpStatuses } from "../types/http-statuses";
 import { v4 } from "uuid";
 import { add } from "date-fns";
+import { createErrorsObject } from "../routers/controllers/utils";
 
 export const usersService = {
   async createNewUser(user: UserInputModel): Promise<ObjectId> {
@@ -26,14 +27,7 @@ export const usersService = {
       throw new CustomErrorWithObject(
         "User already exists",
         HttpStatuses.BadRequest,
-        {
-          errorsMessages: [
-            {
-              field: `${field}`,
-              message: `User with this ${field} already exists`,
-            },
-          ],
-        }
+        createErrorsObject(field, `User with this ${field} already exists`)
       );
     }
 

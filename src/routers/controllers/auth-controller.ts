@@ -63,5 +63,14 @@ export const authController = {
     res.sendStatus(HttpStatuses.NoContent);
   },
 
-  async resendConfirmation(req: Request, res: Response) {},
+  async resendConfirmation(
+    req: RequestWithBody<{ email: string }>,
+    res: Response
+  ) {
+    const email = req.body.email;
+
+    await authService.resendConfirmationCode(email);
+
+    res.sendStatus(HttpStatuses.NoContent);
+  },
 };
