@@ -6,6 +6,7 @@ import {
   createNewUserInDb,
   createUserDto,
   defaultPagination,
+  makeIncorrect,
   req,
 } from "./test-helpers";
 import { MongoClient } from "mongodb";
@@ -188,7 +189,7 @@ describe("/users", () => {
     });
     it("should not delete not existing user", async () => {
       await req
-        .delete(SETTINGS.PATHS.USERS + `/${userId + 21}`)
+        .delete(`${SETTINGS.PATHS.USERS}/${makeIncorrect(userId)}`)
         .set(basicAuth)
         .expect(HttpStatuses.NotFound);
     });
@@ -198,13 +199,9 @@ describe("/users", () => {
         .set(basicAuth)
         .expect(HttpStatuses.NoContent);
 
-      // await req
-      //   .delete(SETTINGS.PATHS.USERS + `/${userId}`)
-      //   .set(basicAuth)
-      //   .expect(HttpStatuses.NotFound);
-
       await req
-        .get(SETTINGS.PATHS.USERS + `/${userId}`)
+        .delete(SETTINGS.PATHS.USERS + `/${userId}`)
+        .set(basicAuth)
         .expect(HttpStatuses.NotFound);
     });
   });

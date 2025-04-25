@@ -38,8 +38,8 @@ export const usersRepository = {
   ): Promise<WithId<UserDbType> | null> {
     return usersCollection.findOne({
       $or: [
-        { email: { $regex: email, $options: "i" } },
-        { login: { $regex: login, $options: "i" } },
+        { "accountData.email": { $regex: email, $options: "i" } },
+        { "accountData.login": { $regex: login, $options: "i" } },
       ],
     });
   },

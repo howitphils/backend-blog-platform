@@ -5,6 +5,7 @@ import {
   createContentDto,
   getAccessToken,
   jwtAuth,
+  makeIncorrect,
   req,
 } from "./test-helpers";
 import { MongoClient } from "mongodb";
@@ -55,7 +56,13 @@ describe("/comments", () => {
 
     it("should not return a comment by incorrect id", async () => {
       await req
-        .get(SETTINGS.PATHS.COMMENTS + `/${commentId + 2}`)
+        .get(SETTINGS.PATHS.COMMENTS + "/22")
+        .expect(HttpStatuses.BadRequest);
+    });
+
+    it("should not return a not existing comment", async () => {
+      await req
+        .get(SETTINGS.PATHS.COMMENTS + "/" + makeIncorrect(commentId))
         .expect(HttpStatuses.NotFound);
     });
   });
@@ -151,10 +158,22 @@ describe("/comments", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.COMMENTS + `/${commentId + 2}`)
+        .put(SETTINGS.PATHS.COMMENTS + "/" + makeIncorrect(commentId))
         .set(jwtAuth(token))
         .send(contentDto)
         .expect(HttpStatuses.NotFound);
+    });
+
+    it("should not update comment by incorrect id", async () => {
+      const contentDto = createContentDto({
+        content: "a".repeat(20),
+      });
+
+      await req
+        .put(SETTINGS.PATHS.COMMENTS + "/22")
+        .set(jwtAuth(token))
+        .send(contentDto)
+        .expect(HttpStatuses.BadRequest);
     });
   });
 
@@ -188,9 +207,9 @@ describe("/comments", () => {
 
     it("should not delete the comment by incorrect id", async () => {
       await req
-        .delete(SETTINGS.PATHS.COMMENTS + `/${commentId + 2}`)
+        .delete(SETTINGS.PATHS.COMMENTS + "/22")
         .set(jwtAuth(token))
-        .expect(HttpStatuses.NotFound);
+        .expect(HttpStatuses.BadRequest);
     });
 
     it("should delete the comment", async () => {
@@ -198,6 +217,11 @@ describe("/comments", () => {
         .delete(SETTINGS.PATHS.COMMENTS + `/${commentId}`)
         .set(jwtAuth(token))
         .expect(HttpStatuses.NoContent);
+
+      await req
+        .delete(SETTINGS.PATHS.COMMENTS + `/${commentId}`)
+        .set(jwtAuth(token))
+        .expect(HttpStatuses.NotFound);
     });
   });
 });

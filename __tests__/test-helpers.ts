@@ -193,5 +193,5 @@ export const createCommentInDb = async () => {
 };
 
 export const makeIncorrect = (id: string) => {
-  return `${id.slice(0, -2) + "ab"}`;
+  return id.slice(0, -2) + "ab";
 };
