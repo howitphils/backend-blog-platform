@@ -7,10 +7,6 @@ import { HttpStatuses } from "../types/http-statuses";
 
 export const postsService = {
   async createNewPost(post: PostInputModel): Promise<ObjectId> {
-    if (!ObjectId.isValid(post.blogId)) {
-      throw new CustomError("Invalid blogId", HttpStatuses.BadRequest);
-    }
-
     const targetBlog = await blogsService.getBlogById(
       new ObjectId(post.blogId)
     );

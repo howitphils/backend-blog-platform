@@ -36,12 +36,12 @@ export const errorHandler = (
     res.status(err.statusCode).json({ message: err.message });
     return;
   }
+
   if (err instanceof CustomErrorWithObject) {
     res.status(err.statusCode).json(err.errorObj);
     return;
   }
+
   console.log(JSON.stringify(err));
-  res
-    .sendStatus(HttpStatuses.ServerError)
-    .json({ message: "Unexpected error" });
+  res.status(HttpStatuses.ServerError).json({ message: "Unexpected error" });
 };

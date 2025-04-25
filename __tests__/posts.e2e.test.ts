@@ -12,6 +12,7 @@ import {
   defaultPagination,
   getAccessToken,
   jwtAuth,
+  makeIncorrect,
   req,
 } from "./test-helpers";
 import { MongoClient } from "mongodb";
@@ -23,6 +24,7 @@ describe("/posts", () => {
 
   beforeAll(async () => {
     client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+    await clearCollections();
   });
 
   afterAll(async () => {
@@ -125,7 +127,7 @@ describe("/posts", () => {
       const contentDto = createContentDto({});
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `/${postId + 12}` + "/comments")
+        .post(SETTINGS.PATHS.POSTS + `/${makeIncorrect(postId)}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDto)
         .expect(HttpStatuses.NotFound);
@@ -246,7 +248,13 @@ describe("/posts", () => {
 
     it("should not return a post by incorrect id", async () => {
       await req
-        .get(SETTINGS.PATHS.POSTS + `/${postId + 21}`)
+        .get(SETTINGS.PATHS.POSTS + "/22")
+        .expect(HttpStatuses.BadRequest);
+    });
+
+    it("should not return a not existing post", async () => {
+      await req
+        .get(SETTINGS.PATHS.POSTS + "/" + makeIncorrect(postId))
         .expect(HttpStatuses.NotFound);
     });
   });
@@ -328,7 +336,20 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${blogId + 22}`)
+        .put(SETTINGS.PATHS.POSTS + "/22")
+        .set(basicAuth)
+        .send(updatedPostDto)
+        .expect(HttpStatuses.BadRequest);
+    });
+    it("should not update not existing post", async () => {
+      const updatedPostDto = createPostDto({
+        blogId: blogId,
+        content: "new",
+        title: "new",
+      });
+
+      await req
+        .put(SETTINGS.PATHS.POSTS + `/${postId.slice(0, -2) + "bc"}`)
         .set(basicAuth)
         .send(updatedPostDto)
         .expect(HttpStatuses.NotFound);
@@ -368,9 +389,9 @@ describe("/posts", () => {
 
     it("should not delete the post by incorrect id", async () => {
       await req
-        .delete(SETTINGS.PATHS.POSTS + `/${postId + 22}`)
+        .delete(SETTINGS.PATHS.POSTS + "/22")
         .set(basicAuth)
-        .expect(HttpStatuses.NotFound);
+        .expect(HttpStatuses.BadRequest);
     });
 
     it("should delete the post", async () => {
@@ -379,13 +400,9 @@ describe("/posts", () => {
         .set(basicAuth)
         .expect(HttpStatuses.NoContent);
 
-      // await req
-      //   .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
-      //   .set(basicAuth)
-      //   .expect(HttpStatuses.NotFound);
-
       await req
-        .get(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .set(basicAuth)
         .expect(HttpStatuses.NotFound);
     });
   });

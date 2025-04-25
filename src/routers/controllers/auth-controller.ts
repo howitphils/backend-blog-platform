@@ -15,7 +15,7 @@ export const authController = {
   ) {
     const { loginOrEmail, password } = req.body;
 
-    const user = await authService.validateUser({
+    const user = await authService.loginUser({
       loginOrEmail,
       password,
     });

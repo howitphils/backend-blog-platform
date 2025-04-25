@@ -25,8 +25,8 @@ export const usersRepository = {
   ): Promise<WithId<UserDbType> | null> {
     return usersCollection.findOne({
       $or: [
-        { email: { $regex: loginOrEmail, $options: "i" } },
-        { login: { $regex: loginOrEmail, $options: "i" } },
+        { "accountData.email": { $regex: loginOrEmail, $options: "i" } },
+        { "accountData.login": { $regex: loginOrEmail, $options: "i" } },
       ],
     });
   },

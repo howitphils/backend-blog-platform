@@ -22,7 +22,3 @@ app.use(SETTINGS.PATHS.AUTH, authRouter);
 app.use(SETTINGS.PATHS.COMMENTS, commentsRouter);
 
 app.use(errorHandler);
-
-app.get("/", (req, res) => {
-  res.send("Hello, Friend!");
-});

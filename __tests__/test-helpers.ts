@@ -45,7 +45,7 @@ export const createNewUserInDb = async (
     .post(SETTINGS.PATHS.USERS)
     .set(basicAuth)
     .send(user)
-    .expect(201);
+    .expect(HttpStatuses.Created);
 
   return res.body;
 };
@@ -153,7 +153,7 @@ export const getAccessToken = async (user?: UserDtoType) => {
       loginOrEmail: user.login,
       password: user.password,
     })
-    .expect(200);
+    .expect(HttpStatuses.Success);
 
   return res.body.accessToken;
 };
@@ -190,4 +190,8 @@ export const createCommentInDb = async () => {
     .expect(HttpStatuses.Created);
 
   return { comment: res.body, token, user: dbUser };
+};
+
+export const makeIncorrect = (id: string) => {
+  return `${id.slice(0, -2) + "ab"}`;
 };

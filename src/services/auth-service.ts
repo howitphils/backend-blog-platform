@@ -10,9 +10,7 @@ import { emailManager } from "../managers/email-manager";
 
 export const authService = {
   // Проверка на существование юзера для логина
-  async validateUser(
-    credentials: LoginInputModel
-  ): Promise<WithId<UserDbType>> {
+  async loginUser(credentials: LoginInputModel): Promise<WithId<UserDbType>> {
     const { loginOrEmail, password } = credentials;
 
     const targetUser = await usersRepository.getUserByLoginOrEmail(
