@@ -100,7 +100,7 @@ export const authService = {
     if (user.emailConfirmation.isConfirmed) {
       throw new CustomErrorWithObject(
         "User with this email does not exist",
-        HttpStatuses.NotFound,
+        HttpStatuses.BadRequest,
         createErrorsObject("email", "Email is already confirmed")
       );
     }
