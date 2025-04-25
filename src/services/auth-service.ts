@@ -47,10 +47,36 @@ export const authService = {
 
     if (!sendingResult) {
       await usersService.deleteUser(targetUser._id);
-      throw new CustomError("email was not sent", HttpStatuses.BadRequest);
+      throw new CustomError(
+        "Email was not sent, check input data",
+        HttpStatuses.BadRequest
+      );
     }
   },
 
-  async confirmRegistration(code: string) {},
+  async confirmRegistration(code: string) {
+    const targetUser = await usersRepository.getUserByConfirmationCode(code);
+
+    if (!targetUser) {
+      throw new CustomError(
+        "Confirmation code is incorrect",
+        HttpStatuses.BadRequest
+      );
+    }
+    if (targetUser.emailConfirmation.expirationDate < new Date()) {
+      throw new CustomError(
+        "Confirmation code is already expired",
+        HttpStatuses.BadRequest
+      );
+    }
+    if (targetUser.emailConfirmation.isConfirmed) {
+      throw new CustomError(
+        "Email is already confirmed",
+        HttpStatuses.BadRequest
+      );
+    }
+
+    return usersRepository.updateIsConfirmedStatus(targetUser._id, true);
+  },
   async resendConfirmationCode(email: string) {},
 };

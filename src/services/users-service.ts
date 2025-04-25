@@ -56,6 +56,8 @@ export const usersService = {
       },
     };
 
+    console.log(newUser.emailConfirmation.confirmationCode);
+
     return usersRepository.createNewUser(newUser);
   },
 
