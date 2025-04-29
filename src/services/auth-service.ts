@@ -63,7 +63,7 @@ export const authService = {
 
     if (targetUser.emailConfirmation.confirmationCode !== code) {
       throw new CustomErrorWithObject(
-        "Confirmation code is incorrect",
+        "code",
         HttpStatuses.BadRequest,
         createErrorsObject("confirmationCode", "Confirmation code is incorrect")
       );
@@ -73,17 +73,14 @@ export const authService = {
       throw new CustomErrorWithObject(
         "Confirmation code is already expired",
         HttpStatuses.BadRequest,
-        createErrorsObject(
-          "confirmationCode",
-          "Confirmation code is already expired"
-        )
+        createErrorsObject("code", "Confirmation code is already expired")
       );
     }
     if (targetUser.emailConfirmation.isConfirmed) {
       throw new CustomErrorWithObject(
         "Email is already confirmed",
         HttpStatuses.BadRequest,
-        createErrorsObject("confirmationCode", "Email is already confirmed")
+        createErrorsObject("code", "Email is already confirmed")
       );
     }
 
@@ -94,9 +91,10 @@ export const authService = {
     const user = await usersRepository.getUserByLoginOrEmail(email);
 
     if (!user) {
-      throw new CustomError(
+      throw new CustomErrorWithObject(
         "User with this email does not exist",
-        HttpStatuses.NotFound
+        HttpStatuses.BadRequest,
+        createErrorsObject("email", "User with this email does not exist")
       );
     }
 
