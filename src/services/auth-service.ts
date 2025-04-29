@@ -44,17 +44,10 @@ export const authService = {
     const createdId = await usersService.createNewUser(user);
     const targetUser = await usersService.getUserById(createdId);
 
-    const sendingResult = await emailManager.sendEmailForRegistration(
+    emailManager.sendEmailForRegistration(
       targetUser.accountData.email,
       targetUser.emailConfirmation.confirmationCode
     );
-
-    if (!sendingResult) {
-      throw new CustomError(
-        "Email was not sent, check input data",
-        HttpStatuses.BadRequest
-      );
-    }
   },
 
   async confirmRegistration(code: string) {
@@ -62,11 +55,20 @@ export const authService = {
 
     if (!targetUser) {
       throw new CustomErrorWithObject(
+        "User is not found",
+        HttpStatuses.BadRequest,
+        createErrorsObject("confirmationCode", "Confirmation code is incorrect")
+      );
+    }
+
+    if (targetUser.emailConfirmation.confirmationCode !== code) {
+      throw new CustomErrorWithObject(
         "Confirmation code is incorrect",
         HttpStatuses.BadRequest,
         createErrorsObject("confirmationCode", "Confirmation code is incorrect")
       );
     }
+
     if (targetUser.emailConfirmation.expirationDate < new Date()) {
       throw new CustomErrorWithObject(
         "Confirmation code is already expired",
@@ -87,6 +89,7 @@ export const authService = {
 
     return usersRepository.updateIsConfirmedStatus(targetUser._id, true);
   },
+
   async resendConfirmationCode(email: string) {
     const user = await usersRepository.getUserByLoginOrEmail(email);
 
@@ -99,22 +102,14 @@ export const authService = {
 
     if (user.emailConfirmation.isConfirmed) {
       throw new CustomErrorWithObject(
-        "User with this email does not exist",
+        "User with this email already confirmed",
         HttpStatuses.BadRequest,
         createErrorsObject("email", "Email is already confirmed")
       );
     }
 
-    const sendingResult = await emailManager.sendEmailForRegistration(
-      email,
-      user.emailConfirmation.confirmationCode
-    );
-
-    if (!sendingResult) {
-      throw new CustomError(
-        "Email was not sent, check input data",
-        HttpStatuses.BadRequest
-      );
-    }
+    emailManager
+      .sendEmailForRegistration(email, user.emailConfirmation.confirmationCode)
+      .catch((e) => console.log(e));
   },
 };
