@@ -61,6 +61,24 @@ export const usersRepository = {
     return updateResult.matchedCount === 1;
   },
 
+  async updateConfirmationCodeAndExpirationDate(
+    _id: ObjectId,
+    newCode: string,
+    newDate: Date
+  ) {
+    const updateResult = await usersCollection.updateOne(
+      { _id },
+      {
+        $set: {
+          "emailConfirmation.confirmationCode": newCode,
+          "emailConfirmation.expirationDate": newDate,
+        },
+      }
+    );
+
+    return updateResult.matchedCount === 1;
+  },
+
   async getUserById(_id: ObjectId): Promise<WithId<UserDbType> | null> {
     return usersCollection.findOne({ _id });
   },

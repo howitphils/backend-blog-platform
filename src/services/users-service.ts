@@ -7,9 +7,9 @@ import {
   CustomErrorWithObject,
 } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
-import { v4 } from "uuid";
-import { add } from "date-fns";
 import { createErrorsObject } from "../routers/controllers/utils";
+import { uuIdService } from "../adapters/uuIdService";
+import { dateFnsService } from "../adapters/dateFnsService";
 
 export const usersService = {
   async createNewUser(user: UserInputModel): Promise<ObjectId> {
@@ -41,16 +41,11 @@ export const usersService = {
         createdAt: new Date().toISOString(),
       },
       emailConfirmation: {
-        confirmationCode: v4(),
-        expirationDate: add(new Date(), {
-          hours: 2,
-          minutes: 22,
-        }),
+        confirmationCode: uuIdService.createRandomCode(),
+        expirationDate: dateFnsService.addToCurrentDate(),
         isConfirmed: false,
       },
     };
-
-    console.log(newUser.emailConfirmation.confirmationCode);
 
     return usersRepository.createNewUser(newUser);
   },

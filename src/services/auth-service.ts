@@ -11,6 +11,8 @@ import { bcryptService } from "../adapters/bcryptService";
 import { usersService } from "./users-service";
 import { emailManager } from "../managers/email-manager";
 import { createErrorsObject } from "../routers/controllers/utils";
+import { uuIdService } from "../adapters/uuIdService";
+import { dateFnsService } from "../adapters/dateFnsService";
 
 export const authService = {
   // Проверка на существование юзера для логина
@@ -98,8 +100,19 @@ export const authService = {
       );
     }
 
+    await usersRepository.updateConfirmationCodeAndExpirationDate(
+      user._id,
+      uuIdService.createRandomCode(),
+      dateFnsService.addToCurrentDate()
+    );
+
+    const updatedUser = await usersRepository.getUserByLoginOrEmail(email);
+
     emailManager
-      .sendEmailForRegistration(email, user.emailConfirmation.confirmationCode)
+      .sendEmailForRegistration(
+        email,
+        updatedUser!.emailConfirmation.confirmationCode
+      )
       .catch((e) => console.log(e));
   },
 };
