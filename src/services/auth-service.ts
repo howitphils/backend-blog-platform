@@ -57,15 +57,7 @@ export const authService = {
       throw new CustomErrorWithObject(
         "User is not found",
         HttpStatuses.BadRequest,
-        createErrorsObject("confirmationCode", "Confirmation code is incorrect")
-      );
-    }
-
-    if (targetUser.emailConfirmation.confirmationCode !== code) {
-      throw new CustomErrorWithObject(
-        "code",
-        HttpStatuses.BadRequest,
-        createErrorsObject("confirmationCode", "Confirmation code is incorrect")
+        createErrorsObject("code", "Confirmation code is incorrect")
       );
     }
 
