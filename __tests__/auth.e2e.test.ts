@@ -1,7 +1,13 @@
 import { HttpStatuses } from "./../src/types/http-statuses";
 // import { db } from "./../src/db/mongodb/mongo";
 import { SETTINGS } from "../src/settings";
-import { createNewUserInDb, createUserDto, req } from "./test-helpers";
+import {
+  createNewUserInDb,
+  createUserDto,
+  getAccessToken,
+  jwtAuth,
+  req,
+} from "./test-helpers";
 import { MongoClient } from "mongodb";
 import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
 
@@ -57,6 +63,32 @@ describe("/auth", () => {
           password: false,
         })
         .expect(HttpStatuses.BadRequest);
+    });
+  });
+
+  describe("me", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    it("should return user's info", async () => {
+      const token = await getAccessToken();
+      const res = await req
+        .get(SETTINGS.PATHS.AUTH + "/me")
+        .set(jwtAuth(token))
+        .expect(HttpStatuses.Success);
+
+      expect(res.body).toEqual({
+        email: "example@gmail.com",
+        login: "new-user",
+        userId: expect.any(String),
+      });
+    });
+
+    it("should return user's info for unauthorized user", async () => {
+      await req
+        .get(SETTINGS.PATHS.AUTH + "/me")
+        .expect(HttpStatuses.Unauthorized);
     });
   });
 });

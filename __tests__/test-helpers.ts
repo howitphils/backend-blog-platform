@@ -85,7 +85,7 @@ export const createNewBlogInDb = async (
     .post(SETTINGS.PATHS.BLOGS)
     .set(basicAuth)
     .send(blog)
-    .expect(201);
+    .expect(HttpStatuses.Created);
 
   return res.body;
 };
