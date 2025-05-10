@@ -52,7 +52,7 @@ export const authService = {
     );
   },
 
-  async confirmRegistration(code: string) {
+  async confirmRegistration(code: string): Promise<boolean> {
     const targetUser = await usersRepository.getUserByConfirmationCode(code);
 
     if (!targetUser) {

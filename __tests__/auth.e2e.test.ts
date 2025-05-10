@@ -9,7 +9,14 @@ import {
   req,
 } from "./test-helpers";
 import { MongoClient } from "mongodb";
-import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
+import {
+  clearCollections,
+  runDb,
+  usersCollection,
+} from "../src/db/mongodb/mongodb";
+import { nodeMailerService } from "../src/adapters/nodemailer-service";
+import { authService } from "../src/services/auth-service";
+import { CustomErrorWithObject } from "../src/middlewares/error-handler";
 
 describe("/auth", () => {
   let client: MongoClient;
@@ -73,6 +80,7 @@ describe("/auth", () => {
 
     it("should return user's info", async () => {
       const token = await getAccessToken();
+
       const res = await req
         .get(SETTINGS.PATHS.AUTH + "/me")
         .set(jwtAuth(token))
@@ -85,10 +93,46 @@ describe("/auth", () => {
       });
     });
 
-    it("should return user's info for unauthorized user", async () => {
+    it("should not return user's info for unauthorized user", async () => {
       await req
         .get(SETTINGS.PATHS.AUTH + "/me")
         .expect(HttpStatuses.Unauthorized);
+    });
+  });
+
+  describe("registration", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    nodeMailerService.sendEmail = jest
+      .fn()
+      .mockImplementation(() => Promise.resolve(true));
+
+    const registerUserUseCase = authService.registerUser;
+
+    it("should accept user's data and send an email", async () => {
+      const userDto = createUserDto({});
+
+      await registerUserUseCase(userDto);
+
+      const usersCount = await usersCollection.countDocuments();
+
+      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
+      expect(usersCount).toBe(1);
+    });
+
+    it("should not register a user twice with an error", async () => {
+      const userDto = createUserDto({});
+
+      await expect(registerUserUseCase(userDto)).rejects.toThrow(
+        CustomErrorWithObject
+      );
+
+      const usersCount = await usersCollection.countDocuments();
+
+      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
+      expect(usersCount).toBe(1);
     });
   });
 });
