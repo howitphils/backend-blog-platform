@@ -2,46 +2,73 @@ import { clearCollections, createUserDto } from "./test-helpers";
 import { nodeMailerService } from "../src/adapters/nodemailer-service";
 import { authService } from "../src/services/auth-service";
 import { CustomErrorWithObject } from "../src/middlewares/error-handler";
-import { usersCollection } from "../src/db/mongodb/mongodb";
+import { runDb, usersCollection } from "../src/db/mongodb/mongodb";
+import { MongoClient } from "mongodb";
+import { SETTINGS } from "../src/settings";
 
-describe("registration", () => {
+describe("/auth", () => {
+  let client: MongoClient;
+
+  beforeAll(async () => {
+    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+  });
+
   afterAll(async () => {
-    await clearCollections();
+    await client.close();
+    console.log("Connection closed");
   });
 
-  nodeMailerService.sendEmail = jest.fn().mockResolvedValue(true);
+  describe("registration", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
 
-  const registerUserUseCase = authService.registerUser;
+    nodeMailerService.sendEmail = jest.fn().mockResolvedValue(true);
 
-  it("should accept user's data and send an email", async () => {
-    const userDto = createUserDto({});
+    const registerUserUseCase = authService.registerUser;
 
-    await registerUserUseCase(userDto);
+    it("should accept user's data and send an email", async () => {
+      const userDto = createUserDto({});
 
-    const usersCount = await usersCollection.countDocuments();
+      await registerUserUseCase(userDto);
 
-    expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
-    expect(usersCount).toBe(1);
+      const usersCount = await usersCollection.countDocuments();
+
+      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
+      expect(usersCount).toBe(1);
+    });
+
+    it("should not register a user twice with an error", async () => {
+      const userDto = createUserDto({});
+
+      await expect(registerUserUseCase(userDto)).rejects.toThrow(
+        CustomErrorWithObject
+      );
+
+      const usersCount = await usersCollection.countDocuments();
+
+      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
+      expect(usersCount).toBe(1);
+    });
   });
 
-  it("should not register a user twice with an error", async () => {
-    const userDto = createUserDto({});
+  describe("email confirmation", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
 
-    await expect(registerUserUseCase(userDto)).rejects.toThrow(
-      CustomErrorWithObject
-    );
+    const confirmEmailUseCase = authService.confirmRegistration;
 
-    const usersCount = await usersCollection.countDocuments();
+    it("should not confirm the email for not existing user", async () => {
+      await expect(confirmEmailUseCase("asds")).rejects.toThrow(
+        CustomErrorWithObject
+      );
+    });
 
-    expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
-    expect(usersCount).toBe(1);
+    it("should not confirm the email with expired code", async () => {
+      await expect(confirmEmailUseCase("asds")).rejects.toThrow(
+        CustomErrorWithObject
+      );
+    });
   });
-});
-
-describe("email confirmation", () => {
-  afterAll(async () => {
-    await clearCollections();
-  });
-
-  it("should confirm the email", () => {});
 });
