@@ -108,10 +108,17 @@ export const authService = {
 
     const updatedUser = await usersRepository.getUserByLoginOrEmail(email);
 
+    if (!updatedUser) {
+      throw new CustomError(
+        "Updated user was not found",
+        HttpStatuses.NotFound
+      );
+    }
+
     emailManager
       .sendEmailForRegistration(
         email,
-        updatedUser!.emailConfirmation.confirmationCode
+        updatedUser.emailConfirmation.confirmationCode
       )
       .catch((e) => console.log(e));
   },
