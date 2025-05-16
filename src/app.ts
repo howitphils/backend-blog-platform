@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use(SETTINGS.PATHS.BLOGS, blogsRouter);
-app.use(SETTINGS.PATHS.POSTS, postsRouter);
+app.use(SETTINGS.PATHS.POSTS.root, postsRouter);
 app.use(SETTINGS.PATHS.TESTS, testsRouter);
 app.use(SETTINGS.PATHS.USERS, usersRouter);
 app.use(SETTINGS.PATHS.AUTH, authRouter);

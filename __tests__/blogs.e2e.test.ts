@@ -290,7 +290,7 @@ describe("/blogs", () => {
       });
 
       await req
-        .get(SETTINGS.PATHS.POSTS + `/${res.body.id}`)
+        .get(SETTINGS.PATHS.POSTS.root + `/${res.body.id}`)
         .expect(HttpStatuses.Success);
     });
 

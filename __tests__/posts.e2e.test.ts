@@ -39,7 +39,7 @@ describe("/posts", () => {
 
     it("should return all posts", async () => {
       const res = await req
-        .get(SETTINGS.PATHS.POSTS)
+        .get(SETTINGS.PATHS.POSTS.root)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
@@ -55,7 +55,7 @@ describe("/posts", () => {
       const dbPost = await createPostInDbHelper();
 
       const res = await req
-        .get(SETTINGS.PATHS.POSTS + `/${dbPost.id}` + "/comments")
+        .get(SETTINGS.PATHS.POSTS.root + `/${dbPost.id}` + "/comments")
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
@@ -81,7 +81,7 @@ describe("/posts", () => {
       postId = dbPost.id;
 
       const res = await req
-        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
+        .post(SETTINGS.PATHS.POSTS.root + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDto)
         .expect(HttpStatuses.Created);
@@ -102,13 +102,13 @@ describe("/posts", () => {
       const contentDtoMax = createContentDto({ content: "d".repeat(301) });
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
+        .post(SETTINGS.PATHS.POSTS.root + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDtoMin)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
+        .post(SETTINGS.PATHS.POSTS.root + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDtoMax)
         .expect(HttpStatuses.BadRequest);
@@ -118,7 +118,7 @@ describe("/posts", () => {
       const contentDto = createContentDto({});
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
+        .post(SETTINGS.PATHS.POSTS.root + `/${postId}` + "/comments")
         .send(contentDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -127,7 +127,9 @@ describe("/posts", () => {
       const contentDto = createContentDto({});
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `/${makeIncorrect(postId)}` + "/comments")
+        .post(
+          SETTINGS.PATHS.POSTS.root + `/${makeIncorrect(postId)}` + "/comments"
+        )
         .set(jwtAuth(token))
         .send(contentDto)
         .expect(HttpStatuses.NotFound);
@@ -147,7 +149,7 @@ describe("/posts", () => {
       const newPostDto = createPostDto({ blogId });
 
       const res = await req
-        .post(SETTINGS.PATHS.POSTS)
+        .post(SETTINGS.PATHS.POSTS.root)
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.Created);
@@ -163,7 +165,7 @@ describe("/posts", () => {
       });
 
       const postsRes = await req
-        .get(SETTINGS.PATHS.POSTS)
+        .get(SETTINGS.PATHS.POSTS.root)
         .expect(HttpStatuses.Success);
 
       expect(postsRes.body.items.length).toBe(1);
@@ -178,46 +180,20 @@ describe("/posts", () => {
       });
 
       await req
-        .post(SETTINGS.PATHS.POSTS)
+        .post(SETTINGS.PATHS.POSTS.root)
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.BadRequest);
     });
 
-    // it("should not create new post with incorrect blogId", async () => {
-    //   const newPostDto = createPostDto({
-    //     blogId: "28",
-    //   });
-
-    //   await req
-    //     .post(SETTINGS.PATHS.POSTS)
-    //     .set(basicAuth)
-    //     .send(newPostDto)
-    //     .expect(HttpStatuses.BadRequest);
-    // });
-
     it("should not create new post by unauthorized user", async () => {
       const newPostDto = createPostDto({ blogId });
 
       await req
-        .post(SETTINGS.PATHS.POSTS)
+        .post(SETTINGS.PATHS.POSTS.root)
         .send(newPostDto)
         .expect(HttpStatuses.Unauthorized);
     });
-
-    // it("should not create new post if blog does not exist", async () => {
-    //   await clearCollections();
-
-    //   const newPostDto = createPostDto({
-    //     blogId,
-    //   });
-
-    //   await req
-    //     .post(SETTINGS.PATHS.POSTS)
-    //     .set(basicAuth)
-    //     .send(newPostDto)
-    //     .expect(HttpStatuses.NotFound);
-    // });
   });
 
   describe("get post by id", () => {
@@ -232,7 +208,7 @@ describe("/posts", () => {
       postId = postDb.id;
 
       const res = await req
-        .get(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .get(SETTINGS.PATHS.POSTS.root + `/${postId}`)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
@@ -248,13 +224,13 @@ describe("/posts", () => {
 
     it("should not return a post by incorrect id", async () => {
       await req
-        .get(SETTINGS.PATHS.POSTS + "/22")
+        .get(SETTINGS.PATHS.POSTS.root + "/22")
         .expect(HttpStatuses.BadRequest);
     });
 
     it("should not return a not existing post", async () => {
       await req
-        .get(SETTINGS.PATHS.POSTS + "/" + makeIncorrect(postId))
+        .get(SETTINGS.PATHS.POSTS.root + "/" + makeIncorrect(postId))
         .expect(HttpStatuses.NotFound);
     });
   });
@@ -280,13 +256,13 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .put(SETTINGS.PATHS.POSTS.root + `/${postId}`)
         .set(basicAuth)
         .send(updatedPostDto)
         .expect(HttpStatuses.NoContent);
 
       const updatedPostRes = await req
-        .get(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .get(SETTINGS.PATHS.POSTS.root + `/${postId}`)
         .expect(HttpStatuses.Success);
 
       expect(updatedPostRes.body).toEqual({
@@ -316,13 +292,13 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .put(SETTINGS.PATHS.POSTS.root + `/${postId}`)
         .set(basicAuth)
         .send(invalidPostDtoMin)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .put(SETTINGS.PATHS.POSTS.root + `/${postId}`)
         .set(basicAuth)
         .send(invalidPostDtoMax)
         .expect(HttpStatuses.BadRequest);
@@ -336,7 +312,7 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + "/22")
+        .put(SETTINGS.PATHS.POSTS.root + "/22")
         .set(basicAuth)
         .send(updatedPostDto)
         .expect(HttpStatuses.BadRequest);
@@ -349,7 +325,7 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${postId.slice(0, -2) + "bc"}`)
+        .put(SETTINGS.PATHS.POSTS.root + `/${postId.slice(0, -2) + "bc"}`)
         .set(basicAuth)
         .send(updatedPostDto)
         .expect(HttpStatuses.NotFound);
@@ -363,7 +339,7 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .put(SETTINGS.PATHS.POSTS.root + `/${postId}`)
         .send(updatedPostDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -383,25 +359,25 @@ describe("/posts", () => {
 
     it("should not delete the post by unauthorized user", async () => {
       await req
-        .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .delete(SETTINGS.PATHS.POSTS.root + `/${postId}`)
         .expect(HttpStatuses.Unauthorized);
     });
 
     it("should not delete the post by incorrect id", async () => {
       await req
-        .delete(SETTINGS.PATHS.POSTS + "/22")
+        .delete(SETTINGS.PATHS.POSTS.root + "/22")
         .set(basicAuth)
         .expect(HttpStatuses.BadRequest);
     });
 
     it("should delete the post", async () => {
       await req
-        .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .delete(SETTINGS.PATHS.POSTS.root + `/${postId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NoContent);
 
       await req
-        .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .delete(SETTINGS.PATHS.POSTS.root + `/${postId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NotFound);
     });
