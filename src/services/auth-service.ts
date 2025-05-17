@@ -46,10 +46,12 @@ export const authService = {
     const createdId = await usersService.createNewUser(user);
     const targetUser = await usersService.getUserById(createdId);
 
-    emailManager.sendEmailForRegistration(
-      targetUser.accountData.email,
-      targetUser.emailConfirmation.confirmationCode
-    );
+    emailManager
+      .sendEmailForRegistration(
+        targetUser.accountData.email,
+        targetUser.emailConfirmation.confirmationCode
+      )
+      .catch((e) => console.log(e));
   },
 
   async confirmRegistration(code: string): Promise<boolean> {
@@ -94,7 +96,7 @@ export const authService = {
 
     if (user.emailConfirmation.isConfirmed) {
       throw new ErrorWithStatus(
-        "User with this email already confirmed",
+        "User with this email is already confirmed",
         HttpStatuses.BadRequest,
         createErrorsObject("email", "Email is already confirmed")
       );

@@ -8,6 +8,7 @@ import { SETTINGS } from "../../src/settings";
 import { HttpStatuses } from "../../src/types/http-statuses";
 import { testSeeder } from "./auth.helpers";
 import { uuIdService } from "../../src/adapters/uuIdService";
+import { dateFnsService } from "../../src/adapters/dateFnsService";
 
 describe("/auth", () => {
   let client: MongoClient;
@@ -68,7 +69,7 @@ describe("/auth", () => {
 
     const confirmEmailUseCase = authService.confirmRegistration;
 
-    it("should not confirm the email for not existing user", async () => {
+    it("should not confirm the email for not existing user and throw an error", async () => {
       try {
         await confirmEmailUseCase("asdczx");
         fail("Expected error to be thrown");
@@ -80,7 +81,7 @@ describe("/auth", () => {
       }
     });
 
-    it("should not confirm the email with expired code", async () => {
+    it("should not confirm the email with expired code and throw an error", async () => {
       const { email, login, pass } = testSeeder.createUserDto();
       const code = uuIdService.createRandomCode();
 
@@ -104,7 +105,7 @@ describe("/auth", () => {
       }
     });
 
-    it("should not confirm already confirmed email", async () => {
+    it("should not confirm already confirmed email and throw an error", async () => {
       const { email, login, pass } = testSeeder.createUserDto();
       const code = uuIdService.createRandomCode();
 
@@ -142,5 +143,99 @@ describe("/auth", () => {
     });
   });
 
-  describe("email resending", () => {});
+  describe("code resending", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    const codeResendingUseCase = authService.resendConfirmationCode;
+
+    nodeMailerService.sendEmail = jest.fn().mockResolvedValue(true);
+
+    it("should throw an error if user does not exist ", async () => {
+      try {
+        await codeResendingUseCase("random@gmail.com");
+        fail("Expected error to be thrown");
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(ErrorWithStatus);
+        expect(error).toHaveProperty("errorObj");
+        expect(error.message).toBe("User with this email does not exist");
+        expect(error.statusCode).toBe(HttpStatuses.BadRequest);
+      }
+    });
+
+    it("should throw an error if user is already confirmed", async () => {
+      const { email, login, pass } = testSeeder.createUserDto();
+      const code = "test";
+
+      await testSeeder.insertUser({
+        email,
+        login,
+        pass,
+        code,
+        isConfirmed: true,
+      });
+
+      try {
+        await codeResendingUseCase(email);
+        fail("Expected error to be thrown");
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(ErrorWithStatus);
+        expect(error).toHaveProperty("errorObj");
+        expect(error.message).toBe("User with this email is already confirmed");
+        expect(error.statusCode).toBe(HttpStatuses.BadRequest);
+      }
+    });
+
+    it("should throw an error if user is already confirmed", async () => {
+      const { email, login, pass } = testSeeder.createUserDto();
+      const code = "test";
+
+      await testSeeder.insertUser({
+        email,
+        login,
+        pass,
+        code,
+        isConfirmed: true,
+      });
+
+      try {
+        await codeResendingUseCase(email);
+        fail("Expected error to be thrown");
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(ErrorWithStatus);
+        expect(error).toHaveProperty("errorObj");
+        expect(error.message).toBe("User with this email is already confirmed");
+        expect(error.statusCode).toBe(HttpStatuses.BadRequest);
+      }
+    });
+
+    it("should update user's code and expiration date and send an email with code", async () => {
+      const { email, login, pass } = testSeeder.createUserDto();
+      const startCode = uuIdService.createRandomCode();
+      const startExpirationDate = dateFnsService.addToCurrentDate();
+
+      await testSeeder.insertUser({
+        email,
+        login,
+        pass,
+        code: startCode,
+        expirationDate: startExpirationDate,
+      });
+
+      await codeResendingUseCase(email);
+
+      const updatedUser = await usersCollection.findOne({
+        "accountData.email": { $regex: email, $options: "i" },
+      });
+
+      expect(updatedUser?.emailConfirmation.confirmationCode).not.toBe(
+        startCode
+      );
+      expect(updatedUser?.emailConfirmation.expirationDate).not.toBe(
+        startExpirationDate
+      );
+      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
+    });
+  });
 });
