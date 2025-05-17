@@ -123,7 +123,7 @@ export const createNewPostInDb = async (
     post = createPostForBlogDto({});
   }
   const res = await req
-    .post(SETTINGS.PATHS.POSTS.root)
+    .post(SETTINGS.PATHS.POSTS)
     .set(basicAuth)
     .send(post)
     .expect(HttpStatuses.Created);

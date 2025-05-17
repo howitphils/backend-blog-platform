@@ -7,30 +7,21 @@ import { postsController } from "./controllers/posts-controller";
 import { validateParamsId } from "../middlewares/validate-paramsId";
 import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 import { commentsBodyValidators } from "../middlewares/body-validations/comments-body-validators";
-import { SETTINGS } from "../settings";
 
 export const postsRouter = Router();
 
 // Получение постов
-postsRouter.get(SETTINGS.PATHS.POSTS.default, postsController.getPosts);
+postsRouter.get("/", postsController.getPosts);
 
 // Получение поста по айди
-postsRouter.get(
-  SETTINGS.PATHS.POSTS.postId,
-  validateParamsId,
-  postsController.getPostById
-);
+postsRouter.get("/:id", validateParamsId, postsController.getPostById);
 
 // Получение комментариев по айди поста
-postsRouter.get(
-  SETTINGS.PATHS.POSTS.comments,
-  validateParamsId,
-  postsController.getComments
-);
+postsRouter.get("/:id/comments", validateParamsId, postsController.getComments);
 
 // Создание комментария к посту
 postsRouter.post(
-  SETTINGS.PATHS.POSTS.comments,
+  "/:id/comments",
   jwtAuthGuard,
   validateParamsId,
   commentsBodyValidators,
@@ -40,7 +31,7 @@ postsRouter.post(
 
 // Создание поста
 postsRouter.post(
-  SETTINGS.PATHS.POSTS.postId,
+  "/",
   authGuard,
   postsBodyValidator,
   bodyValidationResult,
@@ -49,7 +40,7 @@ postsRouter.post(
 
 // Обновление поста
 postsRouter.put(
-  SETTINGS.PATHS.POSTS.postId,
+  "/:id",
   authGuard,
   validateParamsId,
   postsBodyValidator,
@@ -59,7 +50,7 @@ postsRouter.put(
 
 // Удаление поста
 postsRouter.delete(
-  SETTINGS.PATHS.POSTS.postId,
+  "/:id",
   authGuard,
   validateParamsId,
   postsController.deletePost

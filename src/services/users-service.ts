@@ -2,10 +2,7 @@ import { ObjectId, WithId } from "mongodb";
 import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { bcryptService } from "../adapters/bcryptService";
-import {
-  CustomError,
-  CustomErrorWithObject,
-} from "../middlewares/error-handler";
+import { ErrorWithStatus } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { createErrorsObject } from "../routers/controllers/utils";
 import { uuIdService } from "../adapters/uuIdService";
@@ -24,7 +21,7 @@ export const usersService = {
       const field =
         existingUser.accountData.email === email ? "email" : "login";
 
-      throw new CustomErrorWithObject(
+      throw new ErrorWithStatus(
         "User already exists",
         HttpStatuses.BadRequest,
         createErrorsObject(field, `User with this ${field} already exists`)
@@ -53,7 +50,7 @@ export const usersService = {
   async getUserById(id: ObjectId): Promise<WithId<UserDbType>> {
     const user = await usersRepository.getUserById(id);
     if (!user) {
-      throw new CustomError("User does not exist", HttpStatuses.NotFound);
+      throw new ErrorWithStatus("User does not exist", HttpStatuses.NotFound);
     }
     return user;
   },
@@ -62,7 +59,7 @@ export const usersService = {
     const targetUser = await usersRepository.getUserById(id);
 
     if (!targetUser) {
-      throw new CustomError("User does not exist", HttpStatuses.NotFound);
+      throw new ErrorWithStatus("User does not exist", HttpStatuses.NotFound);
     }
 
     return usersRepository.deleteUser(id);

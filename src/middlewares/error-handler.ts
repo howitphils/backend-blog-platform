@@ -2,23 +2,14 @@ import { Request, Response, NextFunction } from "express";
 import { HttpStatuses } from "../types/http-statuses";
 import { OutputErrorsType } from "../types/output-errors-types";
 
-export class CustomError extends Error {
+export class ErrorWithStatus extends Error {
   public readonly statusCode: number;
-
-  constructor(message: string, statusCode: HttpStatuses) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
-
-export class CustomErrorWithObject extends Error {
-  public readonly statusCode: number;
-  public readonly errorObj: OutputErrorsType;
+  public readonly errorObj: OutputErrorsType | undefined;
 
   constructor(
     message: string,
     statusCode: HttpStatuses,
-    errorObj: OutputErrorsType
+    errorObj?: OutputErrorsType
   ) {
     super(message);
     this.statusCode = statusCode;
@@ -32,13 +23,12 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  if (err instanceof CustomError) {
-    res.status(err.statusCode).json({ message: err.message });
-    return;
-  }
-
-  if (err instanceof CustomErrorWithObject) {
-    res.status(err.statusCode).json(err.errorObj);
+  if (err instanceof ErrorWithStatus) {
+    if (err.errorObj) {
+      res.status(err.statusCode).json(err.errorObj);
+    } else {
+      res.status(err.statusCode).json({ message: err.message });
+    }
     return;
   }
 

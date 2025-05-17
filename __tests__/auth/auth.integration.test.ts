@@ -1,7 +1,7 @@
 import { clearCollections, createUserDto } from "../test-helpers";
 import { nodeMailerService } from "../../src/adapters/nodemailer-service";
 import { authService } from "../../src/services/auth-service";
-import { CustomErrorWithObject } from "../../src/middlewares/error-handler";
+import { ErrorWithStatus } from "../../src/middlewares/error-handler";
 import { runDb, usersCollection } from "../../src/db/mongodb/mongodb";
 import { MongoClient } from "mongodb";
 import { SETTINGS } from "../../src/settings";
@@ -48,7 +48,7 @@ describe("/auth", () => {
         await registerUserUseCase(userDto);
         fail("Expected error to be thrown");
       } catch (error: any) {
-        expect(error).toBeInstanceOf(CustomErrorWithObject);
+        expect(error).toBeInstanceOf(ErrorWithStatus);
         expect(error).toHaveProperty("errorObj");
         expect(error.message).toBe("User already exists");
         expect(error.statusCode).toBe(HttpStatuses.BadRequest);
@@ -73,7 +73,7 @@ describe("/auth", () => {
         await confirmEmailUseCase("asdczx");
         fail("Expected error to be thrown");
       } catch (error: any) {
-        expect(error).toBeInstanceOf(CustomErrorWithObject);
+        expect(error).toBeInstanceOf(ErrorWithStatus);
         expect(error).toHaveProperty("errorObj");
         expect(error.message).toBe("User is not found");
         expect(error.statusCode).toBe(HttpStatuses.BadRequest);
@@ -97,7 +97,7 @@ describe("/auth", () => {
         await confirmEmailUseCase(code);
         fail("Expected error to be thrown");
       } catch (error: any) {
-        expect(error).toBeInstanceOf(CustomErrorWithObject);
+        expect(error).toBeInstanceOf(ErrorWithStatus);
         expect(error).toHaveProperty("errorObj");
         expect(error.message).toBe("Confirmation code is already expired");
         expect(error.statusCode).toBe(HttpStatuses.BadRequest);
@@ -120,7 +120,7 @@ describe("/auth", () => {
         await confirmEmailUseCase(code);
         fail("Expected error to be thrown");
       } catch (error: any) {
-        expect(error).toBeInstanceOf(CustomErrorWithObject);
+        expect(error).toBeInstanceOf(ErrorWithStatus);
         expect(error).toHaveProperty("errorObj");
         expect(error.message).toBe("Email is already confirmed");
         expect(error.statusCode).toBe(HttpStatuses.BadRequest);
@@ -138,9 +138,9 @@ describe("/auth", () => {
         code,
       });
 
-      const res = await confirmEmailUseCase(code);
-
-      expect(res).toBe(true);
+      expect(await confirmEmailUseCase(code)).toBe(true);
     });
   });
+
+  describe("email resending", () => {});
 });

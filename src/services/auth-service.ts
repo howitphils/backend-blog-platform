@@ -2,10 +2,7 @@ import { WithId } from "mongodb";
 import { LoginInputModel } from "../types/login-types";
 import { UserDbType, UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
-import {
-  CustomError,
-  CustomErrorWithObject,
-} from "../middlewares/error-handler";
+import { ErrorWithStatus } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { bcryptService } from "../adapters/bcryptService";
 import { usersService } from "./users-service";
@@ -24,7 +21,10 @@ export const authService = {
     );
 
     if (!targetUser) {
-      throw new CustomError("User does not exist", HttpStatuses.Unauthorized);
+      throw new ErrorWithStatus(
+        "User does not exist",
+        HttpStatuses.Unauthorized
+      );
     }
 
     const isCorrect = await bcryptService.compareHash(
@@ -33,7 +33,7 @@ export const authService = {
     );
 
     if (!isCorrect) {
-      throw new CustomError(
+      throw new ErrorWithStatus(
         "Incorrect user's credentials",
         HttpStatuses.Unauthorized
       );
@@ -56,7 +56,7 @@ export const authService = {
     const targetUser = await usersRepository.getUserByConfirmationCode(code);
 
     if (!targetUser) {
-      throw new CustomErrorWithObject(
+      throw new ErrorWithStatus(
         "User is not found",
         HttpStatuses.BadRequest,
         createErrorsObject("code", "Confirmation code is incorrect")
@@ -64,14 +64,14 @@ export const authService = {
     }
 
     if (targetUser.emailConfirmation.expirationDate < new Date()) {
-      throw new CustomErrorWithObject(
+      throw new ErrorWithStatus(
         "Confirmation code is already expired",
         HttpStatuses.BadRequest,
         createErrorsObject("code", "Confirmation code is already expired")
       );
     }
     if (targetUser.emailConfirmation.isConfirmed) {
-      throw new CustomErrorWithObject(
+      throw new ErrorWithStatus(
         "Email is already confirmed",
         HttpStatuses.BadRequest,
         createErrorsObject("code", "Email is already confirmed")
@@ -85,7 +85,7 @@ export const authService = {
     const user = await usersRepository.getUserByLoginOrEmail(email);
 
     if (!user) {
-      throw new CustomErrorWithObject(
+      throw new ErrorWithStatus(
         "User with this email does not exist",
         HttpStatuses.BadRequest,
         createErrorsObject("email", "User with this email does not exist")
@@ -93,7 +93,7 @@ export const authService = {
     }
 
     if (user.emailConfirmation.isConfirmed) {
-      throw new CustomErrorWithObject(
+      throw new ErrorWithStatus(
         "User with this email already confirmed",
         HttpStatuses.BadRequest,
         createErrorsObject("email", "Email is already confirmed")
@@ -109,7 +109,7 @@ export const authService = {
     const updatedUser = await usersRepository.getUserByLoginOrEmail(email);
 
     if (!updatedUser) {
-      throw new CustomError(
+      throw new ErrorWithStatus(
         "Updated user was not found",
         HttpStatuses.NotFound
       );
