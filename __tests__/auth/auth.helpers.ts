@@ -14,11 +14,19 @@ type RegisterUserPayloadType = {
 };
 
 export const testSeeder = {
-  createUserDto() {
+  createUserDto({
+    login,
+    email,
+    pass,
+  }: {
+    login?: string;
+    email?: string;
+    pass?: string;
+  }) {
     return {
-      login: "testing",
-      email: "test@gmail.com",
-      pass: "123456789",
+      login: login || "testing",
+      email: email || "test@gmail.com",
+      pass: pass || "123456789",
     };
   },
   // createUserDtos(count: number) {

@@ -82,7 +82,7 @@ describe("/auth", () => {
     });
 
     it("should not confirm the email with expired code and throw an error", async () => {
-      const { email, login, pass } = testSeeder.createUserDto();
+      const { email, login, pass } = testSeeder.createUserDto({});
       const code = uuIdService.createRandomCode();
 
       await testSeeder.insertUser({
@@ -106,7 +106,7 @@ describe("/auth", () => {
     });
 
     it("should not confirm already confirmed email and throw an error", async () => {
-      const { email, login, pass } = testSeeder.createUserDto();
+      const { email, login, pass } = testSeeder.createUserDto({});
       const code = uuIdService.createRandomCode();
 
       await testSeeder.insertUser({
@@ -129,7 +129,7 @@ describe("/auth", () => {
     });
 
     it("should confirm the email", async () => {
-      const { email, login, pass } = testSeeder.createUserDto();
+      const { email, login, pass } = testSeeder.createUserDto({});
       const code = uuIdService.createRandomCode();
 
       await testSeeder.insertUser({
@@ -165,7 +165,7 @@ describe("/auth", () => {
     });
 
     it("should throw an error if user is already confirmed", async () => {
-      const { email, login, pass } = testSeeder.createUserDto();
+      const { email, login, pass } = testSeeder.createUserDto({});
       const code = "test";
 
       await testSeeder.insertUser({
@@ -188,7 +188,7 @@ describe("/auth", () => {
     });
 
     it("should throw an error if user is already confirmed", async () => {
-      const { email, login, pass } = testSeeder.createUserDto();
+      const { email, login, pass } = testSeeder.createUserDto({});
       const code = "test";
 
       await testSeeder.insertUser({
@@ -211,7 +211,9 @@ describe("/auth", () => {
     });
 
     it("should update user's code and expiration date and send an email with code", async () => {
-      const { email, login, pass } = testSeeder.createUserDto();
+      const { email, login, pass } = testSeeder.createUserDto({
+        email: "someemail@gmail.com",
+      });
       const startCode = uuIdService.createRandomCode();
       const startExpirationDate = dateFnsService.addToCurrentDate();
 
@@ -235,7 +237,7 @@ describe("/auth", () => {
       expect(updatedUser?.emailConfirmation.expirationDate).not.toBe(
         startExpirationDate
       );
-      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
+      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(2);
     });
   });
 });
