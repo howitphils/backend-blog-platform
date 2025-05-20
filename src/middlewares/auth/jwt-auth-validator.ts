@@ -23,7 +23,7 @@ export const jwtAuthGuard = (
     return;
   }
 
-  const verifiedUser = jwtService.verifyToken(token);
+  const verifiedUser = jwtService.verifyAccessToken(token);
 
   if (!verifiedUser) {
     console.log("not verified");

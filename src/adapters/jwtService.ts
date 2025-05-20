@@ -3,17 +3,25 @@ import { SETTINGS } from "../settings";
 
 export const jwtService = {
   createJwtPair(userId: string) {
-    const accessToken = jwt.sign({ userId }, SETTINGS.JWT_SECRET, {
-      expiresIn: "10s",
+    const accessToken = jwt.sign({ userId }, SETTINGS.JWT_SECRET_ACCESS, {
+      expiresIn: "1m",
     });
-    const refreshToken = jwt.sign({ userId }, SETTINGS.JWT_SECRET, {
-      expiresIn: "20s",
+    const refreshToken = jwt.sign({ userId }, SETTINGS.JWT_SECRET_REFRESH, {
+      expiresIn: "2m",
     });
     return { accessToken, refreshToken };
   },
-  verifyToken(token: string) {
+  verifyAccessToken(token: string) {
     try {
-      return jwt.verify(token, SETTINGS.JWT_SECRET) as JwtPayload;
+      return jwt.verify(token, SETTINGS.JWT_SECRET_ACCESS) as JwtPayload;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  },
+  verifyRefreshToken(token: string) {
+    try {
+      return jwt.verify(token, SETTINGS.JWT_SECRET_REFRESH) as JwtPayload;
     } catch (error) {
       console.log(error);
       return null;

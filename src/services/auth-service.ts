@@ -48,6 +48,8 @@ export const authService = {
 
     const tokenPair = jwtService.createJwtPair(targetUser._id.toString());
 
+    console.log(tokenPair);
+
     return tokenPair;
   },
 

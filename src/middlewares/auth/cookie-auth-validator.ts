@@ -17,7 +17,7 @@ export const refreshTokenValidator = (
     return;
   }
 
-  const verified = jwtService.verifyToken(refreshToken);
+  const verified = jwtService.verifyRefreshToken(refreshToken);
 
   if (!verified) {
     console.log("refresh token is not verified");
