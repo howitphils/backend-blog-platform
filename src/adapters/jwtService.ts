@@ -1,9 +1,8 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { ObjectId } from "mongodb";
 import { SETTINGS } from "../settings";
 
 export const jwtService = {
-  createJwtPair(userId: ObjectId) {
+  createJwtPair(userId: string) {
     const accessToken = jwt.sign({ userId }, SETTINGS.JWT_SECRET, {
       expiresIn: "10s",
     });

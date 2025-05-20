@@ -26,5 +26,7 @@ export const refreshTokenValidator = (
     return;
   }
 
+  req.user = { id: verified.userId };
+
   next();
 };

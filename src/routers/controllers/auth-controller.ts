@@ -32,9 +32,31 @@ export const authController = {
   },
 
   async createNewTokenPair(req: Request, res: Response) {
-    const refreshToken = req.cookies[SETTINGS.REFRESH_TOKEN_COOKIE_NAME];
-    await authService.checkRefreshToken(refreshToken);
+    const token = req.cookies[SETTINGS.REFRESH_TOKEN_COOKIE_NAME];
+    const userId = req.user?.id;
+
+    if (!userId) {
+      res.sendStatus(HttpStatuses.ServerError);
+      return;
+    }
+
+    const { accessToken, refreshToken } = await authService.checkRefreshToken(
+      token,
+      userId
+    );
+
+    res.cookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+      httpOnly: true,
+      secure: true,
+      path: "/auth",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(HttpStatuses.Success).json({ accessToken });
   },
+
+  async logout(req: Request, res: Response) {},
 
   async getMyInfo(req: Request, res: Response<MeModel>) {
     const userId = req.user?.id;

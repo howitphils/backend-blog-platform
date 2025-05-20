@@ -8,11 +8,13 @@ import { usersRouter } from "./routers/users-router";
 import { authRouter } from "./routers/auth-router";
 import { commentsRouter } from "./routers/comments-router";
 import { errorHandler } from "./middlewares/error-handler";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(SETTINGS.PATHS.BLOGS, blogsRouter);
 app.use(SETTINGS.PATHS.POSTS, postsRouter);

@@ -39,12 +39,15 @@ export const authService = {
       );
     }
 
-    const tokenPair = jwtService.createJwtPair(targetUser._id);
+    const tokenPair = jwtService.createJwtPair(targetUser._id.toString());
 
     return tokenPair;
   },
 
-  async checkRefreshToken(token: string) {
+  async checkRefreshToken(
+    token: string,
+    userId: string
+  ): Promise<TokenPairType> {
     const user = await usersRepository.findUserByRefreshToken(token);
 
     if (user) {
@@ -53,6 +56,12 @@ export const authService = {
         HttpStatuses.Unauthorized
       );
     }
+
+    await usersRepository.addUsedToken(userId, token);
+
+    const tokenPair = jwtService.createJwtPair(userId);
+
+    return tokenPair;
   },
 
   async registerUser(user: UserInputModel) {

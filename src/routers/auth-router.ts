@@ -19,6 +19,8 @@ authRouter.post(
   authController.loginUser
 );
 
+authRouter.post("/logout", refreshTokenValidator, authController.logout);
+
 authRouter.post(
   "/refresh-token",
   refreshTokenValidator,
