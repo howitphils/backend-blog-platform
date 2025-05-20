@@ -89,7 +89,10 @@ export const usersRepository = {
     return usersCollection.findOne({ usedTokens: { $in: [token] } });
   },
 
-  async addUsedToken(userId: string, token: string): Promise<boolean> {
+  async addUsedTokenToBlacklist(
+    userId: string,
+    token: string
+  ): Promise<boolean> {
     const updatedResult = await usersCollection.updateOne(
       { _id: new ObjectId(userId) },
       { $push: { usedTokens: token } }

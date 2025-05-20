@@ -44,9 +44,22 @@ export const authService = {
     return tokenPair;
   },
 
+  async logout(userId: string, token: string) {
+    const user = await usersRepository.findUserByRefreshToken(token);
+
+    if (user) {
+      throw new ErrorWithStatusCode(
+        "Token is already used",
+        HttpStatuses.Unauthorized
+      );
+    }
+
+    await usersRepository.addUsedTokenToBlacklist(userId, token);
+  },
+
   async checkRefreshToken(
-    token: string,
-    userId: string
+    userId: string,
+    token: string
   ): Promise<TokenPairType> {
     const user = await usersRepository.findUserByRefreshToken(token);
 
@@ -57,7 +70,7 @@ export const authService = {
       );
     }
 
-    await usersRepository.addUsedToken(userId, token);
+    await usersRepository.addUsedTokenToBlacklist(userId, token);
 
     const tokenPair = jwtService.createJwtPair(userId);
 

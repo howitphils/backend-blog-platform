@@ -41,8 +41,8 @@ export const authController = {
     }
 
     const { accessToken, refreshToken } = await authService.checkRefreshToken(
-      token,
-      userId
+      userId,
+      token
     );
 
     res.cookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
@@ -56,7 +56,20 @@ export const authController = {
     res.status(HttpStatuses.Success).json({ accessToken });
   },
 
-  async logout(req: Request, res: Response) {},
+  async logout(req: Request, res: Response) {
+    const userId = req.user?.id;
+    const token = req.cookies[SETTINGS.REFRESH_TOKEN_COOKIE_NAME];
+
+    if (!userId) {
+      res.sendStatus(HttpStatuses.ServerError);
+      return;
+    }
+
+    await authService.logout(userId, token);
+
+    res.clearCookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME);
+    res.sendStatus(HttpStatuses.NoContent);
+  },
 
   async getMyInfo(req: Request, res: Response<MeModel>) {
     const userId = req.user?.id;
