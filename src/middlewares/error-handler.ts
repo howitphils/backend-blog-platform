@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { HttpStatuses } from "../types/http-statuses";
 import { OutputErrorsType } from "../types/output-errors-types";
 
-export class ErrorWithStatus extends Error {
+export class ErrorWithStatusCode extends Error {
   public readonly statusCode: number;
   public readonly errorObj: OutputErrorsType | undefined;
 
@@ -23,7 +23,7 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  if (err instanceof ErrorWithStatus) {
+  if (err instanceof ErrorWithStatusCode) {
     if (err.errorObj) {
       res.status(err.statusCode).json(err.errorObj);
     } else {

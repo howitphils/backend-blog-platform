@@ -30,7 +30,7 @@ export const usersController = {
   },
 
   async createUser(req: RequestWithBody<UserInputModel>, res: Response) {
-    const createResult = await usersService.createNewUser(req.body);
+    const createResult = await usersService.createNewUser(req.body, true);
 
     const newUser = await usersQueryRepository.getUserById(
       createResult as ObjectId

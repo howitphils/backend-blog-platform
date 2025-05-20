@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { postsRepository } from "../db/mongodb/repositories/posts-repository/posts-db-repository";
 import { PostDbType, PostInputModel } from "../types/posts-types";
 import { blogsService } from "./blogs-service";
-import { ErrorWithStatus } from "../middlewares/error-handler";
+import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 
 export const postsService = {
@@ -12,7 +12,10 @@ export const postsService = {
     );
 
     if (!targetBlog) {
-      throw new ErrorWithStatus("Blog does not exist", HttpStatuses.NotFound);
+      throw new ErrorWithStatusCode(
+        "Blog does not exist",
+        HttpStatuses.NotFound
+      );
     }
 
     const newPost: PostDbType = {
@@ -30,7 +33,10 @@ export const postsService = {
   async getPostById(id: ObjectId): Promise<PostDbType> {
     const post = await postsRepository.getPostById(id);
     if (!post) {
-      throw new ErrorWithStatus("Post does not exist", HttpStatuses.NotFound);
+      throw new ErrorWithStatusCode(
+        "Post does not exist",
+        HttpStatuses.NotFound
+      );
     }
     return post;
   },
@@ -42,7 +48,10 @@ export const postsService = {
     const targetPost = await postsRepository.getPostById(id);
 
     if (!targetPost) {
-      throw new ErrorWithStatus("Post does not exist", HttpStatuses.NotFound);
+      throw new ErrorWithStatusCode(
+        "Post does not exist",
+        HttpStatuses.NotFound
+      );
     }
 
     return postsRepository.updatePost(id, updatedPost);
@@ -52,7 +61,10 @@ export const postsService = {
     const targetPost = await postsRepository.getPostById(id);
 
     if (!targetPost) {
-      throw new ErrorWithStatus("Post does not exist", HttpStatuses.NotFound);
+      throw new ErrorWithStatusCode(
+        "Post does not exist",
+        HttpStatuses.NotFound
+      );
     }
 
     return postsRepository.deletePost(id);

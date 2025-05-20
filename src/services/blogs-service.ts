@@ -2,7 +2,7 @@ import { ObjectId, WithId } from "mongodb";
 
 import { blogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
 import { BlogDbType, BlogInputModel } from "../types/blogs-types";
-import { ErrorWithStatus } from "../middlewares/error-handler";
+import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 
 export const blogsService = {
@@ -22,7 +22,10 @@ export const blogsService = {
     const blog = await blogsRepository.getBlogById(id);
 
     if (!blog) {
-      throw new ErrorWithStatus("Blog does not exist", HttpStatuses.NotFound);
+      throw new ErrorWithStatusCode(
+        "Blog does not exist",
+        HttpStatuses.NotFound
+      );
     }
 
     return blog;
@@ -35,7 +38,10 @@ export const blogsService = {
     const targetBlog = await blogsRepository.getBlogById(id);
 
     if (!targetBlog) {
-      throw new ErrorWithStatus("Blog does not exist", HttpStatuses.NotFound);
+      throw new ErrorWithStatusCode(
+        "Blog does not exist",
+        HttpStatuses.NotFound
+      );
     }
 
     return blogsRepository.updateBlog(id, updatedBlog);
@@ -45,7 +51,10 @@ export const blogsService = {
     const targetBlog = await blogsRepository.getBlogById(id);
 
     if (!targetBlog) {
-      throw new ErrorWithStatus("Blog does not exist", HttpStatuses.NotFound);
+      throw new ErrorWithStatusCode(
+        "Blog does not exist",
+        HttpStatuses.NotFound
+      );
     }
 
     return blogsRepository.deleteBlog(id);

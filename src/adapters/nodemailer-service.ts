@@ -10,6 +10,8 @@ export const nodeMailerService = {
     subject: string;
     message: string;
   }) {
+    console.log("Email will be sent");
+
     const transporter = nodemailer.createTransport({
       service: "mail.ru",
       auth: {
