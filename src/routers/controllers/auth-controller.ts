@@ -67,7 +67,14 @@ export const authController = {
 
     await authService.logout(userId, token);
 
-    res.clearCookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME);
+    res.clearCookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, {
+      httpOnly: true,
+      secure: true,
+      path: "/auth",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.sendStatus(HttpStatuses.NoContent);
   },
 

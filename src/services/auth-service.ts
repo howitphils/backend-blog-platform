@@ -39,6 +39,13 @@ export const authService = {
       );
     }
 
+    if (!targetUser.emailConfirmation.isConfirmed) {
+      throw new ErrorWithStatusCode(
+        "User is not confirmed",
+        HttpStatuses.Unauthorized
+      );
+    }
+
     const tokenPair = jwtService.createJwtPair(targetUser._id.toString());
 
     return tokenPair;

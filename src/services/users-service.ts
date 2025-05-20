@@ -33,6 +33,10 @@ export const usersService = {
 
     const passHash = await bcryptService.createHasn(password);
 
+    const code = uuIdService.createRandomCode();
+
+    console.log(code);
+
     const newUser: UserDbType = {
       accountData: {
         email: user.email,
@@ -41,7 +45,7 @@ export const usersService = {
         createdAt: new Date().toISOString(),
       },
       emailConfirmation: {
-        confirmationCode: uuIdService.createRandomCode(),
+        confirmationCode: code,
         expirationDate: dateFnsService.addToCurrentDate(),
         isConfirmed: isAdmin ? true : false,
       },
