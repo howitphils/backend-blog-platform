@@ -1,6 +1,5 @@
-import { WithId } from "mongodb";
-import { LoginInputModel } from "../types/login-types";
-import { UserDbType, UserInputModel } from "../types/users-types";
+import { LoginInputModel, TokenPairType } from "../types/login-types";
+import { UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
@@ -10,10 +9,11 @@ import { emailManager } from "../managers/email-manager";
 import { createErrorsObject } from "../routers/controllers/utils";
 import { uuIdService } from "../adapters/uuIdService";
 import { dateFnsService } from "../adapters/dateFnsService";
+import { jwtService } from "../adapters/jwtService";
 
 export const authService = {
   // Проверка на существование юзера для логина
-  async loginUser(credentials: LoginInputModel): Promise<WithId<UserDbType>> {
+  async loginUser(credentials: LoginInputModel): Promise<TokenPairType> {
     const { loginOrEmail, password } = credentials;
 
     const targetUser = await usersRepository.getUserByLoginOrEmail(
@@ -39,7 +39,9 @@ export const authService = {
       );
     }
 
-    return targetUser;
+    const tokenPair = jwtService.createJwtPair(targetUser._id);
+
+    return tokenPair;
   },
 
   async registerUser(user: UserInputModel) {
@@ -72,6 +74,7 @@ export const authService = {
         createErrorsObject("code", "Confirmation code is already expired")
       );
     }
+
     if (targetUser.emailConfirmation.isConfirmed) {
       throw new ErrorWithStatusCode(
         "Email is already confirmed",

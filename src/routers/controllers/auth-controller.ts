@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { LoginInputModel } from "../../types/login-types";
-import { jwtService } from "../../adapters/jwtService";
 import { RequestWithBody } from "../../types/requests-types";
 import { usersQueryRepository } from "../../db/mongodb/repositories/users-repository/users-query-repository";
 import { ObjectId } from "mongodb";
@@ -15,14 +14,20 @@ export const authController = {
   ) {
     const { loginOrEmail, password } = req.body;
 
-    const user = await authService.loginUser({
+    const { accessToken, refreshToken } = await authService.loginUser({
       loginOrEmail,
       password,
     });
 
-    const token = jwtService.createJwt(user._id);
+    res.cookie("refresh", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      path: "/auth",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
-    res.status(HttpStatuses.Success).json({ accessToken: token });
+    res.status(HttpStatuses.Success).json({ accessToken });
   },
 
   async getMyInfo(req: Request, res: Response<MeModel>) {
