@@ -45,6 +45,7 @@ export const usersService = {
         expirationDate: dateFnsService.addToCurrentDate(),
         isConfirmed: isAdmin ? true : false,
       },
+      usedTokens: [],
     };
 
     return usersRepository.createNewUser(newUser);

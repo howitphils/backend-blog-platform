@@ -23,6 +23,7 @@ export type UserDbType = {
     expirationDate: Date;
     isConfirmed: boolean;
   };
+  usedTokens: string[];
 };
 
 export type UsersRequestQueryType = {

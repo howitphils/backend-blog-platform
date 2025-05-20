@@ -44,6 +44,17 @@ export const authService = {
     return tokenPair;
   },
 
+  async checkRefreshToken(token: string) {
+    const user = await usersRepository.findUserByRefreshToken(token);
+
+    if (user) {
+      throw new ErrorWithStatusCode(
+        "Token is already used",
+        HttpStatuses.Unauthorized
+      );
+    }
+  },
+
   async registerUser(user: UserInputModel) {
     const createdId = await usersService.createNewUser(user, false);
     const targetUser = await usersService.getUserById(createdId);

@@ -6,6 +6,7 @@ import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
 import { authService } from "../../services/auth-service";
 import { MeModel, UserInputModel } from "../../types/users-types";
+import { SETTINGS } from "../../settings";
 
 export const authController = {
   async loginUser(
@@ -19,7 +20,7 @@ export const authController = {
       password,
     });
 
-    res.cookie("refresh", refreshToken, {
+    res.cookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
       httpOnly: true,
       secure: true,
       path: "/auth",
@@ -28,6 +29,11 @@ export const authController = {
     });
 
     res.status(HttpStatuses.Success).json({ accessToken });
+  },
+
+  async createNewTokenPair(req: Request, res: Response) {
+    const refreshToken = req.cookies[SETTINGS.REFRESH_TOKEN_COOKIE_NAME];
+    await authService.checkRefreshToken(refreshToken);
   },
 
   async getMyInfo(req: Request, res: Response<MeModel>) {

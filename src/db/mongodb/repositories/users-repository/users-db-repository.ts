@@ -82,4 +82,10 @@ export const usersRepository = {
   async getUserById(_id: ObjectId): Promise<WithId<UserDbType> | null> {
     return usersCollection.findOne({ _id });
   },
+
+  async findUserByRefreshToken(
+    token: string
+  ): Promise<WithId<UserDbType> | null> {
+    return usersCollection.findOne({ usedTokens: { $in: [token] } });
+  },
 };

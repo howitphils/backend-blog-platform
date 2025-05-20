@@ -7,6 +7,7 @@ import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 import { userBodyValidators } from "../middlewares/body-validations/users-body-validators";
 import { resendEmailBodyValidators } from "../middlewares/body-validations/resend-email-body-validations";
 import { confirmationCodeBodyValidators } from "../middlewares/body-validations/confirm-code-body-validations";
+import { refreshTokenValidator } from "../middlewares/auth/cookie-auth-validator";
 
 export const authRouter = Router();
 
@@ -16,6 +17,12 @@ authRouter.post(
   loginBodyValidators,
   bodyValidationResult,
   authController.loginUser
+);
+
+authRouter.post(
+  "/refresh-token",
+  refreshTokenValidator,
+  authController.createNewTokenPair
 );
 
 // Информация профиля

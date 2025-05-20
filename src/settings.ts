@@ -28,4 +28,5 @@ export const SETTINGS = {
     COMMENTS_COLLECTION_NAME: "comments",
   },
   JWT_SECRET: process.env.JWT_SECRET as string,
+  REFRESH_TOKEN_COOKIE_NAME: "refresh",
 };
