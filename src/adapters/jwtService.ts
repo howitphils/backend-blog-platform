@@ -4,10 +4,10 @@ import { SETTINGS } from "../settings";
 export const jwtService = {
   createJwtPair(userId: string) {
     const accessToken = jwt.sign({ userId }, SETTINGS.JWT_SECRET_ACCESS, {
-      expiresIn: "1m",
+      expiresIn: "10s",
     });
     const refreshToken = jwt.sign({ userId }, SETTINGS.JWT_SECRET_REFRESH, {
-      expiresIn: "2m",
+      expiresIn: "20s",
     });
     return { accessToken, refreshToken };
   },
