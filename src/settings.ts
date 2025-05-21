@@ -23,5 +23,5 @@ export const SETTINGS = {
   },
   JWT_SECRET_ACCESS: process.env.JWT_SECRET || "TEST_KEY",
   JWT_SECRET_REFRESH: process.env.JWT_SECRET || "TEST_KEY_REFRESH",
-  REFRESH_TOKEN_COOKIE_NAME: "refresh",
+  REFRESH_TOKEN_COOKIE_NAME: "refreshToken",
 };

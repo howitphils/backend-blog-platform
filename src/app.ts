@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import { SETTINGS } from "./settings";
 import { blogsRouter } from "./routers/blogs-router";
@@ -24,3 +24,7 @@ app.use(SETTINGS.PATHS.AUTH, authRouter);
 app.use(SETTINGS.PATHS.COMMENTS, commentsRouter);
 
 app.use(errorHandler);
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello, world!");
+});

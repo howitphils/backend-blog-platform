@@ -65,6 +65,7 @@ export const testSeeder = {
           }),
         isConfirmed: isConfirmed ?? false,
       },
+      usedTokens: [],
     };
 
     const res = await usersCollection.insertOne({ ...newUser });

@@ -1,6 +1,7 @@
 import { Response, NextFunction, Request } from "express";
 import { jwtService } from "../../adapters/jwtService";
 import { HttpStatuses } from "../../types/http-statuses";
+import { SETTINGS } from "../../settings";
 
 export const jwtAuthGuard = (
   req: Request<{}>,
@@ -23,7 +24,10 @@ export const jwtAuthGuard = (
     return;
   }
 
-  const verifiedUser = jwtService.verifyAccessToken(token);
+  const verifiedUser = jwtService.verifyToken(
+    token,
+    SETTINGS.JWT_SECRET_ACCESS
+  );
 
   if (!verifiedUser) {
     console.log("not verified");

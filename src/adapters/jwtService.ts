@@ -11,17 +11,9 @@ export const jwtService = {
     });
     return { accessToken, refreshToken };
   },
-  verifyAccessToken(token: string) {
+  verifyToken(token: string, secretKey: string) {
     try {
-      return jwt.verify(token, SETTINGS.JWT_SECRET_ACCESS) as JwtPayload;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  },
-  verifyRefreshToken(token: string) {
-    try {
-      return jwt.verify(token, SETTINGS.JWT_SECRET_REFRESH) as JwtPayload;
+      return jwt.verify(token, secretKey) as JwtPayload;
     } catch (error) {
       console.log(error);
       return null;
