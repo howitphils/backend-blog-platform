@@ -15,6 +15,8 @@ describe("/auth", () => {
 
   beforeAll(async () => {
     client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+
+    nodeMailerService.sendEmail = jest.fn().mockResolvedValue(true);
   });
 
   afterAll(async () => {
@@ -26,8 +28,6 @@ describe("/auth", () => {
     afterAll(async () => {
       await clearCollections();
     });
-
-    nodeMailerService.sendEmail = jest.fn().mockResolvedValue(true);
 
     const registerUserUseCase = authService.registerUser;
 

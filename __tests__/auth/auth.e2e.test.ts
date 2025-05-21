@@ -1,5 +1,4 @@
 import { HttpStatuses } from "../../src/types/http-statuses";
-// import { db } from "./../src/db/mongodb/mongo";
 import { SETTINGS } from "../../src/settings";
 import {
   createNewUserInDb,
@@ -92,5 +91,20 @@ describe("/auth", () => {
         .get(SETTINGS.PATHS.AUTH + "/me")
         .expect(HttpStatuses.Unauthorized);
     });
+
+    it("should not return user's info if token is invalid", async () => {
+      await req
+        .get(SETTINGS.PATHS.AUTH + "/me")
+        .set(jwtAuth("invalidToken"))
+        .expect(HttpStatuses.Unauthorized);
+    });
+  });
+
+  describe("refresh token", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    // it('should ')
   });
 });
