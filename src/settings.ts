@@ -21,7 +21,7 @@ export const SETTINGS = {
     USERS_COLLECTION_NAME: "users",
     COMMENTS_COLLECTION_NAME: "comments",
   },
-  JWT_SECRET_ACCESS: process.env.JWT_SECRET || "TEST_KEY",
-  JWT_SECRET_REFRESH: process.env.JWT_SECRET || "TEST_KEY_REFRESH",
+  JWT_SECRET_ACCESS: process.env.JWT_SECRET_ACCESS as string,
+  JWT_SECRET_REFRESH: process.env.JWT_SECRET_REFRESH as string,
   REFRESH_TOKEN_COOKIE_NAME: "refreshToken",
 };
