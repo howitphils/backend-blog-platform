@@ -1,11 +1,11 @@
-import bcrypt from "bcryptjs";
+import { compare, hash } from "bcryptjs";
 
 export const bcryptService = {
   async createHasn(password: string) {
-    return bcrypt.hash(password, 8);
+    return hash(password, 8);
   },
 
   async compareHash(password: string, passHash: string) {
-    return bcrypt.compare(password, passHash);
+    return compare(password, passHash);
   },
 };

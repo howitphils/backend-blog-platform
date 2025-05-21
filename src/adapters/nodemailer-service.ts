@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { createTransport } from "nodemailer";
 
 export const nodeMailerService = {
   async sendEmail({
@@ -12,7 +12,7 @@ export const nodeMailerService = {
   }) {
     console.log("Email will be sent");
 
-    const transporter = nodemailer.createTransport({
+    const transporter = createTransport({
       service: "mail.ru",
       auth: {
         user: process.env.NODEMAILER_USERNAME,

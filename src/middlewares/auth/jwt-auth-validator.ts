@@ -1,7 +1,7 @@
+import { authService } from "./../../services/auth-service";
 import { Response, NextFunction, Request } from "express";
-import { jwtService } from "../../adapters/jwtService";
 import { HttpStatuses } from "../../types/http-statuses";
-import { SETTINGS } from "../../settings";
+import { ResultStatus } from "../../types/resultObject-types";
 
 export const jwtAuthGuard = (
   req: Request<{}>,
@@ -15,27 +15,15 @@ export const jwtAuthGuard = (
     return;
   }
 
-  const [authType, token] = req.headers.authorization.split(" ");
-
-  if (authType !== "Bearer") {
-    console.log("wrong type");
-
-    res.sendStatus(HttpStatuses.Unauthorized);
-    return;
-  }
-
-  const verifiedUser = jwtService.verifyToken(
-    token,
-    SETTINGS.JWT_SECRET_ACCESS
+  const verificationResult = authService.checkAccessToken(
+    req.headers.authorization
   );
 
-  if (!verifiedUser) {
-    console.log("not verified");
+  if (verificationResult.status !== ResultStatus.Success) {
     res.sendStatus(HttpStatuses.Unauthorized);
-    return;
+  } else {
+    req.user = { id: verificationResult.data as string };
   }
-
-  req.user = { id: verifiedUser.userId };
 
   next();
 };

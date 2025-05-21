@@ -11,7 +11,6 @@ import { refreshTokenValidator } from "../middlewares/auth/cookie-auth-validator
 
 export const authRouter = Router();
 
-// Логинизация
 authRouter.post(
   "/login",
   loginBodyValidators,
@@ -27,7 +26,6 @@ authRouter.post(
   authController.createNewTokenPair
 );
 
-// Информация профиля
 authRouter.get("/me", jwtAuthGuard, authController.getMyInfo);
 
 authRouter.post(

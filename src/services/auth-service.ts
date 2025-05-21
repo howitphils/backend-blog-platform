@@ -10,6 +10,8 @@ import { createErrorsObject } from "../routers/controllers/utils";
 import { uuIdService } from "../adapters/uuIdService";
 import { dateFnsService } from "../adapters/dateFnsService";
 import { jwtService } from "../adapters/jwtService";
+import { ResultObject, ResultStatus } from "../types/resultObject-types";
+import { SETTINGS } from "../settings";
 
 export const authService = {
   // Проверка на существование юзера для логина
@@ -168,5 +170,44 @@ export const authService = {
         updatedUser.emailConfirmation.confirmationCode
       )
       .catch((e) => console.log(e));
+  },
+
+  checkAccessToken(token: string): ResultObject<string | null> {
+    const [authType, accessToken] = token.split(" ");
+
+    if (authType !== "Bearer") {
+      const resultObject: ResultObject = {
+        status: ResultStatus.Unauthorized,
+        errorMessage: "Wrong auth type",
+        extensions: [],
+        data: null,
+      };
+
+      return resultObject;
+    }
+
+    const verifiedUser = jwtService.verifyToken(
+      accessToken,
+      SETTINGS.JWT_SECRET_ACCESS
+    );
+
+    if (!verifiedUser) {
+      console.log("not verified");
+
+      const resultObject: ResultObject = {
+        status: ResultStatus.Unauthorized,
+        errorMessage: "Token is not verified",
+        extensions: [],
+        data: null,
+      };
+
+      return resultObject;
+    }
+
+    return {
+      status: ResultStatus.Success,
+      extensions: [],
+      data: verifiedUser.userId,
+    };
   },
 };
