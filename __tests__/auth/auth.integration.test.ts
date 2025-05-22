@@ -240,4 +240,73 @@ describe("/auth", () => {
       expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(2);
     });
   });
+
+  describe("refresh token", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    const refreshTokensUseCase = authService.refreshTokens;
+    const token = "token";
+    it("should add a token to the blacklist", async () => {
+      const userDto = testSeeder.createUserDto({});
+      const dbUser = await testSeeder.insertUser(userDto);
+
+      await refreshTokensUseCase(dbUser._id.toString(), token);
+
+      const updatedUser = await usersCollection.findOne({ _id: dbUser._id });
+
+      if (!updatedUser) {
+        fail("user expected");
+      }
+
+      expect(updatedUser.usedTokens.length).toBeGreaterThan(0);
+      expect(updatedUser.usedTokens[0]).toBe(token);
+    });
+
+    it("should throw an error if token is already used", async () => {
+      try {
+        await refreshTokensUseCase("userId", "token");
+        fail("Error exprected");
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(ErrorWithStatusCode);
+        expect(error.message).toBe("Token is already used");
+        expect(error.statusCode).toBe(HttpStatuses.Unauthorized);
+      }
+    });
+  });
+  describe("logout", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    const logoutUseCase = authService.logout;
+    const token = "token";
+    it("should add a token to the blacklist", async () => {
+      const userDto = testSeeder.createUserDto({});
+      const dbUser = await testSeeder.insertUser(userDto);
+
+      await logoutUseCase(dbUser._id.toString(), token);
+
+      const updatedUser = await usersCollection.findOne({ _id: dbUser._id });
+
+      if (!updatedUser) {
+        fail("user expected");
+      }
+
+      expect(updatedUser.usedTokens.length).toBeGreaterThan(0);
+      expect(updatedUser.usedTokens[0]).toBe(token);
+    });
+
+    it("should throw an error if token is already used", async () => {
+      try {
+        await logoutUseCase("userId", "token");
+        fail("Error exprected");
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(ErrorWithStatusCode);
+        expect(error.message).toBe("Token is already used");
+        expect(error.statusCode).toBe(HttpStatuses.Unauthorized);
+      }
+    });
+  });
 });

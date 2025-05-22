@@ -68,10 +68,7 @@ export const authService = {
     await usersRepository.addUsedTokenToBlacklist(userId, token);
   },
 
-  async checkRefreshToken(
-    userId: string,
-    token: string
-  ): Promise<TokenPairType> {
+  async refreshTokens(userId: string, token: string): Promise<TokenPairType> {
     const user = await usersRepository.findUserByRefreshToken(token);
 
     if (user) {

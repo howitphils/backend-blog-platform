@@ -40,7 +40,7 @@ export const authController = {
       return;
     }
 
-    const { accessToken, refreshToken } = await authService.checkRefreshToken(
+    const { accessToken, refreshToken } = await authService.refreshTokens(
       userId,
       token
     );
