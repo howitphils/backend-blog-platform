@@ -110,14 +110,64 @@ describe("/auth", () => {
     });
   });
 
-  // describe("refresh token", () => {
-  //   afterAll(async () => {
-  //     await clearCollections();
-  //   });
+  describe("refresh token", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
 
-  //   it("should return new access token", async () => {
-  //     const res = req.post(SETTINGS.PATHS.AUTH + "/refresh-token");
-  //     // .set("Cookie", []);
-  //   });
-  // });
+    it("should return new token pair", async () => {
+      const { refreshToken } = await getTokenPair();
+
+      const res = await req
+        .post(SETTINGS.PATHS.AUTH + "/refresh-token")
+        .set("Cookie", [refreshToken])
+        .expect(HttpStatuses.Success);
+
+      expect(res.body).toEqual({
+        accessToken: expect.any(String),
+      });
+      expect(res.headers["set-cookie"]).toBeDefined();
+      expect(res.headers["set-cookie"].length).toBeGreaterThan(0);
+    });
+
+    it("should return an error if cookie is not provided", async () => {
+      await req
+        .post(SETTINGS.PATHS.AUTH + "/refresh-token")
+        .expect(HttpStatuses.Unauthorized);
+    });
+
+    it("should return an error if the token inside the cookie is incorrect", async () => {
+      await req
+        .post(SETTINGS.PATHS.AUTH + "/refresh-token")
+        .set("Cookie", ["incorrectToken"])
+        .expect(HttpStatuses.Unauthorized);
+    });
+  });
+  describe("logout", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    it("should successfully logout a user", async () => {
+      const { refreshToken } = await getTokenPair();
+
+      await req
+        .post(SETTINGS.PATHS.AUTH + "/logout")
+        .set("Cookie", [refreshToken])
+        .expect(HttpStatuses.NoContent);
+    });
+
+    it("should return an error if cookie is not provided", async () => {
+      await req
+        .post(SETTINGS.PATHS.AUTH + "/logout")
+        .expect(HttpStatuses.Unauthorized);
+    });
+
+    it("should return an error if the code inside the cookie is incorrect", async () => {
+      await req
+        .post(SETTINGS.PATHS.AUTH + "/logout")
+        .set("Cookie", ["incorrectToken"])
+        .expect(HttpStatuses.Unauthorized);
+    });
+  });
 });
