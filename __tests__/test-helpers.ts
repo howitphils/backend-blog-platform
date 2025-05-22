@@ -141,7 +141,7 @@ export const createPostInDbHelper = async () => {
   return createNewPostInDb(postDto);
 };
 
-export const getAccessToken = async (user?: UserDtoType) => {
+export const getTokenPair = async (user?: UserDtoType) => {
   if (!user) {
     user = createUserDto({});
     await createNewUserInDb(user);
@@ -155,7 +155,10 @@ export const getAccessToken = async (user?: UserDtoType) => {
     })
     .expect(HttpStatuses.Success);
 
-  return res.body.accessToken;
+  const accessToken = res.body.accessToken;
+  const refreshToken = res.headers["set-cookie"][0];
+
+  return { accessToken, refreshToken };
 };
 
 export const createContentDto = ({ content }: { content?: string }) => {
@@ -181,7 +184,7 @@ export const createCommentInDb = async () => {
 
   const contentDto = createContentDto({});
 
-  const token = await getAccessToken(userDto);
+  const token = (await getTokenPair(userDto)).accessToken;
 
   const res = await req
     .post(SETTINGS.PATHS.POSTS + `/${dbPost.id}` + "/comments")

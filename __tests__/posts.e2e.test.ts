@@ -10,7 +10,7 @@ import {
   createPostInDbHelper,
   createUserDto,
   defaultPagination,
-  getAccessToken,
+  getTokenPair,
   jwtAuth,
   makeIncorrect,
   req,
@@ -76,7 +76,7 @@ describe("/posts", () => {
       const dbPost = await createPostInDbHelper();
       const contentDto = createContentDto({});
 
-      token = await getAccessToken(userDto);
+      token = (await getTokenPair(userDto)).accessToken;
 
       postId = dbPost.id;
 

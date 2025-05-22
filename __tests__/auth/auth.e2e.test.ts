@@ -3,7 +3,7 @@ import { SETTINGS } from "../../src/settings";
 import {
   createNewUserInDb,
   createUserDto,
-  getAccessToken,
+  getTokenPair,
   jwtAuth,
   req,
 } from "../test-helpers";
@@ -40,9 +40,19 @@ describe("/auth", () => {
         })
         .expect(HttpStatuses.Success);
 
+      const cookies = res.headers["set-cookie"];
+
       expect(res.body).toEqual({
         accessToken: expect.any(String),
       });
+
+      expect(cookies).toBeDefined();
+      expect(cookies.length).toBeGreaterThan(0);
+      expect(cookies).toEqual(
+        expect.arrayContaining([
+          expect.stringContaining(SETTINGS.REFRESH_TOKEN_COOKIE_NAME),
+        ])
+      );
     });
 
     it("it should not login a not existing user", async () => {
@@ -72,7 +82,7 @@ describe("/auth", () => {
     });
 
     it("should return user's info", async () => {
-      const token = await getAccessToken();
+      const token = (await getTokenPair()).accessToken;
 
       const res = await req
         .get(SETTINGS.PATHS.AUTH + "/me")
@@ -100,14 +110,14 @@ describe("/auth", () => {
     });
   });
 
-  describe("refresh token", () => {
-    afterAll(async () => {
-      await clearCollections();
-    });
+  // describe("refresh token", () => {
+  //   afterAll(async () => {
+  //     await clearCollections();
+  //   });
 
-    it("should return new access token", async () => {
-      const res = req.post(SETTINGS.PATHS.AUTH + "/refresh-token");
-      // .set("Cookie");
-    });
-  });
+  //   it("should return new access token", async () => {
+  //     const res = req.post(SETTINGS.PATHS.AUTH + "/refresh-token");
+  //     // .set("Cookie", []);
+  //   });
+  // });
 });

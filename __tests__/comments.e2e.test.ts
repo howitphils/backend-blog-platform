@@ -3,7 +3,7 @@ import {
   clearCollections,
   createCommentInDb,
   createContentDto,
-  getAccessToken,
+  getTokenPair,
   jwtAuth,
   makeIncorrect,
   req,
@@ -143,7 +143,7 @@ describe("/comments", () => {
         content: "a".repeat(20),
       });
 
-      const token2 = await getAccessToken();
+      const token2 = (await getTokenPair()).accessToken;
 
       await req
         .put(SETTINGS.PATHS.COMMENTS + `/${commentId}`)
@@ -197,7 +197,7 @@ describe("/comments", () => {
     });
 
     it("should not delete the comment by another user", async () => {
-      const token2 = await getAccessToken();
+      const token2 = (await getTokenPair()).accessToken;
 
       await req
         .delete(SETTINGS.PATHS.COMMENTS + `/${commentId}`)
