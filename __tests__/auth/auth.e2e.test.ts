@@ -105,6 +105,9 @@ describe("/auth", () => {
       await clearCollections();
     });
 
-    // it('should ')
+    it("should return new access token", async () => {
+      const res = req.post(SETTINGS.PATHS.AUTH + "/refresh-token");
+      // .set("Cookie");
+    });
   });
 });

@@ -11,6 +11,7 @@ export const jwtService = {
     });
     return { accessToken, refreshToken };
   },
+
   verifyToken(token: string, secretKey: string) {
     try {
       return verify(token, secretKey) as JwtPayload;
