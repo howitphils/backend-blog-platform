@@ -116,18 +116,26 @@ describe("/auth", () => {
     });
 
     it("should return new token pair", async () => {
-      const { refreshToken } = await getTokenPair();
+      const { accessToken, refreshTokenCookie } = await getTokenPair();
 
       const res = await req
         .post(SETTINGS.PATHS.AUTH + "/refresh-token")
-        .set("Cookie", [refreshToken])
+        .set("Cookie", [refreshTokenCookie])
         .expect(HttpStatuses.Success);
+
+      const oldRefreshToken = refreshTokenCookie.split(";")[0].split("=")[1];
+      const newRefreshToken = res.headers["set-cookie"][0]
+        .split(";")[0]
+        .split("=")[1];
+
+      console.log("compare: ", oldRefreshToken === newRefreshToken);
 
       expect(res.body).toEqual({
         accessToken: expect.any(String),
       });
-      expect(res.headers["set-cookie"]).toBeDefined();
-      expect(res.headers["set-cookie"].length).toBeGreaterThan(0);
+
+      expect(res.body.accessToken).not.toBe(accessToken);
+      expect(newRefreshToken).not.toBe(oldRefreshToken);
     });
 
     it("should return an error if cookie is not provided", async () => {
@@ -149,11 +157,11 @@ describe("/auth", () => {
     });
 
     it("should successfully logout a user", async () => {
-      const { refreshToken } = await getTokenPair();
+      const { refreshTokenCookie } = await getTokenPair();
 
       await req
         .post(SETTINGS.PATHS.AUTH + "/logout")
-        .set("Cookie", [refreshToken])
+        .set("Cookie", [refreshTokenCookie])
         .expect(HttpStatuses.NoContent);
     });
 

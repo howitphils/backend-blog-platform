@@ -155,12 +155,10 @@ export const getTokenPair = async (user?: UserDtoType) => {
     })
     .expect(HttpStatuses.Success);
 
-  console.log(res);
-
   const accessToken = res.body.accessToken;
-  const refreshToken = res.headers["set-cookie"][0];
+  const refreshTokenCookie = res.headers["set-cookie"][0];
 
-  return { accessToken, refreshToken };
+  return { accessToken, refreshTokenCookie };
 };
 
 export const createContentDto = ({ content }: { content?: string }) => {

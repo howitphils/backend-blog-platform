@@ -11,10 +11,8 @@ import { uuIdService } from "../adapters/uuIdService";
 import { dateFnsService } from "../adapters/dateFnsService";
 import { jwtService } from "../adapters/jwtService";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
-import { SETTINGS } from "../settings";
 
 export const authService = {
-  // Проверка на существование юзера для логина
   async loginUser(credentials: LoginInputModel): Promise<TokenPairType> {
     const { loginOrEmail, password } = credentials;
 
@@ -49,8 +47,6 @@ export const authService = {
     }
 
     const tokenPair = jwtService.createJwtPair(targetUser._id.toString());
-
-    console.log(tokenPair);
 
     return tokenPair;
   },
@@ -183,10 +179,7 @@ export const authService = {
       return resultObject;
     }
 
-    const verifiedUser = jwtService.verifyToken(
-      accessToken,
-      SETTINGS.JWT_SECRET_ACCESS
-    );
+    const verifiedUser = jwtService.verifyAccessToken(accessToken);
 
     if (!verifiedUser) {
       console.log("not verified");

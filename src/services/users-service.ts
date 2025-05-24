@@ -35,8 +35,6 @@ export const usersService = {
 
     const code = uuIdService.createRandomCode();
 
-    console.log(code);
-
     const newUser: UserDbType = {
       accountData: {
         email: user.email,

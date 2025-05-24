@@ -30,10 +30,8 @@ export const runDb = async (url: string, dbName: string | undefined) => {
 
   try {
     await client.connect();
-    console.log("Connected to db");
   } catch (error) {
     await client.close();
-    console.log("Connection with db has been closed");
   }
   return client;
 };
