@@ -72,7 +72,6 @@ export const authController = {
       secure: true,
       path: "/auth",
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.sendStatus(HttpStatuses.NoContent);

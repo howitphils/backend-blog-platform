@@ -21,7 +21,7 @@ export const nodeMailerService = {
       },
     });
 
-    await transporter.sendMail({
+    transporter.sendMail({
       from: `"Blog platform back 👻" ${SETTINGS.NODEMAILER_USERNAME}`, // sender address
       to: email, // list of receivers
       subject: subject, // Subject line
