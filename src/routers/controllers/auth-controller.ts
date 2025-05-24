@@ -71,7 +71,6 @@ export const authController = {
       httpOnly: true,
       secure: true,
       path: "/auth",
-      sameSite: "lax",
     });
 
     res.sendStatus(HttpStatuses.NoContent);
