@@ -1,4 +1,5 @@
 import { createTransport } from "nodemailer";
+import { SETTINGS } from "../settings";
 
 export const nodeMailerService = {
   async sendEmail({
@@ -13,15 +14,15 @@ export const nodeMailerService = {
     console.log("Email will be sent");
 
     const transporter = createTransport({
-      service: "mail.ru",
+      service: SETTINGS.NODEMAILER_MAIL_SERVICE,
       auth: {
-        user: process.env.NODEMAILER_USERNAME,
-        pass: process.env.NODEMAILER_PASS,
+        user: SETTINGS.NODEMAILER_USERNAME,
+        pass: SETTINGS.NODEMAILER_PASS,
       },
     });
 
     await transporter.sendMail({
-      from: `"Blog platform back 👻" ${process.env.NODEMAILER_USERNAME}`, // sender address
+      from: `"Blog platform back 👻" ${SETTINGS.NODEMAILER_USERNAME}`, // sender address
       to: email, // list of receivers
       subject: subject, // Subject line
       html: message, // html body

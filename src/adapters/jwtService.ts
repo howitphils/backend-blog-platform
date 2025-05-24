@@ -1,4 +1,4 @@
-import { JwtPayload, sign, verify } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 import { SETTINGS } from "../settings";
 import { TokenPairType } from "../types/login-types";
 
@@ -22,9 +22,9 @@ export const jwtService = {
     return { accessToken, refreshToken };
   },
 
-  verifyToken(token: string, secretKey: string): JwtPayload | null {
+  verifyToken(token: string, secretKey: string) {
     try {
-      return verify(token, secretKey) as JwtPayload;
+      return verify(token, secretKey);
     } catch (error) {
       console.log(error);
       return null;
