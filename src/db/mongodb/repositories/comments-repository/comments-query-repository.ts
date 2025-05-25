@@ -1,7 +1,7 @@
 import { commentsCollection } from "../../mongodb";
 import { ObjectId, WithId } from "mongodb";
 import {
-  CommentDbModel,
+  CommentDbType,
   CommentsMapedQueryType,
   CommentViewModel,
 } from "../../../../types/comments-types";
@@ -42,7 +42,7 @@ export const commentsQueryRepository = {
   },
 
   // Преобразование комментарий из формата базы данных в формат, который ожидает клиент
-  _mapFromDbToViewModel(comment: WithId<CommentDbModel>): CommentViewModel {
+  _mapFromDbToViewModel(comment: WithId<CommentDbType>): CommentViewModel {
     const { _id, commentatorInfo, content, createdAt } = comment;
     return {
       id: _id!.toString(),

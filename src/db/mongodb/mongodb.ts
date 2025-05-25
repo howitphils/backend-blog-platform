@@ -3,12 +3,15 @@ import { Collection, MongoClient } from "mongodb";
 import { SETTINGS } from "../../settings";
 import { BlogDbType } from "../../types/blogs-types";
 import { UserDbType } from "../../types/users-types";
-import { CommentDbModel } from "../../types/comments-types";
+import { CommentDbType } from "../../types/comments-types";
+// import { Session } from "../../classes";
+import { SessionDbType } from "../../types/sessions-types";
 
 export let blogsCollection: Collection<BlogDbType>;
 export let postsCollection: Collection<PostDbType>;
 export let usersCollection: Collection<UserDbType>;
-export let commentsCollection: Collection<CommentDbModel>;
+export let commentsCollection: Collection<CommentDbType>;
+export let sessionsCollection: Collection<SessionDbType>;
 
 export const runDb = async (url: string, dbName: string | undefined) => {
   const client = new MongoClient(url);
@@ -24,7 +27,7 @@ export const runDb = async (url: string, dbName: string | undefined) => {
     SETTINGS.COLLECTIONS.USERS_COLLECTION_NAME
   );
 
-  commentsCollection = db.collection<CommentDbModel>(
+  commentsCollection = db.collection<CommentDbType>(
     SETTINGS.COLLECTIONS.COMMENTS_COLLECTION_NAME
   );
 

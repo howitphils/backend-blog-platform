@@ -16,6 +16,9 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
+// Для получения корректного ip
+app.set("trust proxy", true);
+
 app.use(SETTINGS.PATHS.BLOGS, blogsRouter);
 app.use(SETTINGS.PATHS.POSTS, postsRouter);
 app.use(SETTINGS.PATHS.TESTS, testsRouter);
@@ -26,5 +29,5 @@ app.use(SETTINGS.PATHS.COMMENTS, commentsRouter);
 app.use(errorHandler);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, world!");
+  res.send(`Hello, world! ${req.ip}`);
 });

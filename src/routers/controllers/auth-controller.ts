@@ -71,6 +71,7 @@ export const authController = {
     res.clearCookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, {
       httpOnly: true,
       secure: true,
+      path: "/auth",
     });
 
     res.sendStatus(HttpStatuses.NoContent);

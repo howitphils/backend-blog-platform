@@ -123,6 +123,7 @@ describe("/auth", () => {
         .set("Cookie", [refreshTokenCookie])
         .expect(HttpStatuses.Success);
 
+      //TODO: время жизни токенов
       const oldRefreshToken = refreshTokenCookie.split(";")[0].split("=")[1];
       const newRefreshToken = res.headers["set-cookie"][0]
         .split(";")[0]

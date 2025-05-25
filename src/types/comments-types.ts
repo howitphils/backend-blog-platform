@@ -16,7 +16,7 @@ export type CommentViewModel = {
   createdAt: string;
 };
 
-export type CommentDbModel = {
+export type CommentDbType = {
   content: string;
   commentatorInfo: CommentatorInfo;
   createdAt: string;

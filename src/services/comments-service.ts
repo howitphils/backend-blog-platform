@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 import {
-  CommentDbModel,
+  CommentDbType,
   CreateCommentDto,
   DeleteCommentDto,
   UpdateCommentDto,
@@ -36,7 +36,7 @@ export const commentsService = {
       };
     }
 
-    const newComment: CommentDbModel = {
+    const newComment: CommentDbType = {
       content: dto.commentBody.content,
       commentatorInfo: {
         userId: dto.userId,
@@ -57,7 +57,7 @@ export const commentsService = {
 
   async getCommentById(
     id: ObjectId
-  ): Promise<ResultObject<CommentDbModel | null>> {
+  ): Promise<ResultObject<CommentDbType | null>> {
     const comment = await commentsRepository.getCommentById(id);
 
     if (!comment) {

@@ -9,8 +9,9 @@ import { emailManager } from "../managers/email-manager";
 import { createErrorsObject } from "../routers/controllers/utils";
 import { uuIdService } from "../adapters/uuIdService";
 import { dateFnsService } from "../adapters/dateFnsService";
-import { jwtService } from "../adapters/jwtService";
+import { JwtPayloadRefresh, jwtService } from "../adapters/jwtService";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
+import { SessionDbType } from "../types/sessions-types";
 
 export const authService = {
   async loginUser(credentials: LoginInputModel): Promise<TokenPairType> {
@@ -47,6 +48,17 @@ export const authService = {
     }
 
     const tokenPair = jwtService.createJwtPair(targetUser._id.toString());
+
+    const payload = jwtService.decodeToken(
+      tokenPair.refreshToken
+    ) as JwtPayloadRefresh;
+
+    // const newSession: SessionDbType = {
+    //   deviceId: payload.deviceId,
+    //   userId: payload.userId,
+    //   exp: payload.exp as number,
+    //   iat: payload.iat as number,
+    // };
 
     return tokenPair;
   },

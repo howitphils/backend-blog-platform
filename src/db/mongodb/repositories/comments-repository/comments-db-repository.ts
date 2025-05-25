@@ -1,12 +1,12 @@
 import { ObjectId, WithId } from "mongodb";
 import { commentsCollection } from "../../mongodb";
 import {
-  CommentDbModel,
+  CommentDbType,
   CommentInputModel,
 } from "../../../../types/comments-types";
 
 export const commentsRepository = {
-  async createComment(comment: CommentDbModel): Promise<ObjectId> {
+  async createComment(comment: CommentDbType): Promise<ObjectId> {
     const createResult = await commentsCollection.insertOne(comment);
     return createResult.insertedId;
   },
@@ -27,7 +27,7 @@ export const commentsRepository = {
     return updateResult.matchedCount === 1;
   },
 
-  async getCommentById(_id: ObjectId): Promise<WithId<CommentDbModel> | null> {
+  async getCommentById(_id: ObjectId): Promise<WithId<CommentDbType> | null> {
     return commentsCollection.findOne({ _id });
   },
 };
