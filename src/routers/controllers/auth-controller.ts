@@ -14,10 +14,18 @@ export const authController = {
     res: Response<{ accessToken: string }>
   ) {
     const { loginOrEmail, password } = req.body;
+    const ip = req.ip || "unknown";
+    const device_name = req.headers["user-agent"] || "default_device";
 
     const { accessToken, refreshToken } = await authService.loginUser({
-      loginOrEmail,
-      password,
+      usersCredentials: {
+        loginOrEmail,
+        password,
+      },
+      usersConfigs: {
+        ip,
+        device_name,
+      },
     });
 
     res.cookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {

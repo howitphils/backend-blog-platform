@@ -29,5 +29,5 @@ app.use(SETTINGS.PATHS.COMMENTS, commentsRouter);
 app.use(errorHandler);
 
 app.get("/", (req: Request, res: Response) => {
-  res.send(`Hello, world! ${req.headers["x-forwarded-for"]}`);
+  res.send("Hello, world!");
 });

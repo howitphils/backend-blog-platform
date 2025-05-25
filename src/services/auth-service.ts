@@ -1,4 +1,4 @@
-import { LoginInputModel, TokenPairType } from "../types/login-types";
+import { TokenPairType, UserInfo } from "../types/login-types";
 import { UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
@@ -12,10 +12,12 @@ import { dateFnsService } from "../adapters/dateFnsService";
 import { JwtPayloadRefresh, jwtService } from "../adapters/jwtService";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
 import { SessionDbType } from "../types/sessions-types";
+import { sessionRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
 
 export const authService = {
-  async loginUser(credentials: LoginInputModel): Promise<TokenPairType> {
-    const { loginOrEmail, password } = credentials;
+  async loginUser(userInfo: UserInfo): Promise<TokenPairType> {
+    const { loginOrEmail, password } = userInfo.usersCredentials;
+    const { device_name, ip } = userInfo.usersConfigs;
 
     const targetUser = await usersRepository.getUserByLoginOrEmail(
       loginOrEmail
@@ -49,16 +51,20 @@ export const authService = {
 
     const tokenPair = jwtService.createJwtPair(targetUser._id.toString());
 
-    const payload = jwtService.decodeToken(
+    const { deviceId, userId, exp, iat } = jwtService.decodeToken(
       tokenPair.refreshToken
     ) as JwtPayloadRefresh;
 
-    // const newSession: SessionDbType = {
-    //   deviceId: payload.deviceId,
-    //   userId: payload.userId,
-    //   exp: payload.exp as number,
-    //   iat: payload.iat as number,
-    // };
+    const newSession: SessionDbType = {
+      deviceId,
+      userId,
+      exp: exp as number,
+      iat: iat as number,
+      device_name,
+      ip,
+    };
+
+    await sessionRepository.createSession(newSession);
 
     return tokenPair;
   },

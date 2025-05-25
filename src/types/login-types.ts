@@ -1,3 +1,14 @@
+export type UserInfo = {
+  usersCredentials: {
+    loginOrEmail: string;
+    password: string;
+  };
+  usersConfigs: {
+    device_name: string;
+    ip: string;
+  };
+};
+
 export type LoginInputModel = {
   loginOrEmail: string;
   password: string;
