@@ -1,7 +1,6 @@
 import { decode, JwtPayload, sign, verify } from "jsonwebtoken";
 import { SETTINGS } from "../settings";
 import { TokenPairType } from "../types/login-types";
-import { uuIdService } from "./uuIdService";
 
 export interface JwtPayloadRefresh extends JwtPayload {
   userId: string;
@@ -11,19 +10,17 @@ export interface JwtPayloadRefresh extends JwtPayload {
 export const jwtService = {
   createAccessToken(payload: { userId: string }) {
     return sign(payload, SETTINGS.JWT_SECRET_ACCESS, {
-      expiresIn: "10s",
+      expiresIn: `${SETTINGS.ACCESS_TOKEN_TTL}s`,
     });
   },
 
   createRefreshToken(payload: { userId: string; deviceId: string }) {
     return sign(payload, SETTINGS.JWT_SECRET_REFRESH, {
-      expiresIn: "20s",
+      expiresIn: `${SETTINGS.REFRESH_TOKEN_TTL}s`,
     });
   },
 
-  createJwtPair(userId: string): TokenPairType {
-    const deviceId = uuIdService.createRandomCode();
-
+  createJwtPair(userId: string, deviceId: string): TokenPairType {
     const accessToken = this.createAccessToken({ userId });
     const refreshToken = this.createRefreshToken({ userId, deviceId });
 
@@ -57,9 +54,10 @@ export const jwtService = {
     };
   },
 
-  verifyRefreshToken(token: string): { userId: string } {
-    return this.verifyToken(token, SETTINGS.JWT_SECRET_REFRESH) as {
-      userId: string;
-    };
+  verifyRefreshToken(token: string): JwtPayloadRefresh {
+    return this.verifyToken(
+      token,
+      SETTINGS.JWT_SECRET_REFRESH
+    ) as JwtPayloadRefresh;
   },
 };

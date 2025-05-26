@@ -30,6 +30,9 @@ export const runDb = async (url: string, dbName: string | undefined) => {
   commentsCollection = db.collection<CommentDbType>(
     SETTINGS.COLLECTIONS.COMMENTS_COLLECTION_NAME
   );
+  sessionsCollection = db.collection<SessionDbType>(
+    SETTINGS.COLLECTIONS.SESSIONS_COLLECTION_NAME
+  );
 
   try {
     await client.connect();
@@ -44,4 +47,5 @@ export const clearCollections = async () => {
   await postsCollection.deleteMany({});
   await usersCollection.deleteMany({});
   await commentsCollection.deleteMany({});
+  await sessionsCollection.deleteMany({});
 };

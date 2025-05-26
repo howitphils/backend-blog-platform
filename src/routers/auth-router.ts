@@ -23,7 +23,7 @@ authRouter.post("/logout", refreshTokenValidator, authController.logout);
 authRouter.post(
   "/refresh-token",
   refreshTokenValidator,
-  authController.createNewTokenPair
+  authController.refreshTokens
 );
 
 authRouter.get("/me", jwtAuthGuard, authController.getMyInfo);

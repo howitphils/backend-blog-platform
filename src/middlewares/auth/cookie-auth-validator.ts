@@ -26,7 +26,12 @@ export const refreshTokenValidator = (
     return;
   }
 
-  req.user = { id: verified.userId };
+  //TODO достать из токена девайсИд, время выпуска и закинуть в реквест
+  req.user = {
+    id: verified.userId,
+    deviceId: verified.deviceId,
+    iat: verified.iat as number,
+  };
 
   next();
 };

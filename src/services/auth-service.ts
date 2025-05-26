@@ -16,6 +16,11 @@ import { sessionRepository } from "../db/mongodb/repositories/sessions-repositor
 
 export const authService = {
   async loginUser(userInfo: UserInfo): Promise<TokenPairType> {
+    //TODO: 1) ищем юзера по кредам
+    //      2) если юзер есть - создаем токены
+    //      3) проверяем есть ли существующая сессия для этого девайса(??)
+    //      4) создаем новую сессию для девайса
+
     const { loginOrEmail, password } = userInfo.usersCredentials;
     const { device_name, ip } = userInfo.usersConfigs;
 
@@ -49,9 +54,14 @@ export const authService = {
       );
     }
 
-    const tokenPair = jwtService.createJwtPair(targetUser._id.toString());
+    const deviceId = uuIdService.createRandomCode();
 
-    const { deviceId, userId, exp, iat } = jwtService.decodeToken(
+    const tokenPair = jwtService.createJwtPair(
+      targetUser._id.toString(),
+      deviceId
+    );
+
+    const { userId, exp, iat } = jwtService.decodeToken(
       tokenPair.refreshToken
     ) as JwtPayloadRefresh;
 
@@ -70,6 +80,9 @@ export const authService = {
   },
 
   async logout(userId: string, token: string) {
+    // TODO: 1) находим сессию по юзерИд и девайсИд
+    //       2) если есть - удаляем
+
     const user = await usersRepository.findUserByRefreshToken(token);
 
     if (user) {
@@ -79,10 +92,15 @@ export const authService = {
       );
     }
 
+    //TODO: удалить сессию из коллекции
     await usersRepository.addUsedTokenToBlacklist(userId, token);
   },
 
   async refreshTokens(userId: string, token: string): Promise<TokenPairType> {
+    //TODO : 1) проверить наличие сессии по юзерИд + девайсИд
+    //       2) в случае успеха - создать новые токены
+    //       3) обновить время выдачи токена в сессии
+
     const user = await usersRepository.findUserByRefreshToken(token);
 
     if (user) {
@@ -92,6 +110,7 @@ export const authService = {
       );
     }
 
+    //TODO: обновить время выпуска для конкретной сессии
     await usersRepository.addUsedTokenToBlacklist(userId, token);
 
     const tokenPair = jwtService.createJwtPair(userId);

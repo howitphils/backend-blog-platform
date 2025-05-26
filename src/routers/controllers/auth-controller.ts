@@ -15,7 +15,7 @@ export const authController = {
   ) {
     const { loginOrEmail, password } = req.body;
     const ip = req.ip || "unknown";
-    const device_name = req.headers["user-agent"] || "default_device";
+    const device_name = req.headers["user-agent"] || "default_device_name";
 
     const { accessToken, refreshToken } = await authService.loginUser({
       usersCredentials: {
@@ -39,12 +39,15 @@ export const authController = {
     res.status(HttpStatuses.Success).json({ accessToken });
   },
 
-  async createNewTokenPair(req: Request, res: Response) {
-    const token = req.cookies[SETTINGS.REFRESH_TOKEN_COOKIE_NAME];
+  async refreshTokens(req: Request, res: Response) {
+    // const token = req.cookies[SETTINGS.REFRESH_TOKEN_COOKIE_NAME];
     const userId = req.user?.id;
+    const deviceId = req.user?.deviceId;
+    const issuedAt = req.user?.iat;
 
-    if (!userId) {
+    if (!userId || !deviceId || !issuedAt) {
       res.sendStatus(HttpStatuses.ServerError);
+      console.log("user is not found in request");
       return;
     }
 
@@ -53,6 +56,7 @@ export const authController = {
       token
     );
 
+    //TODO: куку не создавать, а продлить?? (express-sessions)
     res.cookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
       httpOnly: true,
       secure: true,
