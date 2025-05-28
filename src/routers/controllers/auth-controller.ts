@@ -53,7 +53,8 @@ export const authController = {
 
     const { accessToken, refreshToken } = await authService.refreshTokens(
       userId,
-      token
+      deviceId,
+      issuedAt
     );
 
     //TODO: куку не создавать, а продлить?? (express-sessions)
@@ -70,14 +71,15 @@ export const authController = {
 
   async logout(req: Request, res: Response) {
     const userId = req.user?.id;
-    const token = req.cookies[SETTINGS.REFRESH_TOKEN_COOKIE_NAME];
+    const deviceId = req.user?.deviceId;
 
-    if (!userId) {
+    if (!userId || !deviceId) {
       res.sendStatus(HttpStatuses.ServerError);
+      console.log("user is not found in request");
       return;
     }
 
-    await authService.logout(userId, token);
+    await authService.logout(userId, deviceId);
 
     // httpOnly, path, secure должны быть такими же как при создании
     res.clearCookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, {

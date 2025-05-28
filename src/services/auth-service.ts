@@ -79,41 +79,65 @@ export const authService = {
     return tokenPair;
   },
 
-  async logout(userId: string, token: string) {
+  async logout(userId: string, deviceId: string) {
     // TODO: 1) находим сессию по юзерИд и девайсИд
     //       2) если есть - удаляем
 
-    const user = await usersRepository.findUserByRefreshToken(token);
+    const targetSession = await sessionRepository.findByUserIdAndDeviceId(
+      userId,
+      deviceId
+    );
 
-    if (user) {
+    if (!targetSession) {
       throw new ErrorWithStatusCode(
-        "Token is already used",
-        HttpStatuses.Unauthorized
+        "Session is not found",
+        HttpStatuses.ServerError
       );
     }
 
     //TODO: удалить сессию из коллекции
-    await usersRepository.addUsedTokenToBlacklist(userId, token);
+    const result = await sessionRepository.deleteSession(userId, deviceId);
+    console.log(result);
   },
 
-  async refreshTokens(userId: string, token: string): Promise<TokenPairType> {
+  async refreshTokens(
+    userId: string,
+    deviceId: string,
+    issuedAt: number
+  ): Promise<TokenPairType> {
     //TODO : 1) проверить наличие сессии по юзерИд + девайсИд
+    //       2) сравнить время выдачи сессии с полученным из контроллера
     //       2) в случае успеха - создать новые токены
     //       3) обновить время выдачи токена в сессии
 
-    const user = await usersRepository.findUserByRefreshToken(token);
+    const session = await sessionRepository.findByUserIdAndDeviceId(
+      userId,
+      deviceId
+    );
 
-    if (user) {
+    if (!session) {
       throw new ErrorWithStatusCode(
-        "Token is already used",
+        "Session is not found",
+        HttpStatuses.NotFound
+      );
+    }
+
+    if (session.iat !== issuedAt) {
+      throw new ErrorWithStatusCode(
+        "Token is not valid",
         HttpStatuses.Unauthorized
       );
     }
 
     //TODO: обновить время выпуска для конкретной сессии
-    await usersRepository.addUsedTokenToBlacklist(userId, token);
 
-    const tokenPair = jwtService.createJwtPair(userId);
+    const tokenPair = jwtService.createJwtPair(userId, deviceId);
+
+    const { exp, iat } = jwtService.decodeToken(
+      tokenPair.refreshToken
+    ) as JwtPayloadRefresh;
+
+    await sessionRepository.updateSessionIatAndExp(userId, deviceId, iat, exp);
 
     return tokenPair;
   },
