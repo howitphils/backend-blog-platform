@@ -12,7 +12,7 @@ import { dateFnsService } from "../adapters/dateFnsService";
 import { JwtPayloadRefresh, jwtService } from "../adapters/jwtService";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
 import { SessionDbType } from "../types/sessions-types";
-import { sessionRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
+import { sessionsRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
 
 export const authService = {
   async loginUser(userInfo: UserInfo): Promise<TokenPairType> {
@@ -74,7 +74,7 @@ export const authService = {
       ip,
     };
 
-    await sessionRepository.createSession(newSession);
+    await sessionsRepository.createSession(newSession);
 
     return tokenPair;
   },
@@ -83,7 +83,7 @@ export const authService = {
     // TODO: 1) находим сессию по юзерИд и девайсИд
     //       2) если есть - удаляем
 
-    const targetSession = await sessionRepository.findByUserIdAndDeviceId(
+    const targetSession = await sessionsRepository.findByUserIdAndDeviceId(
       userId,
       deviceId
     );
@@ -96,7 +96,7 @@ export const authService = {
     }
 
     //TODO: удалить сессию из коллекции
-    const result = await sessionRepository.deleteSession(userId, deviceId);
+    const result = await sessionsRepository.deleteSession(userId, deviceId);
     console.log(result);
   },
 
@@ -110,7 +110,7 @@ export const authService = {
     //       2) в случае успеха - создать новые токены
     //       3) обновить время выдачи токена в сессии
 
-    const session = await sessionRepository.findByUserIdAndDeviceId(
+    const session = await sessionsRepository.findByUserIdAndDeviceId(
       userId,
       deviceId
     );
@@ -135,7 +135,7 @@ export const authService = {
       tokenPair.refreshToken
     ) as JwtPayloadRefresh;
 
-    await sessionRepository.updateSessionIatAndExp(userId, deviceId, iat, exp);
+    await sessionsRepository.updateSessionIatAndExp(userId, deviceId, iat, exp);
 
     return tokenPair;
   },

@@ -1,7 +1,7 @@
 import { SessionDbType } from "../../../../types/sessions-types";
 import { sessionsCollection } from "../../mongodb";
 
-export const sessionRepository = {
+export const sessionsRepository = {
   async createSession(session: SessionDbType) {
     const insertedId = await sessionsCollection.insertOne(session);
     return insertedId;
@@ -14,8 +14,18 @@ export const sessionRepository = {
     return deleteResult.deletedCount === 1;
   },
 
+  async deleteAllSessions(userId: string, deviceId: string) {
+    return sessionsCollection.deleteMany({
+      userId,
+      deviceId: { $ne: deviceId },
+    });
+  },
+
   async findByUserIdAndDeviceId(userId: string, deviceId: string) {
     return sessionsCollection.findOne({ $and: [{ userId }, { deviceId }] });
+  },
+  async findByDeviceId(deviceId: string) {
+    return sessionsCollection.findOne({ deviceId });
   },
 
   async updateSessionIatAndExp(

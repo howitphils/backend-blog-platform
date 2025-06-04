@@ -10,3 +10,15 @@ devicesRouter.get(
   refreshTokenValidator,
   devicesController.getAllSessions
 );
+
+devicesRouter.delete(
+  "/devices/:deviceId",
+  refreshTokenValidator,
+  devicesController.getAllSessions
+);
+
+devicesRouter.get(
+  "/devices",
+  refreshTokenValidator,
+  devicesController.getAllSessions
+);
