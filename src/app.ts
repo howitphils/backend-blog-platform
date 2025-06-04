@@ -9,6 +9,7 @@ import { authRouter } from "./routers/auth-router";
 import { commentsRouter } from "./routers/comments-router";
 import { errorHandler } from "./middlewares/error-handler";
 import cookieParser from "cookie-parser";
+import { devicesRouter } from "./routers/devices-router";
 
 export const app = express();
 
@@ -25,6 +26,7 @@ app.use(SETTINGS.PATHS.TESTS, testsRouter);
 app.use(SETTINGS.PATHS.USERS, usersRouter);
 app.use(SETTINGS.PATHS.AUTH, authRouter);
 app.use(SETTINGS.PATHS.COMMENTS, commentsRouter);
+app.use(SETTINGS.PATHS.SECURITY, devicesRouter);
 
 app.use(errorHandler);
 

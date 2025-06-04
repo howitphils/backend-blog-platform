@@ -31,7 +31,7 @@ export const authController = {
     res.cookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
       httpOnly: true,
       secure: true,
-      path: "/auth",
+      path: SETTINGS.PATHS.AUTH,
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });

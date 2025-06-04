@@ -33,5 +33,7 @@ export const sessionRepository = {
     return updateResult.matchedCount === 1;
   },
 
-  async findAllUsersSession(userId: string) {},
+  async findAllUsersSessions(userId: string): Promise<SessionDbType[]> {
+    return sessionsCollection.find({ userId }).toArray();
+  },
 };
