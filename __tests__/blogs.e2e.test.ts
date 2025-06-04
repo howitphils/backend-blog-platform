@@ -8,6 +8,7 @@ import {
   createNewBlogInDb,
   createPostForBlogDto,
   defaultPagination,
+  makeIncorrect,
   req,
 } from "./test-helpers";
 
@@ -127,7 +128,7 @@ describe("/blogs", () => {
 
     it("should not get the blog by the incorrect id", async () => {
       await req
-        .get(SETTINGS.PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
+        .get(SETTINGS.PATHS.BLOGS + "/" + makeIncorrect(blogId))
         .expect(HttpStatuses.NotFound);
     });
   });

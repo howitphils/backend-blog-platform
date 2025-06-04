@@ -91,7 +91,7 @@ export const authService = {
     if (!targetSession) {
       throw new ErrorWithStatusCode(
         "Session is not found",
-        HttpStatuses.ServerError
+        HttpStatuses.NotFound
       );
     }
 

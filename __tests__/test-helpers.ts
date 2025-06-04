@@ -198,3 +198,11 @@ export const createCommentInDb = async () => {
 export const makeIncorrect = (id: string) => {
   return id.slice(0, -2) + "ab";
 };
+
+export const delay = (ms: number): Promise<void> => {
+  return new Promise((res, rej) => {
+    setTimeout(() => {
+      res();
+    }, ms);
+  });
+};

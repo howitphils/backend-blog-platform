@@ -1,8 +1,12 @@
 import { WithId } from "mongodb";
 import { randomUUID } from "crypto";
 import { add } from "date-fns/add";
-import { usersCollection } from "../../src/db/mongodb/mongodb";
+import {
+  sessionsCollection,
+  usersCollection,
+} from "../../src/db/mongodb/mongodb";
 import { UserDbType } from "../../src/types/users-types";
+import { SessionDbType, SessionTestType } from "../../src/types/sessions-types";
 
 type RegisterUserPayloadType = {
   login: string;
@@ -29,6 +33,7 @@ export const testSeeder = {
       pass: pass || "123456789",
     };
   },
+
   // createUserDtos(count: number) {
   //   const users = [];
 
@@ -73,5 +78,22 @@ export const testSeeder = {
       _id: res.insertedId,
       ...newUser,
     };
+  },
+
+  async insertSession(session: SessionTestType) {
+    const { deviceId, device_name, exp, iat, ip, userId } = session;
+
+    const newSession: SessionDbType = {
+      userId: userId ?? "testUserId",
+      deviceId: deviceId ?? "testDeviceId",
+      iat: iat ?? 10,
+      exp: exp ?? 10,
+      ip: ip ?? "testIp",
+      device_name: device_name ?? "testDevice",
+    };
+
+    await sessionsCollection.insertOne({ ...newSession });
+
+    return newSession;
   },
 };

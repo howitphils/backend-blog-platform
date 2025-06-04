@@ -6,3 +6,12 @@ export type SessionDbType = {
   ip: string;
   device_name: string;
 };
+
+export type SessionTestType = {
+  userId?: string;
+  deviceId?: string;
+  iat?: number;
+  exp?: number;
+  ip?: string;
+  device_name?: string;
+};

@@ -3,6 +3,7 @@ import { SETTINGS } from "../../src/settings";
 import {
   createNewUserInDb,
   createUserDto,
+  delay,
   getTokenPair,
   jwtAuth,
   req,
@@ -118,12 +119,13 @@ describe("/auth", () => {
     it("should return new token pair", async () => {
       const { accessToken, refreshTokenCookie } = await getTokenPair();
 
+      await delay(1000);
+
       const res = await req
         .post(SETTINGS.PATHS.AUTH + "/refresh-token")
         .set("Cookie", [refreshTokenCookie])
         .expect(HttpStatuses.Success);
 
-      //TODO: время жизни токенов
       const oldRefreshToken = refreshTokenCookie.split(";")[0].split("=")[1];
       const newRefreshToken = res.headers["set-cookie"][0]
         .split(";")[0]
