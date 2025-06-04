@@ -20,7 +20,7 @@ export const devicesService = {
     }
   },
 
-  async deleteSession(userId: string, deviceId: string): Promise<boolean> {
+  async deleteSession(userId: string, deviceId: string): Promise<void> {
     const targetSession = await sessionsRepository.findByUserIdAndDeviceId(
       userId,
       deviceId
@@ -33,6 +33,6 @@ export const devicesService = {
       );
     }
 
-    return sessionsRepository.deleteSession(userId, deviceId);
+    sessionsRepository.deleteSession(userId, deviceId);
   },
 };

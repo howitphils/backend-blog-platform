@@ -1,4 +1,4 @@
-import { TokenPairType, UserInfo } from "../types/login-types";
+import { TokenPairType, UserInfoType } from "../types/login-types";
 import { UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
@@ -15,7 +15,7 @@ import { SessionDbType } from "../types/sessions-types";
 import { sessionsRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
 
 export const authService = {
-  async loginUser(userInfo: UserInfo): Promise<TokenPairType> {
+  async loginUser(userInfo: UserInfoType): Promise<TokenPairType> {
     //TODO: 1) ищем юзера по кредам
     //      2) если юзер есть - создаем токены
     //      3) проверяем есть ли существующая сессия для этого девайса(??)

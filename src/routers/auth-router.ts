@@ -8,11 +8,13 @@ import { userBodyValidators } from "../middlewares/body-validations/users-body-v
 import { resendEmailBodyValidators } from "../middlewares/body-validations/resend-email-body-validations";
 import { confirmationCodeBodyValidators } from "../middlewares/body-validations/confirm-code-body-validations";
 import { refreshTokenValidator } from "../middlewares/auth/cookie-auth-validator";
+import { apiCallsGuard } from "../middlewares/apiCallsGuard";
 
 export const authRouter = Router();
 
 authRouter.post(
   "/login",
+  apiCallsGuard,
   loginBodyValidators,
   bodyValidationResult,
   authController.loginUser
@@ -30,6 +32,7 @@ authRouter.get("/me", jwtAuthGuard, authController.getMyInfo);
 
 authRouter.post(
   "/registration",
+  apiCallsGuard,
   userBodyValidators,
   bodyValidationResult,
   authController.registerUser
@@ -37,6 +40,7 @@ authRouter.post(
 
 authRouter.post(
   "/registration-confirmation",
+  apiCallsGuard,
   confirmationCodeBodyValidators,
   bodyValidationResult,
   authController.confirmRegistration
@@ -44,6 +48,7 @@ authRouter.post(
 
 authRouter.post(
   "/registration-email-resending",
+  apiCallsGuard,
   resendEmailBodyValidators,
   bodyValidationResult,
   authController.resendConfirmation

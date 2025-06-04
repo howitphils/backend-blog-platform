@@ -1,4 +1,4 @@
-import { add, subHours } from "date-fns";
+import { add, subHours, subSeconds } from "date-fns";
 
 export const dateFnsService = {
   addToCurrentDate(hours?: number, minutes?: number) {
@@ -9,5 +9,8 @@ export const dateFnsService = {
   },
   cutBackFromCurrentDate() {
     return subHours(new Date(), 2);
+  },
+  rollBackBySeconds(seconds: number) {
+    return subSeconds(new Date(), seconds);
   },
 };

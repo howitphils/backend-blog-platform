@@ -7,4 +7,5 @@ export enum HttpStatuses {
   Forbidden = 403,
   NotFound = 404,
   ServerError = 500,
+  TooManyRequests = 429,
 }
