@@ -122,14 +122,15 @@ export const authService = {
       );
     }
 
+    console.log("from token:", issuedAt);
+    console.log("from session:", session.iat);
+
     if (session.iat !== issuedAt) {
       throw new ErrorWithStatusCode(
         "Token is not valid",
         HttpStatuses.Unauthorized
       );
     }
-
-    //TODO: обновить время выпуска для конкретной сессии
 
     const tokenPair = jwtService.createJwtPair(userId, deviceId);
 
@@ -138,6 +139,14 @@ export const authService = {
     ) as JwtPayloadRefresh;
 
     await sessionRepository.updateSessionIatAndExp(userId, deviceId, iat, exp);
+
+    const updatedSession = await sessionRepository.findByUserIdAndDeviceId(
+      userId,
+      deviceId
+    );
+
+    console.log("updated date: ", updatedSession?.iat);
+    console.log(issuedAt);
 
     return tokenPair;
   },

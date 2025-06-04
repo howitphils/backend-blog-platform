@@ -21,6 +21,7 @@ export const SETTINGS = {
     USERS_COLLECTION_NAME: "users",
     COMMENTS_COLLECTION_NAME: "comments",
     SESSIONS_COLLECTION_NAME: "sessions",
+    APICALLS_COLLECTION_NAME: "apicalls",
   },
   JWT_SECRET_ACCESS: process.env.JWT_SECRET_ACCESS as string,
   JWT_SECRET_REFRESH: process.env.JWT_SECRET_REFRESH as string,

@@ -32,4 +32,6 @@ export const sessionRepository = {
 
     return updateResult.matchedCount === 1;
   },
+
+  async findAllUsersSession(userId: string) {},
 };
