@@ -2,13 +2,13 @@ import { Request, Response } from "express";
 import { devicesService } from "../../services/devices-service";
 import { HttpStatuses } from "../../types/http-statuses";
 import { RequestWithParams } from "../../types/requests-types";
+import { sessionsQueryRepository } from "../../db/mongodb/repositories/sessions-repository/sessions-query-repository";
 
 export const devicesController = {
   async getAllSessions(req: Request, res: Response) {
     const userId = req.user.id;
 
-    //TODO: сделать в квери репо с маппингом
-    const sessions = await devicesService.getAllUsersSessions(userId);
+    const sessions = await sessionsQueryRepository.getAllUsersSessions(userId);
 
     res.status(HttpStatuses.Success).json(sessions);
   },

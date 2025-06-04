@@ -15,3 +15,10 @@ export type SessionTestType = {
   ip?: string;
   device_name?: string;
 };
+
+export type SessionViewModel = {
+  ip: string;
+  title: string;
+  lastActiveDate: string;
+  deviceId: string;
+};
