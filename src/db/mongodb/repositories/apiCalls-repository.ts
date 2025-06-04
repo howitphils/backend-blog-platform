@@ -10,7 +10,7 @@ export const apiCallsRepository = {
     url: string;
     date: Date;
   }) {
-    return apiCallsCollection.countDocuments({ ip, url, date });
+    return apiCallsCollection.countDocuments({ ip, url, date: { $gte: date } });
   },
 
   async insertCall({ ip, url, date }: { ip: string; url: string; date: Date }) {

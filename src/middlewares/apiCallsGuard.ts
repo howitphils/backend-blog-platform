@@ -26,7 +26,7 @@ export const apiCallsGuard = async (
     url: originalUrl,
   });
 
-  if (count > SETTINGS.REQUEST_LIMIT) {
+  if (count >= SETTINGS.REQUEST_LIMIT) {
     res.sendStatus(HttpStatuses.TooManyRequests);
     return;
   }
