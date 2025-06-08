@@ -40,6 +40,7 @@ export const runDb = async (url: string, dbName: string | undefined) => {
 
   try {
     await client.connect();
+    console.log("connected to db");
   } catch (error) {
     await client.close();
   }

@@ -10,7 +10,7 @@ export const apiCallsGuard = async (
   next: NextFunction
 ) => {
   const { originalUrl, ip } = req;
-  const tenSecondsAgoDate = dateFnsService.rollBackBySeconds(
+  const secondsAgoDate = dateFnsService.rollBackBySeconds(
     SETTINGS.REQUEST_LIMIT_PERIOD
   );
 
@@ -21,7 +21,7 @@ export const apiCallsGuard = async (
   }
 
   const count = await apiCallsRepository.getAllCallsCount({
-    date: tenSecondsAgoDate,
+    date: secondsAgoDate,
     ip,
     url: originalUrl,
   });

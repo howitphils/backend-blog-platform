@@ -14,11 +14,11 @@ devicesRouter.get(
 devicesRouter.delete(
   "/devices/:deviceId",
   refreshTokenValidator,
-  devicesController.getAllSessions
+  devicesController.deleteSession
 );
 
-devicesRouter.get(
+devicesRouter.delete(
   "/devices",
   refreshTokenValidator,
-  devicesController.getAllSessions
+  devicesController.deleteAllSessions
 );
