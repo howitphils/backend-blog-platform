@@ -1,4 +1,8 @@
-import { TokenPairType, UserInfoType } from "../types/login-types";
+import {
+  RefreshTokensDto,
+  TokenPairType,
+  UserInfoType,
+} from "../types/login-types";
 import { UserInputModel } from "../types/users-types";
 import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
@@ -15,14 +19,14 @@ import { SessionDbType } from "../types/sessions-types";
 import { sessionsRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
 
 export const authService = {
-  async loginUser(userInfo: UserInfoType): Promise<TokenPairType> {
+  async loginUser(userInfoDto: UserInfoType): Promise<TokenPairType> {
     //TODO: 1) ищем юзера по кредам
     //      2) если юзер есть - создаем токены
     //      3) проверяем есть ли существующая сессия для этого девайса(??)
     //      4) создаем новую сессию для девайса
 
-    const { loginOrEmail, password } = userInfo.usersCredentials;
-    const { device_name, ip } = userInfo.usersConfigs;
+    const { loginOrEmail, password } = userInfoDto.usersCredentials;
+    const { device_name, ip } = userInfoDto.usersConfigs;
 
     const targetUser = await usersRepository.getUserByLoginOrEmail(
       loginOrEmail
@@ -100,19 +104,15 @@ export const authService = {
     console.log(result);
   },
 
-  async refreshTokens(
-    userId: string,
-    deviceId: string,
-    issuedAt: number
-  ): Promise<TokenPairType> {
+  async refreshTokens(dto: RefreshTokensDto): Promise<TokenPairType> {
     //TODO : 1) проверить наличие сессии по юзерИд + девайсИд
     //       2) сравнить время выдачи сессии с полученным из контроллера
-    //       2) в случае успеха - создать новые токены
-    //       3) обновить время выдачи токена в сессии
+    //       3) в случае успеха - создать новые токены
+    //       4) обновить время выдачи токена в сессии
 
     const session = await sessionsRepository.findByUserIdAndDeviceId(
-      userId,
-      deviceId
+      dto.userId,
+      dto.deviceId
     );
 
     if (!session) {
@@ -122,20 +122,25 @@ export const authService = {
       );
     }
 
-    if (session.iat !== issuedAt) {
+    if (session.iat !== dto.issuedAt) {
       throw new ErrorWithStatusCode(
         "Token is not valid",
         HttpStatuses.Unauthorized
       );
     }
 
-    const tokenPair = jwtService.createJwtPair(userId, deviceId);
+    const tokenPair = jwtService.createJwtPair(dto.userId, dto.deviceId);
 
     const { exp, iat } = jwtService.decodeToken(
       tokenPair.refreshToken
     ) as JwtPayloadRefresh;
 
-    await sessionsRepository.updateSessionIatAndExp(userId, deviceId, iat, exp);
+    await sessionsRepository.updateSessionIatAndExp(
+      dto.userId,
+      dto.deviceId,
+      iat,
+      exp
+    );
 
     return tokenPair;
   },

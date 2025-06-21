@@ -50,11 +50,11 @@ export const authController = {
       return;
     }
 
-    const { accessToken, refreshToken } = await authService.refreshTokens(
+    const { accessToken, refreshToken } = await authService.refreshTokens({
       userId,
       deviceId,
-      issuedAt
-    );
+      issuedAt,
+    });
 
     //TODO: куку не создавать, а продлить?? (express-sessions)
     res.cookie(APP_CONFIG.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {

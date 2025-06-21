@@ -21,16 +21,17 @@ export const sessionsService = {
   },
 
   async deleteSession(userId: string, deviceId: string): Promise<void> {
-    const targetSession = await sessionsRepository.findByUserIdAndDeviceId(
-      userId,
-      deviceId
-    );
+    const targetSession = await sessionsRepository.findByDeviceId(deviceId);
 
     if (!targetSession) {
       throw new ErrorWithStatusCode(
         "Session is not found",
         HttpStatuses.NotFound
       );
+    }
+
+    if (targetSession.userId !== userId) {
+      throw new ErrorWithStatusCode("Forbidden action", HttpStatuses.Forbidden);
     }
 
     sessionsRepository.deleteSession(userId, deviceId);

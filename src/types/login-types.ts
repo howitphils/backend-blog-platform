@@ -23,3 +23,9 @@ export type TokenPairType = {
   accessToken: string;
   refreshToken: string;
 };
+
+export type RefreshTokensDto = {
+  userId: string;
+  deviceId: string;
+  issuedAt: number;
+};
