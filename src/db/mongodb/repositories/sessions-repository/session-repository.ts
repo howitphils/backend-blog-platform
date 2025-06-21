@@ -20,9 +20,8 @@ export const sessionsRepository = {
       deviceId: { $ne: deviceId },
     });
   },
-
-  async findByUserIdAndDeviceId(userId: string, deviceId: string) {
-    return sessionsCollection.findOne({ $and: [{ userId }, { deviceId }] });
+  async findByDeviceIdAndIssuedAt(iat: number, deviceId: string) {
+    return sessionsCollection.findOne({ $and: [{ iat }, { deviceId }] });
   },
   async findByDeviceId(deviceId: string) {
     return sessionsCollection.findOne({ deviceId });

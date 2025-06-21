@@ -84,15 +84,15 @@ export const authService = {
   },
 
   async logout(dto: RefreshTokensAndLogoutDto) {
-    const targetSession = await sessionsRepository.findByUserIdAndDeviceId(
-      dto.userId,
+    const targetSession = await sessionsRepository.findByDeviceIdAndIssuedAt(
+      dto.issuedAt,
       dto.deviceId
     );
 
     if (!targetSession) {
       throw new ErrorWithStatusCode(
         "Session is not found",
-        HttpStatuses.NotFound
+        HttpStatuses.Unauthorized
       );
     }
 
@@ -112,15 +112,15 @@ export const authService = {
     //       3) в случае успеха - создать новые токены
     //       4) обновить время выдачи токена в сессии
 
-    const session = await sessionsRepository.findByUserIdAndDeviceId(
-      dto.userId,
+    const session = await sessionsRepository.findByDeviceIdAndIssuedAt(
+      dto.issuedAt,
       dto.deviceId
     );
 
     if (!session) {
       throw new ErrorWithStatusCode(
         "Session is not found",
-        HttpStatuses.NotFound
+        HttpStatuses.Unauthorized
       );
     }
 
