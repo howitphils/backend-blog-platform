@@ -6,7 +6,7 @@ import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
 import { authService } from "../../services/auth-service";
 import { MeModel, UserInputModel } from "../../types/users-types";
-import { SETTINGS } from "../../settings";
+import { APP_CONFIG } from "../../settings";
 
 export const authController = {
   async loginUser(
@@ -28,10 +28,9 @@ export const authController = {
       },
     });
 
-    res.cookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+    res.cookie(APP_CONFIG.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
       httpOnly: true,
       secure: true,
-      path: SETTINGS.PATHS.AUTH,
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -58,10 +57,9 @@ export const authController = {
     );
 
     //TODO: куку не создавать, а продлить?? (express-sessions)
-    res.cookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+    res.cookie(APP_CONFIG.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
       httpOnly: true,
       secure: true,
-      path: "/auth",
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -82,10 +80,9 @@ export const authController = {
     await authService.logout(userId, deviceId);
 
     // httpOnly, path, secure должны быть такими же как при создании
-    res.clearCookie(SETTINGS.REFRESH_TOKEN_COOKIE_NAME, {
+    res.clearCookie(APP_CONFIG.REFRESH_TOKEN_COOKIE_NAME, {
       httpOnly: true,
       secure: true,
-      path: "/auth",
     });
 
     res.sendStatus(HttpStatuses.NoContent);

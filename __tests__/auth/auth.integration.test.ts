@@ -4,7 +4,7 @@ import { authService } from "../../src/services/auth-service";
 import { ErrorWithStatusCode } from "../../src/middlewares/error-handler";
 import { runDb, usersCollection } from "../../src/db/mongodb/mongodb";
 import { MongoClient } from "mongodb";
-import { SETTINGS } from "../../src/settings";
+import { APP_CONFIG } from "../../src/settings";
 import { HttpStatuses } from "../../src/types/http-statuses";
 import { testSeeder } from "./auth.helpers";
 import { uuIdService } from "../../src/adapters/uuIdService";
@@ -14,7 +14,7 @@ describe("/auth", () => {
   let client: MongoClient;
 
   beforeAll(async () => {
-    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
 
     nodeMailerService.sendEmail = jest.fn().mockResolvedValue(true);
   });

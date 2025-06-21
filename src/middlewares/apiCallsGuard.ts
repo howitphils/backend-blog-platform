@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { apiCallsRepository } from "../db/mongodb/repositories/apiCalls-repository";
 import { dateFnsService } from "../adapters/dateFnsService";
 import { HttpStatuses } from "../types/http-statuses";
-import { SETTINGS } from "../settings";
+import { APP_CONFIG } from "../settings";
 
 export const apiCallsGuard = async (
   req: Request,
@@ -11,7 +11,7 @@ export const apiCallsGuard = async (
 ) => {
   const { originalUrl, ip } = req;
   const secondsAgoDate = dateFnsService.rollBackBySeconds(
-    SETTINGS.REQUEST_LIMIT_PERIOD
+    APP_CONFIG.REQUEST_LIMIT_PERIOD
   );
 
   if (!ip) {
@@ -26,7 +26,7 @@ export const apiCallsGuard = async (
     url: originalUrl,
   });
 
-  if (count >= SETTINGS.REQUEST_LIMIT) {
+  if (count >= APP_CONFIG.REQUEST_LIMIT) {
     res.sendStatus(HttpStatuses.TooManyRequests);
     return;
   }

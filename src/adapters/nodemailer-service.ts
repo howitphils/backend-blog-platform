@@ -1,5 +1,5 @@
 import { createTransport } from "nodemailer";
-import { SETTINGS } from "../settings";
+import { APP_CONFIG } from "../settings";
 
 export const nodeMailerService = {
   async sendEmail({
@@ -14,15 +14,15 @@ export const nodeMailerService = {
     console.log("Email will be sent");
 
     const transporter = createTransport({
-      service: SETTINGS.NODEMAILER_MAIL_SERVICE,
+      service: APP_CONFIG.NODEMAILER_MAIL_SERVICE,
       auth: {
-        user: SETTINGS.NODEMAILER_USERNAME,
-        pass: SETTINGS.NODEMAILER_PASS,
+        user: APP_CONFIG.NODEMAILER_USERNAME,
+        pass: APP_CONFIG.NODEMAILER_PASS,
       },
     });
 
     transporter.sendMail({
-      from: `"Blog platform back 👻" ${SETTINGS.NODEMAILER_USERNAME}`, // sender address
+      from: `"Blog platform back 👻" ${APP_CONFIG.NODEMAILER_USERNAME}`, // sender address
       to: email, // list of receivers
       subject: subject, // Subject line
       html: message, // html body

@@ -2,7 +2,7 @@ import { agent } from "supertest";
 import { app } from "../src/app";
 import { encodedCredentials } from "../src/middlewares/auth/basic-auth-validator";
 import { UserDtoType, UserViewModel } from "../src/types/users-types";
-import { SETTINGS } from "../src/settings";
+import { APP_CONFIG } from "../src/settings";
 import { BlogDtoType, BlogViewModel } from "../src/types/blogs-types";
 import {
   PostDtoType,
@@ -42,7 +42,7 @@ export const createNewUserInDb = async (
     user = createUserDto({});
   }
   const res = await req
-    .post(SETTINGS.PATHS.USERS)
+    .post(APP_CONFIG.PATHS.USERS)
     .set(basicAuth)
     .send(user)
     .expect(HttpStatuses.Created);
@@ -82,7 +82,7 @@ export const createNewBlogInDb = async (
     blog = createBlogDto({});
   }
   const res = await req
-    .post(SETTINGS.PATHS.BLOGS)
+    .post(APP_CONFIG.PATHS.BLOGS)
     .set(basicAuth)
     .send(blog)
     .expect(HttpStatuses.Created);
@@ -123,7 +123,7 @@ export const createNewPostInDb = async (
     post = createPostForBlogDto({});
   }
   const res = await req
-    .post(SETTINGS.PATHS.POSTS)
+    .post(APP_CONFIG.PATHS.POSTS)
     .set(basicAuth)
     .send(post)
     .expect(HttpStatuses.Created);
@@ -148,7 +148,7 @@ export const getTokenPair = async (user?: UserDtoType) => {
   }
 
   const res = await req
-    .post(SETTINGS.PATHS.AUTH + "/login")
+    .post(APP_CONFIG.PATHS.AUTH + "/login")
     .send({
       loginOrEmail: user.login,
       password: user.password,
@@ -169,7 +169,7 @@ export const createContentDto = ({ content }: { content?: string }) => {
 
 export const clearCollections = async () => {
   await req
-    .delete(SETTINGS.PATHS.TESTS + "/all-data")
+    .delete(APP_CONFIG.PATHS.TESTS + "/all-data")
     .expect(HttpStatuses.NoContent);
 };
 
@@ -187,7 +187,7 @@ export const createCommentInDb = async () => {
   const token = (await getTokenPair(userDto)).accessToken;
 
   const res = await req
-    .post(SETTINGS.PATHS.POSTS + `/${dbPost.id}` + "/comments")
+    .post(APP_CONFIG.PATHS.POSTS + `/${dbPost.id}` + "/comments")
     .set(jwtAuth(token))
     .send(contentDto)
     .expect(HttpStatuses.Created);

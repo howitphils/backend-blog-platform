@@ -1,6 +1,6 @@
 import { PostDbType } from "./../../types/posts-types";
 import { Collection, MongoClient } from "mongodb";
-import { SETTINGS } from "../../settings";
+import { APP_CONFIG } from "../../settings";
 import { BlogDbType } from "../../types/blogs-types";
 import { UserDbType } from "../../types/users-types";
 import { CommentDbType } from "../../types/comments-types";
@@ -19,23 +19,23 @@ export const runDb = async (url: string, dbName: string | undefined) => {
   const db = client.db(dbName);
 
   blogsCollection = db.collection<BlogDbType>(
-    SETTINGS.COLLECTIONS.BLOGS_COLLECTION_NAME
+    APP_CONFIG.COLLECTIONS.BLOGS_COLLECTION_NAME
   );
   postsCollection = db.collection<PostDbType>(
-    SETTINGS.COLLECTIONS.POSTS_COLLECTION_NAME
+    APP_CONFIG.COLLECTIONS.POSTS_COLLECTION_NAME
   );
   usersCollection = db.collection<UserDbType>(
-    SETTINGS.COLLECTIONS.USERS_COLLECTION_NAME
+    APP_CONFIG.COLLECTIONS.USERS_COLLECTION_NAME
   );
 
   commentsCollection = db.collection<CommentDbType>(
-    SETTINGS.COLLECTIONS.COMMENTS_COLLECTION_NAME
+    APP_CONFIG.COLLECTIONS.COMMENTS_COLLECTION_NAME
   );
   sessionsCollection = db.collection<SessionDbType>(
-    SETTINGS.COLLECTIONS.SESSIONS_COLLECTION_NAME
+    APP_CONFIG.COLLECTIONS.SESSIONS_COLLECTION_NAME
   );
   apiCallsCollection = db.collection<ApiCallType>(
-    SETTINGS.COLLECTIONS.APICALLS_COLLECTION_NAME
+    APP_CONFIG.COLLECTIONS.APICALLS_COLLECTION_NAME
   );
 
   try {

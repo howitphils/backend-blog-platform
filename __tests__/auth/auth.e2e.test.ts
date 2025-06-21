@@ -1,5 +1,5 @@
 import { HttpStatuses } from "../../src/types/http-statuses";
-import { SETTINGS } from "../../src/settings";
+import { APP_CONFIG } from "../../src/settings";
 import {
   createNewUserInDb,
   createUserDto,
@@ -16,7 +16,7 @@ describe("/auth", () => {
   let client: MongoClient;
 
   beforeAll(async () => {
-    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
   });
 
   afterAll(async () => {
@@ -34,7 +34,7 @@ describe("/auth", () => {
       await createNewUserInDb(newUser);
 
       const res = await req
-        .post(SETTINGS.PATHS.AUTH + "/login")
+        .post(APP_CONFIG.PATHS.AUTH + "/login")
         .send({
           loginOrEmail: newUser.login,
           password: newUser.password,
@@ -51,14 +51,14 @@ describe("/auth", () => {
       expect(cookies.length).toBeGreaterThan(0);
       expect(cookies).toEqual(
         expect.arrayContaining([
-          expect.stringContaining(SETTINGS.REFRESH_TOKEN_COOKIE_NAME),
+          expect.stringContaining(APP_CONFIG.REFRESH_TOKEN_COOKIE_NAME),
         ])
       );
     });
 
     it("it should not login a not existing user", async () => {
       await req
-        .post(SETTINGS.PATHS.AUTH + "/login")
+        .post(APP_CONFIG.PATHS.AUTH + "/login")
         .send({
           loginOrEmail: "random",
           password: "string",
@@ -68,7 +68,7 @@ describe("/auth", () => {
 
     it("it should not login a user with incorrect input values", async () => {
       await req
-        .post(SETTINGS.PATHS.AUTH + "/login")
+        .post(APP_CONFIG.PATHS.AUTH + "/login")
         .send({
           loginOrEmail: 221,
           password: false,
@@ -86,7 +86,7 @@ describe("/auth", () => {
       const token = (await getTokenPair()).accessToken;
 
       const res = await req
-        .get(SETTINGS.PATHS.AUTH + "/me")
+        .get(APP_CONFIG.PATHS.AUTH + "/me")
         .set(jwtAuth(token))
         .expect(HttpStatuses.Success);
 
@@ -99,13 +99,13 @@ describe("/auth", () => {
 
     it("should not return user's info for unauthorized user", async () => {
       await req
-        .get(SETTINGS.PATHS.AUTH + "/me")
+        .get(APP_CONFIG.PATHS.AUTH + "/me")
         .expect(HttpStatuses.Unauthorized);
     });
 
     it("should not return user's info if token is invalid", async () => {
       await req
-        .get(SETTINGS.PATHS.AUTH + "/me")
+        .get(APP_CONFIG.PATHS.AUTH + "/me")
         .set(jwtAuth("invalidToken"))
         .expect(HttpStatuses.Unauthorized);
     });
@@ -122,7 +122,7 @@ describe("/auth", () => {
       await delay(1000);
 
       const res = await req
-        .post(SETTINGS.PATHS.AUTH + "/refresh-token")
+        .post(APP_CONFIG.PATHS.AUTH + "/refresh-token")
         .set("Cookie", [refreshTokenCookie])
         .expect(HttpStatuses.Success);
 
@@ -143,13 +143,13 @@ describe("/auth", () => {
 
     it("should return an error if cookie is not provided", async () => {
       await req
-        .post(SETTINGS.PATHS.AUTH + "/refresh-token")
+        .post(APP_CONFIG.PATHS.AUTH + "/refresh-token")
         .expect(HttpStatuses.Unauthorized);
     });
 
     it("should return an error if the token inside the cookie is incorrect", async () => {
       await req
-        .post(SETTINGS.PATHS.AUTH + "/refresh-token")
+        .post(APP_CONFIG.PATHS.AUTH + "/refresh-token")
         .set("Cookie", ["incorrectToken"])
         .expect(HttpStatuses.Unauthorized);
     });
@@ -163,20 +163,20 @@ describe("/auth", () => {
       const { refreshTokenCookie } = await getTokenPair();
 
       await req
-        .post(SETTINGS.PATHS.AUTH + "/logout")
+        .post(APP_CONFIG.PATHS.AUTH + "/logout")
         .set("Cookie", [refreshTokenCookie])
         .expect(HttpStatuses.NoContent);
     });
 
     it("should return an error if cookie is not provided", async () => {
       await req
-        .post(SETTINGS.PATHS.AUTH + "/logout")
+        .post(APP_CONFIG.PATHS.AUTH + "/logout")
         .expect(HttpStatuses.Unauthorized);
     });
 
     it("should return an error if the code inside the cookie is incorrect", async () => {
       await req
-        .post(SETTINGS.PATHS.AUTH + "/logout")
+        .post(APP_CONFIG.PATHS.AUTH + "/logout")
         .set("Cookie", ["incorrectToken"])
         .expect(HttpStatuses.Unauthorized);
     });

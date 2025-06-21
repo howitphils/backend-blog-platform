@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
-import { devicesService } from "../../services/devices-service";
+import { sessionsService } from "../../services/sessions-service";
 import { HttpStatuses } from "../../types/http-statuses";
 import { RequestWithParams } from "../../types/requests-types";
 import { sessionsQueryRepository } from "../../db/mongodb/repositories/sessions-repository/sessions-query-repository";
+import { ErrorWithStatusCode } from "../../middlewares/error-handler";
 
-export const devicesController = {
+export const sessionsController = {
   async getAllSessions(req: Request, res: Response) {
     const userId = req.user.id;
 
@@ -20,7 +21,7 @@ export const devicesController = {
       throw new Error("deviceId is not found in req.user");
     }
 
-    await devicesService.deleteAllSessions(userId, deviceId);
+    await sessionsService.deleteAllSessions(userId, deviceId);
 
     res.sendStatus(HttpStatuses.NoContent);
   },
@@ -32,7 +33,14 @@ export const devicesController = {
     const userId = req.user.id;
     const deviceId = req.params.deviceId;
 
-    await devicesService.deleteSession(userId, deviceId);
+    if (!deviceId) {
+      throw new ErrorWithStatusCode(
+        "deviceId is not found",
+        HttpStatuses.NotFound
+      );
+    }
+
+    await sessionsService.deleteSession(userId, deviceId);
 
     res.sendStatus(HttpStatuses.NoContent);
   },

@@ -12,12 +12,12 @@ export const sessionsQueryRepository = {
     return sessions.map(this._mapFromDbToViewModel);
   },
 
-  // Преобразование поста из формата базы данных в формат, который ожидает клиент
+  // Преобразование сессии из формата базы данных в формат, который ожидает клиент
   _mapFromDbToViewModel(session: WithId<SessionDbType>): SessionViewModel {
     return {
       deviceId: session.deviceId,
       ip: session.ip,
-      lastActiveDate: session.iat.toString(),
+      lastActiveDate: new Date(session.iat).toISOString(),
       title: session.device_name,
     };
   },

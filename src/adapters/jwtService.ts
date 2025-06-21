@@ -1,5 +1,5 @@
 import { decode, JwtPayload, sign, verify } from "jsonwebtoken";
-import { SETTINGS } from "../settings";
+import { APP_CONFIG } from "../settings";
 import { TokenPairType } from "../types/login-types";
 
 export interface JwtPayloadRefresh extends JwtPayload {
@@ -9,14 +9,14 @@ export interface JwtPayloadRefresh extends JwtPayload {
 
 export const jwtService = {
   createAccessToken(payload: { userId: string }) {
-    return sign(payload, SETTINGS.JWT_SECRET_ACCESS, {
-      expiresIn: `${SETTINGS.ACCESS_TOKEN_TTL}s`,
+    return sign(payload, APP_CONFIG.JWT_SECRET_ACCESS, {
+      expiresIn: `${APP_CONFIG.ACCESS_TOKEN_TTL}s`,
     });
   },
 
   createRefreshToken(payload: { userId: string; deviceId: string }) {
-    return sign(payload, SETTINGS.JWT_SECRET_REFRESH, {
-      expiresIn: `${SETTINGS.REFRESH_TOKEN_TTL}s`,
+    return sign(payload, APP_CONFIG.JWT_SECRET_REFRESH, {
+      expiresIn: `${APP_CONFIG.REFRESH_TOKEN_TTL}s`,
     });
   },
 
@@ -49,7 +49,7 @@ export const jwtService = {
   },
 
   verifyAccessToken(token: string): { userId: string } {
-    return this.verifyToken(token, SETTINGS.JWT_SECRET_ACCESS) as {
+    return this.verifyToken(token, APP_CONFIG.JWT_SECRET_ACCESS) as {
       userId: string;
     };
   },
@@ -57,7 +57,7 @@ export const jwtService = {
   verifyRefreshToken(token: string): JwtPayloadRefresh {
     return this.verifyToken(
       token,
-      SETTINGS.JWT_SECRET_REFRESH
+      APP_CONFIG.JWT_SECRET_REFRESH
     ) as JwtPayloadRefresh;
   },
 };

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { SETTINGS } from "../../settings";
+import { APP_CONFIG } from "../../settings";
 import { HttpStatuses } from "../../types/http-statuses";
 import { jwtService } from "../../adapters/jwtService";
 
@@ -8,7 +8,7 @@ export const refreshTokenValidator = (
   res: Response,
   next: NextFunction
 ) => {
-  const refreshToken = req.cookies[SETTINGS.REFRESH_TOKEN_COOKIE_NAME];
+  const refreshToken = req.cookies[APP_CONFIG.REFRESH_TOKEN_COOKIE_NAME];
 
   if (!refreshToken) {
     console.log("refresh token does not exist");

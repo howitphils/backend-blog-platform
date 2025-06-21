@@ -1,5 +1,5 @@
 // import { db } from "./../src/db/mongodb/mongo";
-import { SETTINGS } from "../src/settings";
+import { APP_CONFIG } from "../src/settings";
 import {
   basicAuth,
   clearCollections,
@@ -23,7 +23,7 @@ describe("/posts", () => {
   let client: MongoClient;
 
   beforeAll(async () => {
-    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
     await clearCollections();
   });
 
@@ -39,7 +39,7 @@ describe("/posts", () => {
 
     it("should return all posts", async () => {
       const res = await req
-        .get(SETTINGS.PATHS.POSTS)
+        .get(APP_CONFIG.PATHS.POSTS)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
@@ -55,7 +55,7 @@ describe("/posts", () => {
       const dbPost = await createPostInDbHelper();
 
       const res = await req
-        .get(SETTINGS.PATHS.POSTS + `/${dbPost.id}` + "/comments")
+        .get(APP_CONFIG.PATHS.POSTS + `/${dbPost.id}` + "/comments")
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
@@ -81,7 +81,7 @@ describe("/posts", () => {
       postId = dbPost.id;
 
       const res = await req
-        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
+        .post(APP_CONFIG.PATHS.POSTS + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDto)
         .expect(HttpStatuses.Created);
@@ -102,13 +102,13 @@ describe("/posts", () => {
       const contentDtoMax = createContentDto({ content: "d".repeat(301) });
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
+        .post(APP_CONFIG.PATHS.POSTS + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDtoMin)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
+        .post(APP_CONFIG.PATHS.POSTS + `/${postId}` + "/comments")
         .set(jwtAuth(token))
         .send(contentDtoMax)
         .expect(HttpStatuses.BadRequest);
@@ -118,7 +118,7 @@ describe("/posts", () => {
       const contentDto = createContentDto({});
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `/${postId}` + "/comments")
+        .post(APP_CONFIG.PATHS.POSTS + `/${postId}` + "/comments")
         .send(contentDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -127,7 +127,9 @@ describe("/posts", () => {
       const contentDto = createContentDto({});
 
       await req
-        .post(SETTINGS.PATHS.POSTS + `/${makeIncorrect(postId)}` + "/comments")
+        .post(
+          APP_CONFIG.PATHS.POSTS + `/${makeIncorrect(postId)}` + "/comments"
+        )
         .set(jwtAuth(token))
         .send(contentDto)
         .expect(HttpStatuses.NotFound);
@@ -147,7 +149,7 @@ describe("/posts", () => {
       const newPostDto = createPostDto({ blogId });
 
       const res = await req
-        .post(SETTINGS.PATHS.POSTS)
+        .post(APP_CONFIG.PATHS.POSTS)
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.Created);
@@ -163,7 +165,7 @@ describe("/posts", () => {
       });
 
       const postsRes = await req
-        .get(SETTINGS.PATHS.POSTS)
+        .get(APP_CONFIG.PATHS.POSTS)
         .expect(HttpStatuses.Success);
 
       expect(postsRes.body.items.length).toBe(1);
@@ -178,7 +180,7 @@ describe("/posts", () => {
       });
 
       await req
-        .post(SETTINGS.PATHS.POSTS)
+        .post(APP_CONFIG.PATHS.POSTS)
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.BadRequest);
@@ -188,7 +190,7 @@ describe("/posts", () => {
       const newPostDto = createPostDto({ blogId });
 
       await req
-        .post(SETTINGS.PATHS.POSTS)
+        .post(APP_CONFIG.PATHS.POSTS)
         .send(newPostDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -206,7 +208,7 @@ describe("/posts", () => {
       postId = postDb.id;
 
       const res = await req
-        .get(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .get(APP_CONFIG.PATHS.POSTS + `/${postId}`)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
@@ -222,13 +224,13 @@ describe("/posts", () => {
 
     it("should not return a post by incorrect id", async () => {
       await req
-        .get(SETTINGS.PATHS.POSTS + "/22")
+        .get(APP_CONFIG.PATHS.POSTS + "/22")
         .expect(HttpStatuses.BadRequest);
     });
 
     it("should not return a not existing post", async () => {
       await req
-        .get(SETTINGS.PATHS.POSTS + "/" + makeIncorrect(postId))
+        .get(APP_CONFIG.PATHS.POSTS + "/" + makeIncorrect(postId))
         .expect(HttpStatuses.NotFound);
     });
   });
@@ -254,13 +256,13 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .put(APP_CONFIG.PATHS.POSTS + `/${postId}`)
         .set(basicAuth)
         .send(updatedPostDto)
         .expect(HttpStatuses.NoContent);
 
       const updatedPostRes = await req
-        .get(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .get(APP_CONFIG.PATHS.POSTS + `/${postId}`)
         .expect(HttpStatuses.Success);
 
       expect(updatedPostRes.body).toEqual({
@@ -290,13 +292,13 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .put(APP_CONFIG.PATHS.POSTS + `/${postId}`)
         .set(basicAuth)
         .send(invalidPostDtoMin)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .put(APP_CONFIG.PATHS.POSTS + `/${postId}`)
         .set(basicAuth)
         .send(invalidPostDtoMax)
         .expect(HttpStatuses.BadRequest);
@@ -310,7 +312,7 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + "/22")
+        .put(APP_CONFIG.PATHS.POSTS + "/22")
         .set(basicAuth)
         .send(updatedPostDto)
         .expect(HttpStatuses.BadRequest);
@@ -323,7 +325,7 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${postId.slice(0, -2) + "bc"}`)
+        .put(APP_CONFIG.PATHS.POSTS + `/${postId.slice(0, -2) + "bc"}`)
         .set(basicAuth)
         .send(updatedPostDto)
         .expect(HttpStatuses.NotFound);
@@ -337,7 +339,7 @@ describe("/posts", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .put(APP_CONFIG.PATHS.POSTS + `/${postId}`)
         .send(updatedPostDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -357,25 +359,25 @@ describe("/posts", () => {
 
     it("should not delete the post by unauthorized user", async () => {
       await req
-        .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .delete(APP_CONFIG.PATHS.POSTS + `/${postId}`)
         .expect(HttpStatuses.Unauthorized);
     });
 
     it("should not delete the post by incorrect id", async () => {
       await req
-        .delete(SETTINGS.PATHS.POSTS + "/22")
+        .delete(APP_CONFIG.PATHS.POSTS + "/22")
         .set(basicAuth)
         .expect(HttpStatuses.BadRequest);
     });
 
     it("should delete the post", async () => {
       await req
-        .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .delete(APP_CONFIG.PATHS.POSTS + `/${postId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NoContent);
 
       await req
-        .delete(SETTINGS.PATHS.POSTS + `/${postId}`)
+        .delete(APP_CONFIG.PATHS.POSTS + `/${postId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NotFound);
     });

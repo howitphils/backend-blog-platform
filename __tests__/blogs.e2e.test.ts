@@ -1,7 +1,7 @@
 import { HttpStatuses } from "./../src/types/http-statuses";
 import { MongoClient } from "mongodb";
 import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
-import { SETTINGS } from "../src/settings";
+import { APP_CONFIG } from "../src/settings";
 import {
   basicAuth,
   createBlogDto,
@@ -16,7 +16,7 @@ describe("/blogs", () => {
   let client: MongoClient;
 
   beforeAll(async () => {
-    client = await runDb(SETTINGS.MONGO_URL, SETTINGS.TEST_DB_NAME);
+    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
   });
 
   afterAll(async () => {
@@ -31,7 +31,7 @@ describe("/blogs", () => {
 
     it("should return all blogs", async () => {
       const res = await req
-        .get(SETTINGS.PATHS.BLOGS)
+        .get(APP_CONFIG.PATHS.BLOGS)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
@@ -47,7 +47,7 @@ describe("/blogs", () => {
       const newBlogDto = createBlogDto({});
 
       const res = await req
-        .post(SETTINGS.PATHS.BLOGS)
+        .post(APP_CONFIG.PATHS.BLOGS)
         .set(basicAuth)
         .send(newBlogDto)
         .expect(HttpStatuses.Created);
@@ -61,7 +61,7 @@ describe("/blogs", () => {
         isMembership: false,
       });
 
-      const response = await req.get(SETTINGS.PATHS.BLOGS).expect(200);
+      const response = await req.get(APP_CONFIG.PATHS.BLOGS).expect(200);
 
       expect(response.body.items.length).toBe(1);
     });
@@ -80,13 +80,13 @@ describe("/blogs", () => {
       });
 
       await req
-        .post(SETTINGS.PATHS.BLOGS)
+        .post(APP_CONFIG.PATHS.BLOGS)
         .set(basicAuth)
         .send(minInvalidBlogDto)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .post(SETTINGS.PATHS.BLOGS)
+        .post(APP_CONFIG.PATHS.BLOGS)
         .set(basicAuth)
         .send(maxInvalidBlogDto)
         .expect(HttpStatuses.BadRequest);
@@ -96,7 +96,7 @@ describe("/blogs", () => {
       const newBlogDto = createBlogDto({});
 
       await req
-        .post(SETTINGS.PATHS.BLOGS)
+        .post(APP_CONFIG.PATHS.BLOGS)
         .send(newBlogDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -113,7 +113,7 @@ describe("/blogs", () => {
 
       blogId = blogDb.id;
       const res = await req
-        .get(SETTINGS.PATHS.BLOGS + `/${blogDb.id}`)
+        .get(APP_CONFIG.PATHS.BLOGS + `/${blogDb.id}`)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
@@ -128,7 +128,7 @@ describe("/blogs", () => {
 
     it("should not get the blog by the incorrect id", async () => {
       await req
-        .get(SETTINGS.PATHS.BLOGS + "/" + makeIncorrect(blogId))
+        .get(APP_CONFIG.PATHS.BLOGS + "/" + makeIncorrect(blogId))
         .expect(HttpStatuses.NotFound);
     });
   });
@@ -151,13 +151,13 @@ describe("/blogs", () => {
       blogId = blogDb.id;
 
       await req
-        .put(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+        .put(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
         .send(updatedBlogDto)
         .expect(HttpStatuses.NoContent);
 
       const res = await req
-        .get(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+        .get(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
@@ -184,13 +184,13 @@ describe("/blogs", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+        .put(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
         .send(minInvalidBlogDto)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .put(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+        .put(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
         .send(maxInvalidBlogDto)
         .expect(HttpStatuses.BadRequest);
@@ -202,7 +202,7 @@ describe("/blogs", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
+        .put(APP_CONFIG.PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
         .set(basicAuth)
         .send(newBlogDto)
         .expect(HttpStatuses.NotFound);
@@ -214,7 +214,7 @@ describe("/blogs", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.BLOGS + "/22")
+        .put(APP_CONFIG.PATHS.BLOGS + "/22")
         .set(basicAuth)
         .send(newBlogDto)
         .expect(HttpStatuses.BadRequest);
@@ -226,7 +226,7 @@ describe("/blogs", () => {
       });
 
       await req
-        .put(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+        .put(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
         .send(newBlogDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -244,7 +244,7 @@ describe("/blogs", () => {
       blogId = blogDb.id;
 
       const res = await req
-        .get(SETTINGS.PATHS.BLOGS + `/${blogDb.id}` + "/posts")
+        .get(APP_CONFIG.PATHS.BLOGS + `/${blogDb.id}` + "/posts")
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
@@ -252,12 +252,14 @@ describe("/blogs", () => {
 
     it("should not return all posts for a specific blog with incorrect blogId", async () => {
       await req
-        .get(SETTINGS.PATHS.BLOGS + "/22" + "/posts")
+        .get(APP_CONFIG.PATHS.BLOGS + "/22" + "/posts")
         .expect(HttpStatuses.BadRequest);
     });
     it("should not return all posts for not existing blog", async () => {
       await req
-        .get(SETTINGS.PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}` + "/posts")
+        .get(
+          APP_CONFIG.PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}` + "/posts"
+        )
         .expect(HttpStatuses.NotFound);
     });
   });
@@ -275,7 +277,7 @@ describe("/blogs", () => {
       blogId = blogDb.id;
 
       const res = await req
-        .post(SETTINGS.PATHS.BLOGS + `/${blogId}` + "/posts")
+        .post(APP_CONFIG.PATHS.BLOGS + `/${blogId}` + "/posts")
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.Created);
@@ -291,7 +293,7 @@ describe("/blogs", () => {
       });
 
       await req
-        .get(SETTINGS.PATHS.POSTS + `/${res.body.id}`)
+        .get(APP_CONFIG.PATHS.POSTS + `/${res.body.id}`)
         .expect(HttpStatuses.Success);
     });
 
@@ -299,7 +301,7 @@ describe("/blogs", () => {
       const newPostDto = createPostForBlogDto({});
 
       await req
-        .post(SETTINGS.PATHS.BLOGS + "/22/posts")
+        .post(APP_CONFIG.PATHS.BLOGS + "/22/posts")
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.BadRequest);
@@ -309,7 +311,7 @@ describe("/blogs", () => {
       const newPostDto = createPostForBlogDto({});
 
       await req
-        .post(SETTINGS.PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
+        .post(APP_CONFIG.PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.NotFound);
@@ -329,13 +331,13 @@ describe("/blogs", () => {
       });
 
       await req
-        .post(SETTINGS.PATHS.BLOGS + `/${blogId}` + "/posts")
+        .post(APP_CONFIG.PATHS.BLOGS + `/${blogId}` + "/posts")
         .set(basicAuth)
         .send(invalidPostDtoMin)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .post(SETTINGS.PATHS.BLOGS + `/${blogId}` + "/posts")
+        .post(APP_CONFIG.PATHS.BLOGS + `/${blogId}` + "/posts")
         .set(basicAuth)
         .send(invalidPostDtoMax)
         .expect(HttpStatuses.BadRequest);
@@ -345,7 +347,7 @@ describe("/blogs", () => {
       const postDto = createPostForBlogDto({});
 
       await req
-        .post(SETTINGS.PATHS.BLOGS + `/${blogId}` + "/posts")
+        .post(APP_CONFIG.PATHS.BLOGS + `/${blogId}` + "/posts")
         .send(postDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -365,25 +367,25 @@ describe("/blogs", () => {
 
     it("should not delete the blog by unauthorized user", async () => {
       await req
-        .delete(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+        .delete(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
         .expect(HttpStatuses.Unauthorized);
     });
 
     it("should not delete the blog with incorrect id", async () => {
       await req
-        .delete(SETTINGS.PATHS.BLOGS + "/22")
+        .delete(APP_CONFIG.PATHS.BLOGS + "/22")
         .set(basicAuth)
         .expect(HttpStatuses.BadRequest);
     });
 
     it("should delete the blog", async () => {
       await req
-        .delete(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+        .delete(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NoContent);
 
       await req
-        .delete(SETTINGS.PATHS.BLOGS + `/${blogId}`)
+        .delete(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NotFound);
     });

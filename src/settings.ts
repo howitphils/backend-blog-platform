@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 config();
 
-export const SETTINGS = {
+export const APP_CONFIG = {
   PORT: process.env.PORT || 5003,
   PATHS: {
     BLOGS: "/blogs",

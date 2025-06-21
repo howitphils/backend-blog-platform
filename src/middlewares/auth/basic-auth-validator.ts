@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { SETTINGS } from "../../settings";
+import { APP_CONFIG } from "../../settings";
 import { HttpStatuses } from "../../types/http-statuses";
 
 // Кодируем логин и пароль в base64
-export const encodedCredentials = Buffer.from(SETTINGS.ADMIN).toString(
+export const encodedCredentials = Buffer.from(APP_CONFIG.ADMIN).toString(
   "base64"
 );
 

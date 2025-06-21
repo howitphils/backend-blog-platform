@@ -3,7 +3,7 @@ import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { SessionDbType } from "../types/sessions-types";
 
-export const devicesService = {
+export const sessionsService = {
   async getAllUsersSessions(userId: string): Promise<SessionDbType[]> {
     return sessionsRepository.findAllUsersSessions(userId);
   },
