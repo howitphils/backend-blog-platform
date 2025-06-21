@@ -39,7 +39,6 @@ export const authController = {
   },
 
   async refreshTokens(req: Request, res: Response) {
-    // const token = req.cookies[SETTINGS.REFRESH_TOKEN_COOKIE_NAME];
     const userId = req.user?.id;
     const deviceId = req.user?.deviceId;
     const issuedAt = req.user?.iat;
@@ -69,15 +68,16 @@ export const authController = {
 
   async logout(req: Request, res: Response) {
     const userId = req.user?.id;
+    const issuedAt = req.user?.iat;
     const deviceId = req.user?.deviceId;
 
-    if (!userId || !deviceId) {
+    if (!userId || !deviceId || !issuedAt) {
       res.sendStatus(HttpStatuses.ServerError);
       console.log("user is not found in request");
       return;
     }
 
-    await authService.logout(userId, deviceId);
+    await authService.logout({ userId, deviceId, issuedAt });
 
     // httpOnly, path, secure должны быть такими же как при создании
     res.clearCookie(APP_CONFIG.REFRESH_TOKEN_COOKIE_NAME, {

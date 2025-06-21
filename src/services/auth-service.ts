@@ -1,5 +1,5 @@
 import {
-  RefreshTokensDto,
+  RefreshTokensAndLogoutDto,
   TokenPairType,
   UserInfoType,
 } from "../types/login-types";
@@ -83,13 +83,10 @@ export const authService = {
     return tokenPair;
   },
 
-  async logout(userId: string, deviceId: string) {
-    // TODO: 1) находим сессию по юзерИд и девайсИд
-    //       2) если есть - удаляем
-
+  async logout(dto: RefreshTokensAndLogoutDto) {
     const targetSession = await sessionsRepository.findByUserIdAndDeviceId(
-      userId,
-      deviceId
+      dto.userId,
+      dto.deviceId
     );
 
     if (!targetSession) {
@@ -99,12 +96,17 @@ export const authService = {
       );
     }
 
-    //TODO: удалить сессию из коллекции
-    const result = await sessionsRepository.deleteSession(userId, deviceId);
-    console.log(result);
+    if (targetSession.iat !== dto.issuedAt) {
+      throw new ErrorWithStatusCode(
+        "Token is not valid",
+        HttpStatuses.Unauthorized
+      );
+    }
+
+    await sessionsRepository.deleteSession(dto.userId, dto.deviceId);
   },
 
-  async refreshTokens(dto: RefreshTokensDto): Promise<TokenPairType> {
+  async refreshTokens(dto: RefreshTokensAndLogoutDto): Promise<TokenPairType> {
     //TODO : 1) проверить наличие сессии по юзерИд + девайсИд
     //       2) сравнить время выдачи сессии с полученным из контроллера
     //       3) в случае успеха - создать новые токены

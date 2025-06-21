@@ -24,7 +24,7 @@ export type TokenPairType = {
   refreshToken: string;
 };
 
-export type RefreshTokensDto = {
+export type RefreshTokensAndLogoutDto = {
   userId: string;
   deviceId: string;
   issuedAt: number;
