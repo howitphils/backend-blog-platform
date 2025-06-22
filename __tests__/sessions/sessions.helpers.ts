@@ -1,10 +1,11 @@
 import { APP_CONFIG } from "../../src/settings";
 import { HttpStatuses } from "../../src/types/http-statuses";
+import { SessionViewModel } from "../../src/types/sessions-types";
 import { UserInputModel } from "../../src/types/users-types";
 import { req } from "../test-helpers";
 
 export const devicesTestHelper = {
-  async getDevices(refreshToken: string) {
+  async getDevices(refreshToken: string): Promise<SessionViewModel[]> {
     const res = await req
       .get(APP_CONFIG.TEST_PATHS.DEVICES)
       .set("Cookie", `refreshToken=${refreshToken}`)
@@ -12,7 +13,7 @@ export const devicesTestHelper = {
 
     return res.body;
   },
-  async loginUser(count: number, userDto: UserInputModel) {
+  async loginUser(count: number, userDto: UserInputModel): Promise<string[]> {
     const refreshTokens: string[] = [];
 
     for (let i = 1; i <= count; i++) {
