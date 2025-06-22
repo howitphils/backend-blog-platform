@@ -128,19 +128,12 @@ export const authService = {
       tokenPair.refreshToken
     ) as JwtPayloadRefresh;
 
-    const result = await sessionsRepository.updateSessionIatAndExp(
+    await sessionsRepository.updateSessionIatAndExp(
       dto.userId,
       dto.deviceId,
       iat as number,
       exp as number
     );
-
-    if (!result) {
-      throw new ErrorWithStatusCode(
-        "session was not updated",
-        HttpStatuses.ServerError
-      );
-    }
 
     return tokenPair;
   },

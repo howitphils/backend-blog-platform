@@ -11,6 +11,7 @@ import { MongoClient } from "mongodb";
 import { runDb } from "../../src/db/mongodb/mongodb";
 import { clearCollections } from "../test-helpers";
 import { SessionViewModel } from "../../src/types/sessions-types";
+import { devicesTestHelper } from "./sessions.helpers";
 
 describe("/devices", () => {
   let client: MongoClient;
@@ -57,21 +58,8 @@ describe("/devices", () => {
       await clearCollections();
     });
 
-    // beforeAll(async () => {
-    //   const userDto = createUserDto({});
-    //   await createNewUserInDb(userDto);
-    //   const refreshTokens: string[] = [];
-
-    //   for (let i = 0; i < APP_CONFIG.USER_LOGINS_TEST_COUNT; i++) {
-    //     const { refreshTokenCookie } = await getTokenPair(userDto);
-
-    //     refreshTokens.push(refreshTokenCookie.split(";")[0].split("=")[1]);
-    //   }
-    //   console.log(refreshTokens);
-    // });
-
-    const refreshTokens: string[] = [];
-    let firstDevice: SessionViewModel;
+    let refreshTokens: string[] = [];
+    let devices: SessionViewModel[];
 
     it("should login a user 4 times with different user-agent", async () => {
       const userDto = createUserDto({
@@ -80,35 +68,23 @@ describe("/devices", () => {
       });
       await createNewUserInDb(userDto);
 
-      for (let i = 1; i <= APP_CONFIG.USER_LOGINS_TEST_COUNT; i++) {
-        const res = await req
-          .post(APP_CONFIG.PATHS.AUTH + "/login")
-          .send({
-            loginOrEmail: userDto.login,
-            password: userDto.password,
-          })
-          .set("User-agent", `device${i}`)
-          .expect(HttpStatuses.Success);
+      refreshTokens = await devicesTestHelper.loginUser(
+        APP_CONFIG.USER_LOGINS_TEST_COUNT,
+        userDto
+      );
 
-        const refreshToken = res.headers["set-cookie"][0]
-          .split(";")[0]
-          .split("=")[1];
+      const devicesArr = await devicesTestHelper.getDevices(refreshTokens[0]);
 
-        refreshTokens.push(refreshToken);
-      }
-
-      const res = await req
-        .get(APP_CONFIG.TEST_PATHS.DEVICES)
-        .set("Cookie", [`refreshToken=${refreshTokens[0]}`])
-        .expect(HttpStatuses.Success);
-
-      console.log(res.body);
-
-      firstDevice = res.body[0];
+      devices = devicesArr;
 
       expect(refreshTokens.length).toBe(APP_CONFIG.USER_LOGINS_TEST_COUNT);
-      expect(res.body.length).toBe(APP_CONFIG.USER_LOGINS_TEST_COUNT);
-      expect(res.body[0]).toHaveProperty("title");
+      expect(devices.length).toBe(APP_CONFIG.USER_LOGINS_TEST_COUNT);
+      expect(devices[0]).toEqual({
+        ip: expect.any(String),
+        title: expect.any(String),
+        lastActiveDate: expect.any(String),
+        deviceId: expect.any(String),
+      });
     });
 
     it("return error if session is not found", async () => {
@@ -120,7 +96,7 @@ describe("/devices", () => {
 
     it("return error if user is not authorized", async () => {
       await req
-        .delete(APP_CONFIG.TEST_PATHS.DEVICES + `/${firstDevice.deviceId}`)
+        .delete(APP_CONFIG.TEST_PATHS.DEVICES + `/${devices[0].deviceId}`)
         .expect(HttpStatuses.Unauthorized);
     });
     it("return error if user is trying to delete session that is not his own", async () => {
@@ -128,31 +104,76 @@ describe("/devices", () => {
       const { refreshTokenCookie } = await getTokenPair();
 
       await req
-        .delete(APP_CONFIG.TEST_PATHS.DEVICES + `/${firstDevice.deviceId}`)
+        .delete(APP_CONFIG.TEST_PATHS.DEVICES + `/${devices[0].deviceId}`)
         .set("Cookie", refreshTokenCookie)
         .expect(HttpStatuses.Forbidden);
     });
+
+    let newRefreshToken: string;
     it("should create new refresh token for device 1", async () => {
-      const prevActiveDate = firstDevice.lastActiveDate;
-      console.log(prevActiveDate);
+      await delay(1000);
 
       const res = await req
         .post(APP_CONFIG.TEST_PATHS.REFRESH_TOKEN)
         .set("Cookie", [`refreshToken=${refreshTokens[0]}`])
         .expect(HttpStatuses.Success);
 
-      const newCookie = res.headers["set-cookie"][0];
+      newRefreshToken = res.headers["set-cookie"][0]
+        .split(";")[0]
+        .split("=")[1];
 
-      const res2 = await req
-        .get(APP_CONFIG.TEST_PATHS.DEVICES)
-        .set("Cookie", newCookie)
-        .expect(HttpStatuses.Success);
+      expect(newRefreshToken).not.toBe(refreshTokens[0]);
+    });
 
-      console.log(prevActiveDate);
-      console.log(res2.body);
+    it("should return devices with updated lastActiveDate for device1", async () => {
+      const prevActiveDate = devices[0].lastActiveDate;
 
-      expect(res2.body.length).toBe(APP_CONFIG.USER_LOGINS_TEST_COUNT);
-      expect(res2.body[0].lastActiveDate).not.toBe(prevActiveDate);
+      const devicesArr = await devicesTestHelper.getDevices(refreshTokens[0]);
+
+      for (let i = 0; i < devices.length; i++) {
+        expect(devicesArr[i].deviceId).toBe(devices[i].deviceId);
+      }
+
+      expect(devicesArr.length).toBe(APP_CONFIG.USER_LOGINS_TEST_COUNT);
+      expect(devicesArr[0].lastActiveDate).not.toBe(prevActiveDate);
+    });
+
+    it("should delete device 2", async () => {
+      await req
+        .delete(APP_CONFIG.TEST_PATHS.DEVICES + `/${devices[1].deviceId}`)
+        .set("Cookie", `refreshToken=${refreshTokens[0]}`)
+        .expect(HttpStatuses.NoContent);
+
+      const devicesArr = await devicesTestHelper.getDevices(refreshTokens[0]);
+
+      expect(devicesArr.length).toBe(APP_CONFIG.USER_LOGINS_TEST_COUNT - 1);
+      expect(devicesArr[1].title).not.toBe("device2");
+      expect(devicesArr[1].title).toBe("device3");
+    });
+
+    it("should logout device 3", async () => {
+      await req
+        .post(APP_CONFIG.TEST_PATHS.LOGOUT)
+        .set("Cookie", `refreshToken=${refreshTokens[2]}`)
+        .expect(HttpStatuses.NoContent);
+
+      const devices = await devicesTestHelper.getDevices(refreshTokens[0]);
+
+      expect(devices.length).toBe(APP_CONFIG.USER_LOGINS_TEST_COUNT - 2);
+      expect(devices[1].title).not.toBe("device3");
+      expect(devices[1].title).toBe("device4");
+    });
+
+    it("should remove all devices except 1", async () => {
+      await req
+        .delete(APP_CONFIG.TEST_PATHS.DEVICES)
+        .set("Cookie", `refreshToken=${refreshTokens[0]}`)
+        .expect(HttpStatuses.NoContent);
+
+      const devices = await devicesTestHelper.getDevices(refreshTokens[0]);
+
+      expect(devices.length).toBe(1);
+      expect(devices[0].title).toBe("device1");
     });
   });
 });

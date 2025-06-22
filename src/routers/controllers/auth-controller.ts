@@ -55,7 +55,6 @@ export const authController = {
       issuedAt,
     });
 
-    //TODO: куку не создавать, а продлить?? (express-sessions)
     res.cookie(APP_CONFIG.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
       httpOnly: true,
       secure: true,

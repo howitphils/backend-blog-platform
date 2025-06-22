@@ -15,6 +15,7 @@ export const APP_CONFIG = {
   TEST_PATHS: {
     DEVICES: "/security/devices",
     REFRESH_TOKEN: "/auth/refresh-token",
+    LOGOUT: "/auth/logout",
   },
   ADMIN: process.env.ADMIN || "admin:qwerty",
   MONGO_URL: process.env.MONGO_URL || "mongodb://localhost:27017",
