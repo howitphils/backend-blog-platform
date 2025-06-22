@@ -41,6 +41,7 @@ export const createNewUserInDb = async (
   if (!user) {
     user = createUserDto({});
   }
+
   const res = await req
     .post(APP_CONFIG.PATHS.USERS)
     .set(basicAuth)

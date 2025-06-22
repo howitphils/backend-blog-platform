@@ -20,9 +20,11 @@ export const sessionsRepository = {
       deviceId: { $ne: deviceId },
     });
   },
+
   async findByDeviceIdAndIssuedAt(iat: number, deviceId: string) {
     return sessionsCollection.findOne({ $and: [{ iat }, { deviceId }] });
   },
+
   async findByDeviceId(deviceId: string) {
     return sessionsCollection.findOne({ deviceId });
   },
@@ -30,8 +32,8 @@ export const sessionsRepository = {
   async updateSessionIatAndExp(
     userId: string,
     deviceId: string,
-    newIat: number | undefined,
-    newExp: number | undefined
+    newIat: number,
+    newExp: number
   ) {
     // TODO: fix types
     const updateResult = await sessionsCollection.updateOne(

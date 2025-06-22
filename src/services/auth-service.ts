@@ -20,11 +20,6 @@ import { sessionsRepository } from "../db/mongodb/repositories/sessions-reposito
 
 export const authService = {
   async loginUser(userInfoDto: UserInfoType): Promise<TokenPairType> {
-    //TODO: 1) ищем юзера по кредам
-    //      2) если юзер есть - создаем токены
-    //      3) проверяем есть ли существующая сессия для этого девайса(??)
-    //      4) создаем новую сессию для девайса
-
     const { loginOrEmail, password } = userInfoDto.usersCredentials;
     const { device_name, ip } = userInfoDto.usersConfigs;
 
@@ -106,12 +101,8 @@ export const authService = {
     await sessionsRepository.deleteSession(dto.userId, dto.deviceId);
   },
 
+  //ТЕСТЫ на логаут + рефреш + логин + сессии
   async refreshTokens(dto: RefreshTokensAndLogoutDto): Promise<TokenPairType> {
-    //TODO : 1) проверить наличие сессии по юзерИд + девайсИд
-    //       2) сравнить время выдачи сессии с полученным из контроллера
-    //       3) в случае успеха - создать новые токены
-    //       4) обновить время выдачи токена в сессии
-
     const session = await sessionsRepository.findByDeviceIdAndIssuedAt(
       dto.issuedAt,
       dto.deviceId
@@ -137,12 +128,19 @@ export const authService = {
       tokenPair.refreshToken
     ) as JwtPayloadRefresh;
 
-    await sessionsRepository.updateSessionIatAndExp(
+    const result = await sessionsRepository.updateSessionIatAndExp(
       dto.userId,
       dto.deviceId,
-      iat,
-      exp
+      iat as number,
+      exp as number
     );
+
+    if (!result) {
+      throw new ErrorWithStatusCode(
+        "session was not updated",
+        HttpStatuses.ServerError
+      );
+    }
 
     return tokenPair;
   },

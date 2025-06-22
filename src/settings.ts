@@ -12,6 +12,10 @@ export const APP_CONFIG = {
     COMMENTS: "/comments",
     SECURITY: "/security",
   },
+  TEST_PATHS: {
+    DEVICES: "/security/devices",
+    REFRESH_TOKEN: "/auth/refresh-token",
+  },
   ADMIN: process.env.ADMIN || "admin:qwerty",
   MONGO_URL: process.env.MONGO_URL || "mongodb://localhost:27017",
   DB_NAME: process.env.DB_NAME as string,
@@ -34,4 +38,5 @@ export const APP_CONFIG = {
   ACCESS_TOKEN_TTL: 10,
   REQUEST_LIMIT: 5,
   REQUEST_LIMIT_PERIOD: 10,
+  USER_LOGINS_TEST_COUNT: 4,
 };

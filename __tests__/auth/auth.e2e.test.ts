@@ -111,7 +111,7 @@ describe("/auth", () => {
     });
   });
 
-  describe("refresh token", () => {
+  describe("refresh tokens", () => {
     afterAll(async () => {
       await clearCollections();
     });
