@@ -22,6 +22,7 @@ describe("/devices", () => {
 
   afterAll(async () => {
     await clearCollections();
+
     await client.close();
     console.log("Connection closed");
   });

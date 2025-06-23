@@ -33,7 +33,8 @@ export const usersService = {
 
     const passHash = await bcryptService.createHasn(password);
 
-    const code = uuIdService.createRandomCode();
+    const confirmationCode = uuIdService.createRandomCode();
+    const recoveryCode = uuIdService.createRandomCode();
 
     const newUser: UserDbType = {
       accountData: {
@@ -43,11 +44,14 @@ export const usersService = {
         createdAt: new Date().toISOString(),
       },
       emailConfirmation: {
-        confirmationCode: code,
+        confirmationCode,
         expirationDate: dateFnsService.addToCurrentDate(),
         isConfirmed: isAdmin ? true : false,
       },
-      usedTokens: [],
+      passwordRecovery: {
+        recoveryCode,
+        expirationDate: dateFnsService.addToCurrentDate(),
+      },
     };
 
     return usersRepository.createNewUser(newUser);

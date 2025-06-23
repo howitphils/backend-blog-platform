@@ -89,14 +89,22 @@ export const usersRepository = {
     return usersCollection.findOne({ usedTokens: { $in: [token] } });
   },
 
-  async addUsedTokenToBlacklist(
-    userId: string,
-    token: string
-  ): Promise<boolean> {
-    const updatedResult = await usersCollection.updateOne(
-      { _id: new ObjectId(userId) },
-      { $push: { usedTokens: token } }
+  async findUserByRecoveryCode(
+    code: string
+  ): Promise<WithId<UserDbType> | null> {
+    return usersCollection.findOne({ "passwordRecovery.recoveryCode": code });
+  },
+
+  async findUserByEmail(email: string): Promise<WithId<UserDbType> | null> {
+    return usersCollection.findOne({ "accountData.email": email });
+  },
+
+  async updatePasswordHash(userId: ObjectId, hash: string): Promise<boolean> {
+    const result = await usersCollection.updateOne(
+      { _id: userId },
+      { "accountData.passHash": hash }
     );
-    return updatedResult.matchedCount === 1;
+
+    return result.matchedCount === 1;
   },
 };

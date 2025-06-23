@@ -101,7 +101,6 @@ export const authService = {
     await sessionsRepository.deleteSession(dto.userId, dto.deviceId);
   },
 
-  //ТЕСТЫ на логаут + рефреш + логин + сессии
   async refreshTokens(dto: RefreshTokensAndLogoutDto): Promise<TokenPairType> {
     const session = await sessionsRepository.findByDeviceIdAndIssuedAt(
       dto.issuedAt,
@@ -111,13 +110,6 @@ export const authService = {
     if (!session) {
       throw new ErrorWithStatusCode(
         "Session is not found",
-        HttpStatuses.Unauthorized
-      );
-    }
-
-    if (session.iat !== dto.issuedAt) {
-      throw new ErrorWithStatusCode(
-        "Token is not valid",
         HttpStatuses.Unauthorized
       );
     }
@@ -148,6 +140,30 @@ export const authService = {
         targetUser.emailConfirmation.confirmationCode
       )
       .catch((e) => console.log(e));
+  },
+
+  async recoverPassword(email: string) {
+    const user = await usersRepository.findUserByEmail(email);
+
+    if (!user) {
+      throw new ErrorWithStatusCode("user is not found", HttpStatuses.NotFound);
+    }
+
+    emailManager
+      .sendEmailForPasswordRecovery(email, user.passwordRecovery.recoveryCode)
+      .catch((e) => console.log(e));
+  },
+
+  async confirmPasswordRecovery(newPassword: string, recoveryCode: string) {
+    const user = await usersRepository.findUserByRecoveryCode(recoveryCode);
+
+    if (!user) {
+      throw new ErrorWithStatusCode("user is not found", HttpStatuses.NotFound);
+    }
+
+    const passHash = await bcryptService.createHasn(newPassword);
+
+    await usersRepository.updatePasswordHash(user._id, passHash);
   },
 
   async confirmRegistration(code: string): Promise<boolean> {

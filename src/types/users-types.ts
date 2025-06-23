@@ -23,7 +23,10 @@ export type UserDbType = {
     expirationDate: Date;
     isConfirmed: boolean;
   };
-  usedTokens: string[];
+  passwordRecovery: {
+    recoveryCode: string;
+    expirationDate: Date;
+  };
 };
 
 export type UsersRequestQueryType = {

@@ -16,6 +16,7 @@ export const nodeMailerService = {
     const transporter = createTransport({
       service: APP_CONFIG.NODEMAILER_MAIL_SERVICE,
       auth: {
+        // sender credentials
         user: APP_CONFIG.NODEMAILER_USERNAME,
         pass: APP_CONFIG.NODEMAILER_PASS,
       },
