@@ -9,29 +9,55 @@ import { resendEmailBodyValidators } from "../middlewares/body-validations/resen
 import { confirmationCodeBodyValidators } from "../middlewares/body-validations/confirm-code-body-validations";
 import { refreshTokenValidator } from "../middlewares/auth/cookie-auth-validator";
 import { apiCallsGuard } from "../middlewares/apiCallsGuard";
+import { confrimPasswordRecoveryValidators } from "../middlewares/body-validations/confirm-recover-password-body-validators";
+import { APP_CONFIG } from "../settings";
 
 export const authRouter = Router();
 
 authRouter.post(
-  "/login",
+  APP_CONFIG.ENDPOINT_PATHS.AUTH.LOGIN,
   apiCallsGuard,
   loginBodyValidators,
   bodyValidationResult,
   authController.loginUser
 );
 
-authRouter.post("/logout", refreshTokenValidator, authController.logout);
+authRouter.post(
+  APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY,
+  apiCallsGuard,
+  resendEmailBodyValidators,
+  bodyValidationResult,
+  authController.recoverPassword
+);
 
 authRouter.post(
-  "/refresh-token",
+  APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY,
+  apiCallsGuard,
+  confrimPasswordRecoveryValidators,
+  bodyValidationResult,
+  authController.confirmPasswordRecovery
+);
+
+authRouter.post(
+  APP_CONFIG.ENDPOINT_PATHS.AUTH.LOGOUT,
+  refreshTokenValidator,
+  authController.logout
+);
+
+authRouter.post(
+  APP_CONFIG.ENDPOINT_PATHS.AUTH.REFRESH_TOKEN,
   refreshTokenValidator,
   authController.refreshTokens
 );
 
-authRouter.get("/me", jwtAuthGuard, authController.getMyInfo);
+authRouter.get(
+  APP_CONFIG.ENDPOINT_PATHS.AUTH.ME,
+  jwtAuthGuard,
+  authController.getMyInfo
+);
 
 authRouter.post(
-  "/registration",
+  APP_CONFIG.ENDPOINT_PATHS.AUTH.REGISTRATION,
   apiCallsGuard,
   userBodyValidators,
   bodyValidationResult,
@@ -39,7 +65,7 @@ authRouter.post(
 );
 
 authRouter.post(
-  "/registration-confirmation",
+  APP_CONFIG.ENDPOINT_PATHS.AUTH.REGISTRATION_CONFIRMATION,
   apiCallsGuard,
   confirmationCodeBodyValidators,
   bodyValidationResult,
@@ -47,7 +73,7 @@ authRouter.post(
 );
 
 authRouter.post(
-  "/registration-email-resending",
+  APP_CONFIG.ENDPOINT_PATHS.AUTH.REGISTRATION_EMAIL_RESENDING,
   apiCallsGuard,
   resendEmailBodyValidators,
   bodyValidationResult,

@@ -7,6 +7,7 @@ export const dateFnsService = {
       minutes: minutes || 22,
     });
   },
+
   rollBackBySeconds(seconds: number) {
     return subSeconds(new Date(), seconds);
   },

@@ -17,6 +17,7 @@ import { JwtPayloadRefresh, jwtService } from "../adapters/jwtService";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
 import { SessionDbType } from "../types/sessions-types";
 import { sessionsRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
+import { APP_CONFIG } from "../settings";
 
 export const authService = {
   async loginUser(userInfoDto: UserInfoType): Promise<TokenPairType> {
@@ -29,7 +30,7 @@ export const authService = {
 
     if (!targetUser) {
       throw new ErrorWithStatusCode(
-        "User does not exist",
+        APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND,
         HttpStatuses.Unauthorized
       );
     }
@@ -143,14 +144,17 @@ export const authService = {
   },
 
   async recoverPassword(email: string) {
+    let recoveryCode: string = "";
     const user = await usersRepository.findUserByEmail(email);
 
     if (!user) {
-      throw new ErrorWithStatusCode("user is not found", HttpStatuses.NotFound);
+      recoveryCode = uuIdService.createRandomCode();
+    } else {
+      recoveryCode = user.passwordRecovery.recoveryCode;
     }
 
     emailManager
-      .sendEmailForPasswordRecovery(email, user.passwordRecovery.recoveryCode)
+      .sendEmailForPasswordRecovery(email, recoveryCode)
       .catch((e) => console.log(e));
   },
 
@@ -158,7 +162,17 @@ export const authService = {
     const user = await usersRepository.findUserByRecoveryCode(recoveryCode);
 
     if (!user) {
-      throw new ErrorWithStatusCode("user is not found", HttpStatuses.NotFound);
+      throw new ErrorWithStatusCode(
+        APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_INCORRECT,
+        HttpStatuses.NotFound
+      );
+    }
+
+    if (user.passwordRecovery.expirationDate < new Date()) {
+      throw new ErrorWithStatusCode(
+        APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_EXPIRED,
+        HttpStatuses.BadRequest
+      );
     }
 
     const passHash = await bcryptService.createHasn(newPassword);
@@ -171,7 +185,7 @@ export const authService = {
 
     if (!targetUser) {
       throw new ErrorWithStatusCode(
-        "User is not found",
+        APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND,
         HttpStatuses.BadRequest,
         createErrorsObject("code", "Confirmation code is incorrect")
       );

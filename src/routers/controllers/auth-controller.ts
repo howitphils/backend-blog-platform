@@ -135,4 +135,26 @@ export const authController = {
 
     res.sendStatus(HttpStatuses.NoContent);
   },
+
+  async recoverPassword(
+    req: RequestWithBody<{ email: string }>,
+    res: Response
+  ) {
+    const email = req.body.email;
+
+    await authService.recoverPassword(email);
+
+    res.sendStatus(HttpStatuses.NoContent);
+  },
+
+  async confirmPasswordRecovery(
+    req: RequestWithBody<{ newPassword: string; recoveryCode: string }>,
+    res: Response
+  ) {
+    const { newPassword, recoveryCode } = req.body;
+
+    await authService.confirmPasswordRecovery(newPassword, recoveryCode);
+
+    res.sendStatus(HttpStatuses.NoContent);
+  },
 };

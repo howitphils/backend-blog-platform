@@ -1,10 +1,6 @@
 import { ObjectId, WithId } from "mongodb";
 import { UserDbType } from "../../../../types/users-types";
 import { usersCollection } from "../../mongodb";
-// import { db } from "../../mongo";
-// import { SETTINGS } from "../../../../settings";
-
-// const usersCollection = db.getCollections(SETTINGS.DB_NAME).usersCollection;
 
 export const usersRepository = {
   // Создание нового юзера
@@ -102,7 +98,7 @@ export const usersRepository = {
   async updatePasswordHash(userId: ObjectId, hash: string): Promise<boolean> {
     const result = await usersCollection.updateOne(
       { _id: userId },
-      { "accountData.passHash": hash }
+      { $set: { "accountData.passHash": hash } }
     );
 
     return result.matchedCount === 1;

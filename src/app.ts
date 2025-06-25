@@ -20,13 +20,13 @@ app.use(cookieParser());
 // Для получения корректного ip
 app.set("trust proxy", true);
 
-app.use(APP_CONFIG.PATHS.BLOGS, blogsRouter);
-app.use(APP_CONFIG.PATHS.POSTS, postsRouter);
-app.use(APP_CONFIG.PATHS.TESTS, testsRouter);
-app.use(APP_CONFIG.PATHS.USERS, usersRouter);
-app.use(APP_CONFIG.PATHS.AUTH, authRouter);
-app.use(APP_CONFIG.PATHS.COMMENTS, commentsRouter);
-app.use(APP_CONFIG.PATHS.SECURITY, sessionsRouter);
+app.use(APP_CONFIG.MAIN_PATHS.BLOGS, blogsRouter);
+app.use(APP_CONFIG.MAIN_PATHS.POSTS, postsRouter);
+app.use(APP_CONFIG.MAIN_PATHS.TESTS, testsRouter);
+app.use(APP_CONFIG.MAIN_PATHS.USERS, usersRouter);
+app.use(APP_CONFIG.MAIN_PATHS.AUTH, authRouter);
+app.use(APP_CONFIG.MAIN_PATHS.COMMENTS, commentsRouter);
+app.use(APP_CONFIG.MAIN_PATHS.SECURITY, sessionsRouter);
 
 app.use(errorHandler);
 

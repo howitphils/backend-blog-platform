@@ -3,7 +3,7 @@ config();
 
 export const APP_CONFIG = {
   PORT: process.env.PORT || 5003,
-  PATHS: {
+  MAIN_PATHS: {
     BLOGS: "/blogs",
     POSTS: "/posts",
     TESTS: "/testing",
@@ -11,6 +11,19 @@ export const APP_CONFIG = {
     AUTH: "/auth",
     COMMENTS: "/comments",
     SECURITY: "/security",
+  },
+  ENDPOINT_PATHS: {
+    AUTH: {
+      LOGIN: "/login",
+      LOGOUT: "/logout",
+      PASSWORD_RECOVERY: "/password-recovery",
+      CONFIRM_PASSWORD_RECOVERY: "/new-password",
+      REFRESH_TOKEN: "/refresh-token",
+      REGISTRATION: "/registration",
+      REGISTRATION_CONFIRMATION: "/registration-confirmation",
+      REGISTRATION_EMAIL_RESENDING: "/registration-email-resending",
+      ME: "/me",
+    },
   },
   TEST_PATHS: {
     DEVICES: "/security/devices",
@@ -40,4 +53,9 @@ export const APP_CONFIG = {
   REQUEST_LIMIT: 5,
   REQUEST_LIMIT_PERIOD: 10,
   USER_LOGINS_TEST_COUNT: 4,
+  ERROR_MESSAGES: {
+    USER_NOT_FOUND: "User is not found",
+    RECOVERY_CODE_IS_EXPIRED: "Recovery code is expired",
+    RECOVERY_CODE_IS_INCORRECT: "Recovery code is incorrect",
+  },
 };
