@@ -40,7 +40,7 @@ describe("/comments", () => {
       user = commentInfo.user;
 
       const res = await req
-        .get(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .get(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
@@ -56,13 +56,13 @@ describe("/comments", () => {
 
     it("should not return a comment by incorrect id", async () => {
       await req
-        .get(APP_CONFIG.PATHS.COMMENTS + "/22")
+        .get(APP_CONFIG.MAIN_PATHS.COMMENTS + "/22")
         .expect(HttpStatuses.BadRequest);
     });
 
     it("should not return a not existing comment", async () => {
       await req
-        .get(APP_CONFIG.PATHS.COMMENTS + "/" + makeIncorrect(commentId))
+        .get(APP_CONFIG.MAIN_PATHS.COMMENTS + "/" + makeIncorrect(commentId))
         .expect(HttpStatuses.NotFound);
     });
   });
@@ -85,13 +85,13 @@ describe("/comments", () => {
       token = commentInfo.token;
 
       await req
-        .put(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .set(jwtAuth(token))
         .send(updatedCommentDto)
         .expect(HttpStatuses.NoContent);
 
       const res = await req
-        .get(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .get(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
@@ -115,13 +115,13 @@ describe("/comments", () => {
       });
 
       await req
-        .put(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .set(jwtAuth(token))
         .send(invalidContentDtoMin)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .put(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .set(jwtAuth(token))
         .send(invalidContentDtoMax)
         .expect(HttpStatuses.BadRequest);
@@ -133,7 +133,7 @@ describe("/comments", () => {
       });
 
       await req
-        .put(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .send(contentDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -146,7 +146,7 @@ describe("/comments", () => {
       const token2 = (await getTokenPair()).accessToken;
 
       await req
-        .put(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .set(jwtAuth(token2))
         .send(contentDto)
         .expect(HttpStatuses.Forbidden);
@@ -158,7 +158,7 @@ describe("/comments", () => {
       });
 
       await req
-        .put(APP_CONFIG.PATHS.COMMENTS + "/" + makeIncorrect(commentId))
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + "/" + makeIncorrect(commentId))
         .set(jwtAuth(token))
         .send(contentDto)
         .expect(HttpStatuses.NotFound);
@@ -170,7 +170,7 @@ describe("/comments", () => {
       });
 
       await req
-        .put(APP_CONFIG.PATHS.COMMENTS + "/22")
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + "/22")
         .set(jwtAuth(token))
         .send(contentDto)
         .expect(HttpStatuses.BadRequest);
@@ -192,7 +192,7 @@ describe("/comments", () => {
       token = commentInfo.token;
 
       await req
-        .delete(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .delete(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .expect(HttpStatuses.Unauthorized);
     });
 
@@ -200,26 +200,26 @@ describe("/comments", () => {
       const token2 = (await getTokenPair()).accessToken;
 
       await req
-        .delete(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .delete(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .set(jwtAuth(token2))
         .expect(HttpStatuses.Forbidden);
     });
 
     it("should not delete the comment by incorrect id", async () => {
       await req
-        .delete(APP_CONFIG.PATHS.COMMENTS + "/22")
+        .delete(APP_CONFIG.MAIN_PATHS.COMMENTS + "/22")
         .set(jwtAuth(token))
         .expect(HttpStatuses.BadRequest);
     });
 
     it("should delete the comment", async () => {
       await req
-        .delete(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .delete(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .set(jwtAuth(token))
         .expect(HttpStatuses.NoContent);
 
       await req
-        .delete(APP_CONFIG.PATHS.COMMENTS + `/${commentId}`)
+        .delete(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
         .set(jwtAuth(token))
         .expect(HttpStatuses.NotFound);
     });

@@ -164,7 +164,7 @@ export const authService = {
     if (!user) {
       throw new ErrorWithStatusCode(
         APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_INCORRECT,
-        HttpStatuses.NotFound
+        HttpStatuses.BadRequest
       );
     }
 

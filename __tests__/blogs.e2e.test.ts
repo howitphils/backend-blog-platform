@@ -31,7 +31,7 @@ describe("/blogs", () => {
 
     it("should return all blogs", async () => {
       const res = await req
-        .get(APP_CONFIG.PATHS.BLOGS)
+        .get(APP_CONFIG.MAIN_PATHS.BLOGS)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
@@ -47,7 +47,7 @@ describe("/blogs", () => {
       const newBlogDto = createBlogDto({});
 
       const res = await req
-        .post(APP_CONFIG.PATHS.BLOGS)
+        .post(APP_CONFIG.MAIN_PATHS.BLOGS)
         .set(basicAuth)
         .send(newBlogDto)
         .expect(HttpStatuses.Created);
@@ -61,7 +61,7 @@ describe("/blogs", () => {
         isMembership: false,
       });
 
-      const response = await req.get(APP_CONFIG.PATHS.BLOGS).expect(200);
+      const response = await req.get(APP_CONFIG.MAIN_PATHS.BLOGS).expect(200);
 
       expect(response.body.items.length).toBe(1);
     });
@@ -80,13 +80,13 @@ describe("/blogs", () => {
       });
 
       await req
-        .post(APP_CONFIG.PATHS.BLOGS)
+        .post(APP_CONFIG.MAIN_PATHS.BLOGS)
         .set(basicAuth)
         .send(minInvalidBlogDto)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .post(APP_CONFIG.PATHS.BLOGS)
+        .post(APP_CONFIG.MAIN_PATHS.BLOGS)
         .set(basicAuth)
         .send(maxInvalidBlogDto)
         .expect(HttpStatuses.BadRequest);
@@ -96,7 +96,7 @@ describe("/blogs", () => {
       const newBlogDto = createBlogDto({});
 
       await req
-        .post(APP_CONFIG.PATHS.BLOGS)
+        .post(APP_CONFIG.MAIN_PATHS.BLOGS)
         .send(newBlogDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -113,7 +113,7 @@ describe("/blogs", () => {
 
       blogId = blogDb.id;
       const res = await req
-        .get(APP_CONFIG.PATHS.BLOGS + `/${blogDb.id}`)
+        .get(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogDb.id}`)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
@@ -128,7 +128,7 @@ describe("/blogs", () => {
 
     it("should not get the blog by the incorrect id", async () => {
       await req
-        .get(APP_CONFIG.PATHS.BLOGS + "/" + makeIncorrect(blogId))
+        .get(APP_CONFIG.MAIN_PATHS.BLOGS + "/" + makeIncorrect(blogId))
         .expect(HttpStatuses.NotFound);
     });
   });
@@ -151,13 +151,13 @@ describe("/blogs", () => {
       blogId = blogDb.id;
 
       await req
-        .put(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
+        .put(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
         .send(updatedBlogDto)
         .expect(HttpStatuses.NoContent);
 
       const res = await req
-        .get(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
+        .get(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}`)
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
@@ -184,13 +184,13 @@ describe("/blogs", () => {
       });
 
       await req
-        .put(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
+        .put(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
         .send(minInvalidBlogDto)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .put(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
+        .put(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
         .send(maxInvalidBlogDto)
         .expect(HttpStatuses.BadRequest);
@@ -202,7 +202,7 @@ describe("/blogs", () => {
       });
 
       await req
-        .put(APP_CONFIG.PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
+        .put(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
         .set(basicAuth)
         .send(newBlogDto)
         .expect(HttpStatuses.NotFound);
@@ -214,7 +214,7 @@ describe("/blogs", () => {
       });
 
       await req
-        .put(APP_CONFIG.PATHS.BLOGS + "/22")
+        .put(APP_CONFIG.MAIN_PATHS.BLOGS + "/22")
         .set(basicAuth)
         .send(newBlogDto)
         .expect(HttpStatuses.BadRequest);
@@ -226,7 +226,7 @@ describe("/blogs", () => {
       });
 
       await req
-        .put(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
+        .put(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}`)
         .send(newBlogDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -244,7 +244,7 @@ describe("/blogs", () => {
       blogId = blogDb.id;
 
       const res = await req
-        .get(APP_CONFIG.PATHS.BLOGS + `/${blogDb.id}` + "/posts")
+        .get(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogDb.id}` + "/posts")
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual(defaultPagination);
@@ -252,13 +252,15 @@ describe("/blogs", () => {
 
     it("should not return all posts for a specific blog with incorrect blogId", async () => {
       await req
-        .get(APP_CONFIG.PATHS.BLOGS + "/22" + "/posts")
+        .get(APP_CONFIG.MAIN_PATHS.BLOGS + "/22" + "/posts")
         .expect(HttpStatuses.BadRequest);
     });
     it("should not return all posts for not existing blog", async () => {
       await req
         .get(
-          APP_CONFIG.PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}` + "/posts"
+          APP_CONFIG.MAIN_PATHS.BLOGS +
+            `/${blogId.slice(0, -1) + "a"}` +
+            "/posts"
         )
         .expect(HttpStatuses.NotFound);
     });
@@ -277,7 +279,7 @@ describe("/blogs", () => {
       blogId = blogDb.id;
 
       const res = await req
-        .post(APP_CONFIG.PATHS.BLOGS + `/${blogId}` + "/posts")
+        .post(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}` + "/posts")
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.Created);
@@ -293,7 +295,7 @@ describe("/blogs", () => {
       });
 
       await req
-        .get(APP_CONFIG.PATHS.POSTS + `/${res.body.id}`)
+        .get(APP_CONFIG.MAIN_PATHS.POSTS + `/${res.body.id}`)
         .expect(HttpStatuses.Success);
     });
 
@@ -301,7 +303,7 @@ describe("/blogs", () => {
       const newPostDto = createPostForBlogDto({});
 
       await req
-        .post(APP_CONFIG.PATHS.BLOGS + "/22/posts")
+        .post(APP_CONFIG.MAIN_PATHS.BLOGS + "/22/posts")
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.BadRequest);
@@ -311,7 +313,7 @@ describe("/blogs", () => {
       const newPostDto = createPostForBlogDto({});
 
       await req
-        .post(APP_CONFIG.PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
+        .post(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.NotFound);
@@ -331,13 +333,13 @@ describe("/blogs", () => {
       });
 
       await req
-        .post(APP_CONFIG.PATHS.BLOGS + `/${blogId}` + "/posts")
+        .post(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}` + "/posts")
         .set(basicAuth)
         .send(invalidPostDtoMin)
         .expect(HttpStatuses.BadRequest);
 
       await req
-        .post(APP_CONFIG.PATHS.BLOGS + `/${blogId}` + "/posts")
+        .post(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}` + "/posts")
         .set(basicAuth)
         .send(invalidPostDtoMax)
         .expect(HttpStatuses.BadRequest);
@@ -347,7 +349,7 @@ describe("/blogs", () => {
       const postDto = createPostForBlogDto({});
 
       await req
-        .post(APP_CONFIG.PATHS.BLOGS + `/${blogId}` + "/posts")
+        .post(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}` + "/posts")
         .send(postDto)
         .expect(HttpStatuses.Unauthorized);
     });
@@ -367,25 +369,25 @@ describe("/blogs", () => {
 
     it("should not delete the blog by unauthorized user", async () => {
       await req
-        .delete(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
+        .delete(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}`)
         .expect(HttpStatuses.Unauthorized);
     });
 
     it("should not delete the blog with incorrect id", async () => {
       await req
-        .delete(APP_CONFIG.PATHS.BLOGS + "/22")
+        .delete(APP_CONFIG.MAIN_PATHS.BLOGS + "/22")
         .set(basicAuth)
         .expect(HttpStatuses.BadRequest);
     });
 
     it("should delete the blog", async () => {
       await req
-        .delete(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
+        .delete(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NoContent);
 
       await req
-        .delete(APP_CONFIG.PATHS.BLOGS + `/${blogId}`)
+        .delete(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NotFound);
     });

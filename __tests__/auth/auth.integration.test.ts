@@ -83,19 +83,19 @@ describe("/auth", () => {
 
     it("should not confirm the email with expired code and throw an error", async () => {
       const { email, login, pass } = testSeeder.createUserDto({});
-      const code = uuIdService.createRandomCode();
+      const confirmationCode = uuIdService.createRandomCode();
 
       await testSeeder.insertUser({
         email,
         login,
         pass,
-        code,
+        confirmationCode,
         expirationDate: new Date(),
         isConfirmed: true,
       });
 
       try {
-        await confirmEmailUseCase(code);
+        await confirmEmailUseCase(confirmationCode);
         fail("Expected error to be thrown");
       } catch (error: any) {
         expect(error).toBeInstanceOf(ErrorWithStatusCode);
@@ -107,18 +107,18 @@ describe("/auth", () => {
 
     it("should not confirm already confirmed email and throw an error", async () => {
       const { email, login, pass } = testSeeder.createUserDto({});
-      const code = uuIdService.createRandomCode();
+      const confirmationCode = uuIdService.createRandomCode();
 
       await testSeeder.insertUser({
         email,
         login,
         pass,
-        code,
+        confirmationCode,
         isConfirmed: true,
       });
 
       try {
-        await confirmEmailUseCase(code);
+        await confirmEmailUseCase(confirmationCode);
         fail("Expected error to be thrown");
       } catch (error: any) {
         expect(error).toBeInstanceOf(ErrorWithStatusCode);
@@ -130,20 +130,20 @@ describe("/auth", () => {
 
     it("should confirm the email", async () => {
       const { email, login, pass } = testSeeder.createUserDto({});
-      const code = uuIdService.createRandomCode();
+      const confirmationCode = uuIdService.createRandomCode();
 
       await testSeeder.insertUser({
         email,
         login,
         pass,
-        code,
+        confirmationCode,
       });
 
-      expect(await confirmEmailUseCase(code)).toBeTruthy();
+      expect(await confirmEmailUseCase(confirmationCode)).toBeTruthy();
     });
   });
 
-  describe("code resending", () => {
+  describe("confirmationCode resending", () => {
     afterAll(async () => {
       await clearCollections();
     });
@@ -166,13 +166,13 @@ describe("/auth", () => {
 
     it("should throw an error if user is already confirmed", async () => {
       const { email, login, pass } = testSeeder.createUserDto({});
-      const code = "test";
+      const confirmationCode = "test";
 
       await testSeeder.insertUser({
         email,
         login,
         pass,
-        code,
+        confirmationCode,
         isConfirmed: true,
       });
 
@@ -189,13 +189,13 @@ describe("/auth", () => {
 
     it("should throw an error if user is already confirmed", async () => {
       const { email, login, pass } = testSeeder.createUserDto({});
-      const code = "test";
+      const confirmationCode = "test";
 
       await testSeeder.insertUser({
         email,
         login,
         pass,
-        code,
+        confirmationCode,
         isConfirmed: true,
       });
 
@@ -210,7 +210,7 @@ describe("/auth", () => {
       }
     });
 
-    it("should update user's code and expiration date and send an email with code", async () => {
+    it("should update user's confirmationCode and expiration date and send an email with confirmationCode", async () => {
       const { email, login, pass } = testSeeder.createUserDto({
         email: "someemail@gmail.com",
       });
@@ -221,7 +221,7 @@ describe("/auth", () => {
         email,
         login,
         pass,
-        code: startCode,
+        confirmationCode: startCode,
         expirationDate: startExpirationDate,
       });
 
@@ -280,6 +280,69 @@ describe("/auth", () => {
         expect(error).toBeInstanceOf(ErrorWithStatusCode);
         expect(error.message).toBe("Session is not found");
         expect(error.statusCode).toBe(HttpStatuses.Unauthorized);
+      }
+    });
+  });
+
+  describe("password recovery", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    const passwordRecoveryUseCase = authService.recoverPassword;
+
+    it("should send an email", async () => {
+      const { email, login, pass } = testSeeder.createUserDto({});
+      await testSeeder.insertUser({
+        email,
+        login,
+        pass,
+      });
+
+      await passwordRecoveryUseCase(email);
+
+      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("password recovery confirmation", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    const confirmPasswordRecoveryUseCase = authService.confirmPasswordRecovery;
+
+    it("should return an error if recovery code is incorrect", async () => {
+      const { email, login, pass } = testSeeder.createUserDto({});
+      await testSeeder.insertUser({
+        email,
+        login,
+        pass,
+        recoveryCode: "correct_code",
+        recoveryCodeExpirationDate: dateFnsService.rollBackBySeconds(10),
+      });
+
+      try {
+        await confirmPasswordRecoveryUseCase("123456", "incorrect_code");
+        fail("Error exprected");
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(ErrorWithStatusCode);
+        expect(error.message).toBe(
+          APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_INCORRECT
+        );
+        expect(error.statusCode).toBe(HttpStatuses.BadRequest);
+      }
+    });
+    it("should return an error if recovery code is expired", async () => {
+      try {
+        await confirmPasswordRecoveryUseCase("123456", "correct_code");
+        fail("Error exprected");
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(ErrorWithStatusCode);
+        expect(error.message).toBe(
+          APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_EXPIRED
+        );
+        expect(error.statusCode).toBe(HttpStatuses.BadRequest);
       }
     });
   });

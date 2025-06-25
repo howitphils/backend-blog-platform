@@ -32,7 +32,7 @@ describe("/users", () => {
 
     it("should return all users", async () => {
       const res = await req
-        .get(APP_CONFIG.PATHS.USERS)
+        .get(APP_CONFIG.MAIN_PATHS.USERS)
         .set(basicAuth)
         .expect(HttpStatuses.Success);
 
@@ -49,7 +49,7 @@ describe("/users", () => {
       const newUserDto = createUserDto({});
 
       const res = await req
-        .post(APP_CONFIG.PATHS.USERS)
+        .post(APP_CONFIG.MAIN_PATHS.USERS)
         .set(basicAuth)
         .send(newUserDto)
         .expect(HttpStatuses.Created);
@@ -66,7 +66,7 @@ describe("/users", () => {
       const newUserDto = createUserDto({ email: "unique-email@mail.ru" });
 
       const res = await req
-        .post(APP_CONFIG.PATHS.USERS)
+        .post(APP_CONFIG.MAIN_PATHS.USERS)
         .set(basicAuth)
         .send(newUserDto)
         .expect(HttpStatuses.BadRequest);
@@ -85,7 +85,7 @@ describe("/users", () => {
       const newUserDto = createUserDto({ login: "unique" });
 
       const res = await req
-        .post(APP_CONFIG.PATHS.USERS)
+        .post(APP_CONFIG.MAIN_PATHS.USERS)
         .set(basicAuth)
         .send(newUserDto)
         .expect(HttpStatuses.BadRequest);
@@ -106,7 +106,7 @@ describe("/users", () => {
       const invalidUserDtoPattern = createUserDto({ login: "&^%$))" });
 
       const res = await req
-        .post(APP_CONFIG.PATHS.USERS)
+        .post(APP_CONFIG.MAIN_PATHS.USERS)
         .set(basicAuth)
         .send(invalidUserDtoMin)
         .expect(HttpStatuses.BadRequest);
@@ -121,7 +121,7 @@ describe("/users", () => {
       });
 
       const res2 = await req
-        .post(APP_CONFIG.PATHS.USERS)
+        .post(APP_CONFIG.MAIN_PATHS.USERS)
         .set(basicAuth)
         .send(invalidUserDtoMax)
         .expect(HttpStatuses.BadRequest);
@@ -136,7 +136,7 @@ describe("/users", () => {
       });
 
       const res3 = await req
-        .post(APP_CONFIG.PATHS.USERS)
+        .post(APP_CONFIG.MAIN_PATHS.USERS)
         .set(basicAuth)
         .send(invalidUserDtoPattern)
         .expect(HttpStatuses.BadRequest);
@@ -155,7 +155,7 @@ describe("/users", () => {
       const invalidUserDtoPattern = createUserDto({ email: "hello" });
 
       const res = await req
-        .post(APP_CONFIG.PATHS.USERS)
+        .post(APP_CONFIG.MAIN_PATHS.USERS)
         .set(basicAuth)
         .send(invalidUserDtoPattern)
         .expect(HttpStatuses.BadRequest);
@@ -184,23 +184,23 @@ describe("/users", () => {
       userId = newUser.id;
 
       await req
-        .delete(APP_CONFIG.PATHS.USERS + `/${userId}`)
+        .delete(APP_CONFIG.MAIN_PATHS.USERS + `/${userId}`)
         .expect(HttpStatuses.Unauthorized);
     });
     it("should not delete not existing user", async () => {
       await req
-        .delete(`${APP_CONFIG.PATHS.USERS}/${makeIncorrect(userId)}`)
+        .delete(`${APP_CONFIG.MAIN_PATHS.USERS}/${makeIncorrect(userId)}`)
         .set(basicAuth)
         .expect(HttpStatuses.NotFound);
     });
     it("should delete the user", async () => {
       await req
-        .delete(APP_CONFIG.PATHS.USERS + `/${userId}`)
+        .delete(APP_CONFIG.MAIN_PATHS.USERS + `/${userId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NoContent);
 
       await req
-        .delete(APP_CONFIG.PATHS.USERS + `/${userId}`)
+        .delete(APP_CONFIG.MAIN_PATHS.USERS + `/${userId}`)
         .set(basicAuth)
         .expect(HttpStatuses.NotFound);
     });

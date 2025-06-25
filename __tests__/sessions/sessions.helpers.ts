@@ -18,7 +18,7 @@ export const devicesTestHelper = {
 
     for (let i = 1; i <= count; i++) {
       const res = await req
-        .post(APP_CONFIG.PATHS.AUTH + "/login")
+        .post(APP_CONFIG.MAIN_PATHS.AUTH + "/login")
         .send({
           loginOrEmail: userDto.login,
           password: userDto.password,

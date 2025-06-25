@@ -43,7 +43,7 @@ export const createNewUserInDb = async (
   }
 
   const res = await req
-    .post(APP_CONFIG.PATHS.USERS)
+    .post(APP_CONFIG.MAIN_PATHS.USERS)
     .set(basicAuth)
     .send(user)
     .expect(HttpStatuses.Created);
@@ -83,7 +83,7 @@ export const createNewBlogInDb = async (
     blog = createBlogDto({});
   }
   const res = await req
-    .post(APP_CONFIG.PATHS.BLOGS)
+    .post(APP_CONFIG.MAIN_PATHS.BLOGS)
     .set(basicAuth)
     .send(blog)
     .expect(HttpStatuses.Created);
@@ -124,7 +124,7 @@ export const createNewPostInDb = async (
     post = createPostForBlogDto({});
   }
   const res = await req
-    .post(APP_CONFIG.PATHS.POSTS)
+    .post(APP_CONFIG.MAIN_PATHS.POSTS)
     .set(basicAuth)
     .send(post)
     .expect(HttpStatuses.Created);
@@ -149,7 +149,7 @@ export const getTokenPair = async (user?: UserDtoType) => {
   }
 
   const res = await req
-    .post(APP_CONFIG.PATHS.AUTH + "/login")
+    .post(APP_CONFIG.MAIN_PATHS.AUTH + "/login")
     .send({
       loginOrEmail: user.login,
       password: user.password,
@@ -170,7 +170,7 @@ export const createContentDto = ({ content }: { content?: string }) => {
 
 export const clearCollections = async () => {
   await req
-    .delete(APP_CONFIG.PATHS.TESTS + "/all-data")
+    .delete(APP_CONFIG.MAIN_PATHS.TESTS + "/all-data")
     .expect(HttpStatuses.NoContent);
 };
 
@@ -188,7 +188,7 @@ export const createCommentInDb = async () => {
   const token = (await getTokenPair(userDto)).accessToken;
 
   const res = await req
-    .post(APP_CONFIG.PATHS.POSTS + `/${dbPost.id}` + "/comments")
+    .post(APP_CONFIG.MAIN_PATHS.POSTS + `/${dbPost.id}` + "/comments")
     .set(jwtAuth(token))
     .send(contentDto)
     .expect(HttpStatuses.Created);

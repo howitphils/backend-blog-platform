@@ -1,20 +1,22 @@
 import { WithId } from "mongodb";
-import { randomUUID } from "crypto";
-import { add } from "date-fns/add";
 import {
   sessionsCollection,
   usersCollection,
 } from "../../src/db/mongodb/mongodb";
 import { UserDbType } from "../../src/types/users-types";
 import { SessionDbType, SessionTestType } from "../../src/types/sessions-types";
+import { uuIdService } from "../../src/adapters/uuIdService";
+import { dateFnsService } from "../../src/adapters/dateFnsService";
 
 type RegisterUserPayloadType = {
   login: string;
   pass: string;
   email: string;
-  code?: string;
+  confirmationCode?: string;
   expirationDate?: Date;
   isConfirmed?: boolean;
+  recoveryCode?: string;
+  recoveryCodeExpirationDate?: Date;
 };
 
 export const testSeeder = {
@@ -46,13 +48,16 @@ export const testSeeder = {
   //   }
   //   return users;
   // },
+
   async insertUser({
     login,
     pass,
     email,
-    code,
+    confirmationCode,
     expirationDate,
     isConfirmed,
+    recoveryCode,
+    recoveryCodeExpirationDate,
   }: RegisterUserPayloadType): Promise<WithId<UserDbType>> {
     const newUser: UserDbType = {
       accountData: {
@@ -62,15 +67,15 @@ export const testSeeder = {
         createdAt: new Date().toISOString(),
       },
       emailConfirmation: {
-        confirmationCode: code ?? randomUUID(),
-        expirationDate:
-          expirationDate ??
-          add(new Date(), {
-            minutes: 30,
-          }),
+        confirmationCode: confirmationCode ?? uuIdService.createRandomCode(),
+        expirationDate: expirationDate ?? dateFnsService.addToCurrentDate(),
         isConfirmed: isConfirmed ?? false,
       },
-      usedTokens: [],
+      passwordRecovery: {
+        expirationDate:
+          recoveryCodeExpirationDate ?? dateFnsService.addToCurrentDate(),
+        recoveryCode: recoveryCode ?? uuIdService.createRandomCode(),
+      },
     };
 
     const res = await usersCollection.insertOne({ ...newUser });

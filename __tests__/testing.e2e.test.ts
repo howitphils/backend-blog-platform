@@ -19,7 +19,7 @@ describe("/testing", () => {
 
   it("should remove all data from db", async () => {
     await req
-      .delete(APP_CONFIG.PATHS.TESTS + "/all-data")
+      .delete(APP_CONFIG.MAIN_PATHS.TESTS + "/all-data")
       .expect(HttpStatuses.NoContent);
   });
 });

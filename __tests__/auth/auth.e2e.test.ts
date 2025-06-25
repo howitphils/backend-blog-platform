@@ -182,7 +182,7 @@ describe("/auth", () => {
     });
   });
 
-  describe(APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY, () => {
+  describe("password recovery", () => {
     afterAll(async () => {
       await clearCollections();
     });
@@ -197,7 +197,7 @@ describe("/auth", () => {
         .expect(HttpStatuses.BadRequest);
     });
   });
-  describe(APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY, () => {
+  describe("confirm password recovery", () => {
     afterAll(async () => {
       await clearCollections();
     });
