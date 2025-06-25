@@ -24,7 +24,7 @@ describe("/auth", () => {
     console.log("Connection closed");
   });
 
-  describe("login", () => {
+  describe(APP_CONFIG.ENDPOINT_PATHS.AUTH.LOGIN, () => {
     afterAll(async () => {
       await clearCollections();
     });
@@ -34,7 +34,7 @@ describe("/auth", () => {
       await createNewUserInDb(newUser);
 
       const res = await req
-        .post(APP_CONFIG.PATHS.AUTH + "/login")
+        .post(APP_CONFIG.MAIN_PATHS.AUTH + "/login")
         .send({
           loginOrEmail: newUser.login,
           password: newUser.password,
@@ -58,7 +58,7 @@ describe("/auth", () => {
 
     it("it should not login a not existing user", async () => {
       await req
-        .post(APP_CONFIG.PATHS.AUTH + "/login")
+        .post(APP_CONFIG.MAIN_PATHS.AUTH + "/login")
         .send({
           loginOrEmail: "random",
           password: "string",
@@ -68,7 +68,7 @@ describe("/auth", () => {
 
     it("it should not login a user with incorrect input values", async () => {
       await req
-        .post(APP_CONFIG.PATHS.AUTH + "/login")
+        .post(APP_CONFIG.MAIN_PATHS.AUTH + "/login")
         .send({
           loginOrEmail: 221,
           password: false,
@@ -77,7 +77,7 @@ describe("/auth", () => {
     });
   });
 
-  describe("me", () => {
+  describe(APP_CONFIG.ENDPOINT_PATHS.AUTH.ME, () => {
     afterAll(async () => {
       await clearCollections();
     });
@@ -86,7 +86,7 @@ describe("/auth", () => {
       const token = (await getTokenPair()).accessToken;
 
       const res = await req
-        .get(APP_CONFIG.PATHS.AUTH + "/me")
+        .get(APP_CONFIG.MAIN_PATHS.AUTH + "/me")
         .set(jwtAuth(token))
         .expect(HttpStatuses.Success);
 
@@ -99,19 +99,19 @@ describe("/auth", () => {
 
     it("should not return user's info for unauthorized user", async () => {
       await req
-        .get(APP_CONFIG.PATHS.AUTH + "/me")
+        .get(APP_CONFIG.MAIN_PATHS.AUTH + "/me")
         .expect(HttpStatuses.Unauthorized);
     });
 
     it("should not return user's info if token is invalid", async () => {
       await req
-        .get(APP_CONFIG.PATHS.AUTH + "/me")
+        .get(APP_CONFIG.MAIN_PATHS.AUTH + "/me")
         .set(jwtAuth("invalidToken"))
         .expect(HttpStatuses.Unauthorized);
     });
   });
 
-  describe("refresh tokens", () => {
+  describe(APP_CONFIG.ENDPOINT_PATHS.AUTH.REFRESH_TOKEN, () => {
     afterAll(async () => {
       await clearCollections();
     });
@@ -122,7 +122,7 @@ describe("/auth", () => {
       await delay(1000);
 
       const res = await req
-        .post(APP_CONFIG.PATHS.AUTH + "/refresh-token")
+        .post(APP_CONFIG.MAIN_PATHS.AUTH + "/refresh-token")
         .set("Cookie", [refreshTokenCookie])
         .expect(HttpStatuses.Success);
 
@@ -143,18 +143,18 @@ describe("/auth", () => {
 
     it("should return an error if cookie is not provided", async () => {
       await req
-        .post(APP_CONFIG.PATHS.AUTH + "/refresh-token")
+        .post(APP_CONFIG.MAIN_PATHS.AUTH + "/refresh-token")
         .expect(HttpStatuses.Unauthorized);
     });
 
     it("should return an error if the token inside the cookie is incorrect", async () => {
       await req
-        .post(APP_CONFIG.PATHS.AUTH + "/refresh-token")
+        .post(APP_CONFIG.MAIN_PATHS.AUTH + "/refresh-token")
         .set("Cookie", ["incorrectToken"])
         .expect(HttpStatuses.Unauthorized);
     });
   });
-  describe("logout", () => {
+  describe(APP_CONFIG.ENDPOINT_PATHS.AUTH.LOGOUT, () => {
     afterAll(async () => {
       await clearCollections();
     });
@@ -163,22 +163,53 @@ describe("/auth", () => {
       const { refreshTokenCookie } = await getTokenPair();
 
       await req
-        .post(APP_CONFIG.PATHS.AUTH + "/logout")
+        .post(APP_CONFIG.MAIN_PATHS.AUTH + "/logout")
         .set("Cookie", [refreshTokenCookie])
         .expect(HttpStatuses.NoContent);
     });
 
     it("should return an error if cookie is not provided", async () => {
       await req
-        .post(APP_CONFIG.PATHS.AUTH + "/logout")
+        .post(APP_CONFIG.MAIN_PATHS.AUTH + "/logout")
         .expect(HttpStatuses.Unauthorized);
     });
 
     it("should return an error if the code inside the cookie is incorrect", async () => {
       await req
-        .post(APP_CONFIG.PATHS.AUTH + "/logout")
+        .post(APP_CONFIG.MAIN_PATHS.AUTH + "/logout")
         .set("Cookie", ["incorrectToken"])
         .expect(HttpStatuses.Unauthorized);
+    });
+  });
+
+  describe(APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY, () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    it("should return an error for incorrect email", async () => {
+      await req
+        .post(
+          APP_CONFIG.MAIN_PATHS.AUTH +
+            APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
+        )
+        .send({ email: "incorrect_email" })
+        .expect(HttpStatuses.BadRequest);
+    });
+  });
+  describe(APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY, () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    it("should return an error for incorrect password length", async () => {
+      await req
+        .post(
+          APP_CONFIG.MAIN_PATHS.AUTH +
+            APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY
+        )
+        .send({ newPassword: "12345", recoveryCode: "code" })
+        .expect(HttpStatuses.BadRequest);
     });
   });
 });

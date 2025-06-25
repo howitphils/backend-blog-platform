@@ -7,6 +7,7 @@ import { HttpStatuses } from "../types/http-statuses";
 import { createErrorsObject } from "../routers/controllers/utils";
 import { uuIdService } from "../adapters/uuIdService";
 import { dateFnsService } from "../adapters/dateFnsService";
+import { APP_CONFIG } from "../settings";
 
 export const usersService = {
   async createNewUser(
@@ -61,7 +62,7 @@ export const usersService = {
     const user = await usersRepository.getUserById(id);
     if (!user) {
       throw new ErrorWithStatusCode(
-        "User does not exist",
+        APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND,
         HttpStatuses.NotFound
       );
     }
@@ -73,7 +74,7 @@ export const usersService = {
 
     if (!targetUser) {
       throw new ErrorWithStatusCode(
-        "User does not exist",
+        APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND,
         HttpStatuses.NotFound
       );
     }
