@@ -1,4 +1,4 @@
-import { clearCollections, createUserDto } from "../test-helpers";
+import { clearCollections, createUserDto, req } from "../test-helpers";
 import { nodeMailerService } from "../../src/adapters/nodemailer-service";
 import { authService } from "../../src/services/auth-service";
 import { ErrorWithStatusCode } from "../../src/middlewares/error-handler";
@@ -9,6 +9,7 @@ import { HttpStatuses } from "../../src/types/http-statuses";
 import { testSeeder } from "./auth.helpers";
 import { uuIdService } from "../../src/adapters/uuIdService";
 import { dateFnsService } from "../../src/adapters/dateFnsService";
+import { UserDbType } from "../../src/types/users-types";
 
 describe("/auth", () => {
   let client: MongoClient;
@@ -289,17 +290,16 @@ describe("/auth", () => {
       await clearCollections();
     });
 
-    const passwordRecoveryUseCase = authService.recoverPassword;
+    it("should send an email even if user is not registered", async () => {
+      jest.resetAllMocks();
 
-    it("should send an email", async () => {
-      const { email, login, pass } = testSeeder.createUserDto({});
-      await testSeeder.insertUser({
-        email,
-        login,
-        pass,
-      });
-
-      await passwordRecoveryUseCase(email);
+      await req
+        .post(
+          APP_CONFIG.MAIN_PATHS.AUTH +
+            APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
+        )
+        .send({ email: "some@email.com" })
+        .expect(HttpStatuses.NoContent);
 
       expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
     });
@@ -310,18 +310,39 @@ describe("/auth", () => {
       await clearCollections();
     });
 
-    const confirmPasswordRecoveryUseCase = authService.confirmPasswordRecovery;
-
-    it("should return an error if recovery code is incorrect", async () => {
+    it("should update the password", async () => {
       const { email, login, pass } = testSeeder.createUserDto({});
       await testSeeder.insertUser({
         email,
         login,
         pass,
         recoveryCode: "correct_code",
-        recoveryCodeExpirationDate: dateFnsService.rollBackBySeconds(10),
       });
 
+      const oldUser = (await usersCollection.findOne({
+        "accountData.email": email,
+      })) as UserDbType;
+
+      await req
+        .post(
+          APP_CONFIG.MAIN_PATHS.AUTH +
+            APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY
+        )
+        .send({ newPassword: "new_password", recoveryCode: "correct_code" })
+        .expect(HttpStatuses.NoContent);
+
+      const updatedUser = (await usersCollection.findOne({
+        "accountData.email": email,
+      })) as UserDbType;
+
+      expect(oldUser.accountData.passHash).not.toBe(
+        updatedUser.accountData.passHash
+      );
+    });
+
+    const confirmPasswordRecoveryUseCase = authService.confirmPasswordRecovery;
+
+    it("should return an error if recovery code is incorrect", async () => {
       try {
         await confirmPasswordRecoveryUseCase("123456", "incorrect_code");
         fail("Error exprected");
@@ -333,9 +354,22 @@ describe("/auth", () => {
         expect(error.statusCode).toBe(HttpStatuses.BadRequest);
       }
     });
-    it("should return an error if recovery code is expired", async () => {
+
+    it("should return an error if recovery code has been expired", async () => {
+      const { email, login, pass } = testSeeder.createUserDto({
+        email: "new_email@mail.com",
+        login: "uniqueLogin",
+      });
+      await testSeeder.insertUser({
+        email,
+        login,
+        pass,
+        recoveryCode: "some_code",
+        recoveryCodeExpirationDate: dateFnsService.rollBackBySeconds(10),
+      });
+
       try {
-        await confirmPasswordRecoveryUseCase("123456", "correct_code");
+        await confirmPasswordRecoveryUseCase("123456", "some_code");
         fail("Error exprected");
       } catch (error: any) {
         expect(error).toBeInstanceOf(ErrorWithStatusCode);

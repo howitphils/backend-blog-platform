@@ -188,13 +188,16 @@ describe("/auth", () => {
     });
 
     it("should return an error for incorrect email", async () => {
-      await req
+      const res = await req
         .post(
           APP_CONFIG.MAIN_PATHS.AUTH +
             APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
         )
         .send({ email: "incorrect_email" })
         .expect(HttpStatuses.BadRequest);
+
+      expect(res.body.errorsMessages[0].field).toBe("email");
+      expect(res.body.errorsMessages[0].message).toBe("Must be an email");
     });
   });
   describe("confirm password recovery", () => {
@@ -203,13 +206,33 @@ describe("/auth", () => {
     });
 
     it("should return an error for incorrect password length", async () => {
-      await req
+      const res = await req
         .post(
           APP_CONFIG.MAIN_PATHS.AUTH +
             APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY
         )
         .send({ newPassword: "12345", recoveryCode: "code" })
         .expect(HttpStatuses.BadRequest);
+
+      expect(res.body.errorsMessages[0].field).toBe("newPassword");
+      expect(res.body.errorsMessages[0].message).toBe(
+        "Length must be between 6 and 20 symbols"
+      );
+    });
+
+    it("should return an error for incorrect recovery code type", async () => {
+      const res = await req
+        .post(
+          APP_CONFIG.MAIN_PATHS.AUTH +
+            APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY
+        )
+        .send({ newPassword: "123456", recoveryCode: 22 })
+        .expect(HttpStatuses.BadRequest);
+
+      console.log(res.body);
+
+      expect(res.body.errorsMessages[0].field).toBe("recoveryCode");
+      expect(res.body.errorsMessages[0].message).toBe("Must be a string");
     });
   });
 });
