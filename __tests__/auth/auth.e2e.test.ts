@@ -229,8 +229,6 @@ describe("/auth", () => {
         .send({ newPassword: "123456", recoveryCode: 22 })
         .expect(HttpStatuses.BadRequest);
 
-      console.log(res.body);
-
       expect(res.body.errorsMessages[0].field).toBe("recoveryCode");
       expect(res.body.errorsMessages[0].message).toBe("Must be a string");
     });

@@ -8,7 +8,7 @@ import { authService } from "../../services/auth-service";
 import { MeModel, UserInputModel } from "../../types/users-types";
 import { APP_CONFIG } from "../../settings";
 
-export const authController = {
+class AuthController {
   async loginUser(
     req: RequestWithBody<LoginInputModel>,
     res: Response<{ accessToken: string }>
@@ -36,7 +36,7 @@ export const authController = {
     });
 
     res.status(HttpStatuses.Success).json({ accessToken });
-  },
+  }
 
   async refreshTokens(req: Request, res: Response) {
     const userId = req.user?.id;
@@ -63,7 +63,7 @@ export const authController = {
     });
 
     res.status(HttpStatuses.Success).json({ accessToken });
-  },
+  }
 
   async logout(req: Request, res: Response) {
     const userId = req.user?.id;
@@ -85,7 +85,7 @@ export const authController = {
     });
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
+  }
 
   async getMyInfo(req: Request, res: Response<MeModel>) {
     const userId = req.user?.id;
@@ -102,7 +102,7 @@ export const authController = {
     }
 
     res.status(HttpStatuses.Success).json(myInfo);
-  },
+  }
 
   async registerUser(req: RequestWithBody<UserInputModel>, res: Response) {
     await authService.registerUser({
@@ -112,7 +112,7 @@ export const authController = {
     });
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
+  }
 
   async confirmRegistration(
     req: RequestWithBody<{ code: string }>,
@@ -123,7 +123,7 @@ export const authController = {
     await authService.confirmRegistration(code);
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
+  }
 
   async resendConfirmation(
     req: RequestWithBody<{ email: string }>,
@@ -134,7 +134,7 @@ export const authController = {
     await authService.resendConfirmationCode(email);
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
+  }
 
   async recoverPassword(
     req: RequestWithBody<{ email: string }>,
@@ -145,7 +145,7 @@ export const authController = {
     await authService.recoverPassword(email);
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
+  }
 
   async confirmPasswordRecovery(
     req: RequestWithBody<{ newPassword: string; recoveryCode: string }>,
@@ -156,5 +156,7 @@ export const authController = {
     await authService.confirmPasswordRecovery(newPassword, recoveryCode);
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
-};
+  }
+}
+
+export const authController = new AuthController();

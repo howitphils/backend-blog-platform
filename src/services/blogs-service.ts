@@ -5,7 +5,7 @@ import { BlogDbType, BlogInputModel } from "../types/blogs-types";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 
-export const blogsService = {
+class BlogsService {
   async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {
     const newBlog: BlogDbType = {
       name: blog.name,
@@ -16,7 +16,7 @@ export const blogsService = {
     };
 
     return blogsRepository.createNewBlog(newBlog);
-  },
+  }
 
   async getBlogById(id: ObjectId): Promise<WithId<BlogDbType>> {
     const blog = await blogsRepository.getBlogById(id);
@@ -29,7 +29,7 @@ export const blogsService = {
     }
 
     return blog;
-  },
+  }
 
   async updateBlog(
     id: ObjectId,
@@ -45,7 +45,7 @@ export const blogsService = {
     }
 
     return blogsRepository.updateBlog(id, updatedBlog);
-  },
+  }
 
   async deleteBlog(id: ObjectId): Promise<boolean> {
     const targetBlog = await blogsRepository.getBlogById(id);
@@ -58,5 +58,7 @@ export const blogsService = {
     }
 
     return blogsRepository.deleteBlog(id);
-  },
-};
+  }
+}
+
+export const blogsService = new BlogsService();

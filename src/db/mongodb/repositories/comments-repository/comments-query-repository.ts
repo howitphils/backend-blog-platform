@@ -7,7 +7,7 @@ import {
 } from "../../../../types/comments-types";
 import { PaginationType } from "../../../../types/common-types";
 
-export const commentsQueryRepository = {
+class CommentsQueryRepository {
   // Получение всех комментариев с учетом query параметров
   async getAllCommentsForPost(
     filters: CommentsMapedQueryType,
@@ -33,13 +33,13 @@ export const commentsQueryRepository = {
       totalCount,
       items: comments.map(this._mapFromDbToViewModel),
     };
-  },
+  }
 
   async getCommentById(_id: ObjectId): Promise<CommentViewModel | null> {
     const targetComment = await commentsCollection.findOne({ _id });
     if (!targetComment) return null;
     return this._mapFromDbToViewModel(targetComment);
-  },
+  }
 
   // Преобразование комментарий из формата базы данных в формат, который ожидает клиент
   _mapFromDbToViewModel(comment: WithId<CommentDbType>): CommentViewModel {
@@ -50,5 +50,7 @@ export const commentsQueryRepository = {
       content,
       createdAt,
     };
-  },
-};
+  }
+}
+
+export const commentsQueryRepository = new CommentsQueryRepository();

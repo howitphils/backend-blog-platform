@@ -19,7 +19,7 @@ import { SessionDbType } from "../types/sessions-types";
 import { sessionsRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
 import { APP_CONFIG } from "../settings";
 
-export const authService = {
+class AuthService {
   async loginUser(userInfoDto: UserInfoType): Promise<TokenPairType> {
     const { loginOrEmail, password } = userInfoDto.usersCredentials;
     const { device_name, ip } = userInfoDto.usersConfigs;
@@ -77,7 +77,7 @@ export const authService = {
     await sessionsRepository.createSession(newSession);
 
     return tokenPair;
-  },
+  }
 
   async logout(dto: RefreshTokensAndLogoutDto) {
     const targetSession = await sessionsRepository.findByDeviceIdAndIssuedAt(
@@ -100,7 +100,7 @@ export const authService = {
     }
 
     await sessionsRepository.deleteSession(dto.userId, dto.deviceId);
-  },
+  }
 
   async refreshTokens(dto: RefreshTokensAndLogoutDto): Promise<TokenPairType> {
     const session = await sessionsRepository.findByDeviceIdAndIssuedAt(
@@ -129,7 +129,7 @@ export const authService = {
     );
 
     return tokenPair;
-  },
+  }
 
   async registerUser(user: UserInputModel) {
     const createdId = await usersService.createNewUser(user, false);
@@ -141,7 +141,7 @@ export const authService = {
         targetUser.emailConfirmation.confirmationCode
       )
       .catch((e) => console.log(e));
-  },
+  }
 
   async recoverPassword(email: string) {
     let recoveryCode: string = "";
@@ -156,7 +156,7 @@ export const authService = {
     emailManager
       .sendEmailForPasswordRecovery(email, recoveryCode)
       .catch((e) => console.log(e));
-  },
+  }
 
   async confirmPasswordRecovery(newPassword: string, recoveryCode: string) {
     const user = await usersRepository.findUserByRecoveryCode(recoveryCode);
@@ -178,7 +178,7 @@ export const authService = {
     const passHash = await bcryptService.createHasn(newPassword);
 
     await usersRepository.updatePasswordHash(user._id, passHash);
-  },
+  }
 
   async confirmRegistration(code: string): Promise<boolean> {
     const targetUser = await usersRepository.getUserByConfirmationCode(code);
@@ -208,7 +208,7 @@ export const authService = {
     }
 
     return usersRepository.updateIsConfirmedStatus(targetUser._id, true);
-  },
+  }
 
   async resendConfirmationCode(email: string) {
     const user = await usersRepository.getUserByLoginOrEmail(email);
@@ -250,7 +250,7 @@ export const authService = {
         updatedUser.emailConfirmation.confirmationCode
       )
       .catch((e) => console.log(e));
-  },
+  }
 
   checkAccessToken(token: string): ResultObject<string | null> {
     const [authType, accessToken] = token.split(" ");
@@ -286,5 +286,7 @@ export const authService = {
       extensions: [],
       data: verifiedUser.userId,
     };
-  },
-};
+  }
+}
+
+export const authService = new AuthService();

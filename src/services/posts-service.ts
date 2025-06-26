@@ -5,7 +5,7 @@ import { blogsService } from "./blogs-service";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 
-export const postsService = {
+class PostsService {
   async createNewPost(post: PostInputModel): Promise<ObjectId> {
     const targetBlog = await blogsService.getBlogById(
       new ObjectId(post.blogId)
@@ -28,7 +28,7 @@ export const postsService = {
     };
 
     return postsRepository.createNewPost(newPost);
-  },
+  }
 
   async getPostById(id: ObjectId): Promise<PostDbType> {
     const post = await postsRepository.getPostById(id);
@@ -39,7 +39,7 @@ export const postsService = {
       );
     }
     return post;
-  },
+  }
 
   async updatePost(
     id: ObjectId,
@@ -55,7 +55,7 @@ export const postsService = {
     }
 
     return postsRepository.updatePost(id, updatedPost);
-  },
+  }
 
   async deletePost(id: ObjectId): Promise<boolean> {
     const targetPost = await postsRepository.getPostById(id);
@@ -68,5 +68,7 @@ export const postsService = {
     }
 
     return postsRepository.deletePost(id);
-  },
-};
+  }
+}
+
+export const postsService = new PostsService();

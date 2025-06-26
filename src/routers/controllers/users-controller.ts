@@ -17,7 +17,7 @@ import {
 } from "../../types/requests-types";
 import { HttpStatuses } from "../../types/http-statuses";
 
-export const usersController = {
+class UsersController {
   async getUsers(
     req: RequestWithQuery<UsersRequestQueryType>,
     res: Response<PaginationType<UserViewModel>>
@@ -27,7 +27,7 @@ export const usersController = {
     const users = await usersQueryRepository.getAllUsers(mapedQueryParams);
 
     res.status(HttpStatuses.Success).json(users);
-  },
+  }
 
   async createUser(req: RequestWithBody<UserInputModel>, res: Response) {
     const createResult = await usersService.createNewUser(req.body, true);
@@ -42,7 +42,7 @@ export const usersController = {
     }
 
     res.status(HttpStatuses.Created).json(newUser);
-  },
+  }
 
   async deleteUser(req: RequestWithParams<ParamsId>, res: Response) {
     const isDeleted = await usersService.deleteUser(req.params.id);
@@ -52,5 +52,7 @@ export const usersController = {
       return;
     }
     res.sendStatus(HttpStatuses.NoContent);
-  },
-};
+  }
+}
+
+export const usersController = new UsersController();

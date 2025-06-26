@@ -5,16 +5,16 @@ import {
   CommentInputModel,
 } from "../../../../types/comments-types";
 
-export const commentsRepository = {
+class CommentsRepository {
   async createComment(comment: CommentDbType): Promise<ObjectId> {
     const createResult = await commentsCollection.insertOne(comment);
     return createResult.insertedId;
-  },
+  }
 
   async deleteComment(_id: ObjectId): Promise<boolean> {
     const deleteResult = await commentsCollection.deleteOne({ _id });
     return deleteResult.deletedCount === 1;
-  },
+  }
 
   async updateComment(
     _id: ObjectId,
@@ -25,9 +25,11 @@ export const commentsRepository = {
       { $set: { ...comment } }
     );
     return updateResult.matchedCount === 1;
-  },
+  }
 
   async getCommentById(_id: ObjectId): Promise<WithId<CommentDbType> | null> {
     return commentsCollection.findOne({ _id });
-  },
-};
+  }
+}
+
+export const commentsRepository = new CommentsRepository();

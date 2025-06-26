@@ -9,7 +9,7 @@ import { uuIdService } from "../adapters/uuIdService";
 import { dateFnsService } from "../adapters/dateFnsService";
 import { APP_CONFIG } from "../settings";
 
-export const usersService = {
+class UsersService {
   async createNewUser(
     user: UserInputModel,
     isAdmin: boolean
@@ -56,7 +56,7 @@ export const usersService = {
     };
 
     return usersRepository.createNewUser(newUser);
-  },
+  }
 
   async getUserById(id: ObjectId): Promise<WithId<UserDbType>> {
     const user = await usersRepository.getUserById(id);
@@ -67,7 +67,7 @@ export const usersService = {
       );
     }
     return user;
-  },
+  }
 
   async deleteUser(id: ObjectId): Promise<boolean> {
     const targetUser = await usersRepository.getUserById(id);
@@ -80,5 +80,7 @@ export const usersService = {
     }
 
     return usersRepository.deleteUser(id);
-  },
-};
+  }
+}
+
+export const usersService = new UsersService();

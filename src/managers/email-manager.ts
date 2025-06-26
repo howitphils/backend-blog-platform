@@ -1,6 +1,6 @@
 import { nodeMailerService } from "../adapters/nodemailer-service";
 
-export const emailManager = {
+class EmailManager {
   async sendEmailForRegistration(email: string, confirmationCode: string) {
     return nodeMailerService.sendEmail({
       email,
@@ -10,7 +10,7 @@ export const emailManager = {
             <a href='https://somesite.com/confirm-email?code=${confirmationCode}'>complete registration</a>
         </p>`,
     });
-  },
+  }
 
   async sendEmailForPasswordRecovery(email: string, recoveryCode: string) {
     return nodeMailerService.sendEmail({
@@ -21,5 +21,7 @@ export const emailManager = {
           <a href='https://somesite.com/password-recovery?recoveryCode=${recoveryCode}'>recovery password</a>
       </p>`,
     });
-  },
-};
+  }
+}
+
+export const emailManager = new EmailManager();

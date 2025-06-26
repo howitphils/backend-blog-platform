@@ -312,16 +312,13 @@ describe("/auth", () => {
 
     it("should update the password", async () => {
       const { email, login, pass } = testSeeder.createUserDto({});
+      // закинет pass как passHash в бд
       await testSeeder.insertUser({
         email,
         login,
         pass,
         recoveryCode: "correct_code",
       });
-
-      const oldUser = (await usersCollection.findOne({
-        "accountData.email": email,
-      })) as UserDbType;
 
       await req
         .post(
@@ -335,9 +332,7 @@ describe("/auth", () => {
         "accountData.email": email,
       })) as UserDbType;
 
-      expect(oldUser.accountData.passHash).not.toBe(
-        updatedUser.accountData.passHash
-      );
+      expect(pass).not.toBe(updatedUser.accountData.passHash);
     });
 
     const confirmPasswordRecoveryUseCase = authService.confirmPasswordRecovery;

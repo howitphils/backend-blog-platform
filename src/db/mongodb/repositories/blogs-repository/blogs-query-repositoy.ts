@@ -7,7 +7,7 @@ import { BlogDbType } from "../../../../types/blogs-types";
 import { blogsCollection } from "../../mongodb";
 import { PaginationType } from "../../../../types/common-types";
 
-export const blogsQueryRepository = {
+class BlogsQueryRepository {
   async getAllBlogs(
     filters: BlogsMapedQueryType
   ): Promise<PaginationType<BlogViewModel>> {
@@ -42,7 +42,7 @@ export const blogsQueryRepository = {
       totalCount,
       items: blogs.map(this._mapFromDbToViewModel),
     };
-  },
+  }
 
   async getBlogById(_id: ObjectId): Promise<BlogViewModel | null> {
     const targetBlog = await blogsCollection.findOne({ _id });
@@ -51,7 +51,7 @@ export const blogsQueryRepository = {
     } else {
       return null;
     }
-  },
+  }
 
   // Преобразование данных из БД в формат, который будет отправлен клиенту
   _mapFromDbToViewModel(blog: WithId<BlogDbType>): BlogViewModel {
@@ -63,5 +63,7 @@ export const blogsQueryRepository = {
       name: blog.name,
       websiteUrl: blog.websiteUrl,
     };
-  },
-};
+  }
+}
+
+export const blogsQueryRepository = new BlogsQueryRepository();

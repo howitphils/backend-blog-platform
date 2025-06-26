@@ -18,7 +18,7 @@ import { ResultStatus } from "../../types/resultObject-types";
 import { HttpStatuses } from "../../types/http-statuses";
 import { convertToHttpCode } from "./utils";
 
-export const commentsController = {
+class CommentsController {
   async getCommentById(
     req: RequestWithParams<ParamsId>,
     res: Response<CommentViewModel>
@@ -31,7 +31,7 @@ export const commentsController = {
       return;
     }
     res.status(HttpStatuses.Success).json(targetComment);
-  },
+  }
 
   async updateComment(
     req: RequestWithParamsAndBodyAndUserId<ParamsId, CommentInputModel, UserId>,
@@ -62,7 +62,7 @@ export const commentsController = {
     }
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
+  }
 
   async deleteComment(
     req: RequestWithParamsAndUserId<ParamsId, UserId>,
@@ -91,5 +91,7 @@ export const commentsController = {
     }
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
-};
+  }
+}
+
+export const commentsController = new CommentsController();

@@ -3,10 +3,10 @@ import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { SessionDbType } from "../types/sessions-types";
 
-export const sessionsService = {
+class SessionService {
   async getAllUsersSessions(userId: string): Promise<SessionDbType[]> {
     return sessionsRepository.findAllUsersSessions(userId);
-  },
+  }
 
   async deleteAllSessions(userId: string, deviceId: string): Promise<void> {
     await sessionsRepository.deleteAllSessions(userId, deviceId);
@@ -18,7 +18,7 @@ export const sessionsService = {
         HttpStatuses.ServerError
       );
     }
-  },
+  }
 
   async deleteSession(userId: string, deviceId: string): Promise<void> {
     const targetSession = await sessionsRepository.findByDeviceId(deviceId);
@@ -35,5 +35,7 @@ export const sessionsService = {
     }
 
     sessionsRepository.deleteSession(userId, deviceId);
-  },
-};
+  }
+}
+
+export const sessionsService = new SessionService();

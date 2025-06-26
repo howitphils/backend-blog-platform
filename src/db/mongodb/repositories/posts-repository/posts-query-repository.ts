@@ -7,7 +7,7 @@ import {
 import { postsCollection } from "../../mongodb";
 import { PaginationType } from "../../../../types/common-types";
 
-export const postsQueryRepository = {
+class PostsQueryRepository {
   // Получение всех постов с учетом query параметров
   async getAllPosts(
     filters: PostsMapedQueryType
@@ -32,7 +32,7 @@ export const postsQueryRepository = {
       totalCount,
       items: posts.map(this._mapFromDbToViewModel),
     };
-  },
+  }
 
   // Получение постов конкретного блога
   async getAllPostsByBlogId(
@@ -61,7 +61,7 @@ export const postsQueryRepository = {
       totalCount,
       items: posts.map(this._mapFromDbToViewModel),
     };
-  },
+  }
 
   async getPostById(_id: ObjectId): Promise<PostViewModel | null> {
     // Получаем пост по id
@@ -72,7 +72,7 @@ export const postsQueryRepository = {
     }
     // Если пост найден, преобразуем его в формат, который ожидает клиент
     return this._mapFromDbToViewModel(post);
-  },
+  }
 
   // Преобразование поста из формата базы данных в формат, который ожидает клиент
   _mapFromDbToViewModel(post: WithId<PostDbType>): PostViewModel {
@@ -85,5 +85,7 @@ export const postsQueryRepository = {
       shortDescription: post.shortDescription,
       title: post.title,
     };
-  },
-};
+  }
+}
+
+export const postsQueryRepository = new PostsQueryRepository();

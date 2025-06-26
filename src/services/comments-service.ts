@@ -11,7 +11,7 @@ import { postsService } from "./posts-service";
 import { usersService } from "./users-service";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
 
-export const commentsService = {
+class CommentsService {
   async createNewComment(
     dto: CreateCommentDto
   ): Promise<ResultObject<ObjectId | null>> {
@@ -53,7 +53,7 @@ export const commentsService = {
       extensions: [],
       data: newCommentId,
     };
-  },
+  }
 
   async getCommentById(
     id: ObjectId
@@ -74,7 +74,7 @@ export const commentsService = {
       extensions: [],
       data: comment,
     };
-  },
+  }
 
   async updateComment(
     dto: UpdateCommentDto
@@ -108,7 +108,7 @@ export const commentsService = {
       extensions: [],
       data: true,
     };
-  },
+  }
 
   async deleteComment(
     dto: DeleteCommentDto
@@ -142,5 +142,7 @@ export const commentsService = {
       extensions: [],
       data: true,
     };
-  },
-};
+  }
+}
+
+export const commentsService = new CommentsService();

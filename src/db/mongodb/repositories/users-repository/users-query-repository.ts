@@ -8,7 +8,7 @@ import {
 import { ObjectId, WithId } from "mongodb";
 import { PaginationType } from "../../../../types/common-types";
 
-export const usersQueryRepository = {
+class UsersQueryRepository {
   // Получение всех юзеров с учетом query параметров
   async getAllUsers(
     filters: UsersMapedQueryType
@@ -62,21 +62,21 @@ export const usersQueryRepository = {
       totalCount,
       items: users.map(this._mapFromDbToViewModel),
     };
-  },
+  }
 
   async getUserById(_id: ObjectId): Promise<UserViewModel | null> {
     const targetUser = await usersCollection.findOne({ _id });
     if (!targetUser) return null;
 
     return this._mapFromDbToViewModel(targetUser);
-  },
+  }
 
   async getMyInfo(_id: ObjectId): Promise<MeModel | null> {
     const targetUser = await usersCollection.findOne({ _id });
     if (!targetUser) return null;
 
     return this._createMeModel(targetUser);
-  },
+  }
 
   // Преобразование юзера из формата базы данных в формат, который ожидает клиент
   _mapFromDbToViewModel(user: WithId<UserDbType>): UserViewModel {
@@ -87,7 +87,7 @@ export const usersQueryRepository = {
       email: email,
       createdAt: createdAt,
     };
-  },
+  }
 
   _createMeModel(user: WithId<UserDbType>): MeModel {
     return {
@@ -95,5 +95,7 @@ export const usersQueryRepository = {
       email: user.accountData.email,
       login: user.accountData.login,
     };
-  },
-};
+  }
+}
+
+export const usersQueryRepository = new UsersQueryRepository();

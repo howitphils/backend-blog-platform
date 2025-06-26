@@ -26,7 +26,7 @@ import {
 import { PaginationType, ParamsId } from "../../types/common-types";
 import { HttpStatuses } from "../../types/http-statuses";
 
-export const blogsController = {
+class BlogsController {
   async getBlogs(
     req: RequestWithQuery<BlogsRequestQueryType>,
     res: Response<PaginationType<BlogViewModel>>
@@ -36,7 +36,7 @@ export const blogsController = {
     const blogs = await blogsQueryRepository.getAllBlogs(mapedQueryParams);
 
     res.status(HttpStatuses.Success).json(blogs);
-  },
+  }
 
   async getPostsByBlogId(
     req: RequestWithParamsAndQuery<ParamsId, PostsRequestQueryType>,
@@ -53,7 +53,7 @@ export const blogsController = {
     );
 
     res.status(HttpStatuses.Success).json(posts);
-  },
+  }
 
   async createBlog(
     req: RequestWithBody<BlogInputModel>,
@@ -69,7 +69,7 @@ export const blogsController = {
     }
 
     res.status(HttpStatuses.Created).json(newBlog);
-  },
+  }
 
   async createPostForBlog(
     req: RequestWithParamsAndBody<ParamsId, PostForBlogInputModel>,
@@ -92,7 +92,7 @@ export const blogsController = {
     }
 
     res.status(HttpStatuses.Created).json(newPost);
-  },
+  }
 
   async getBlogById(
     req: RequestWithParams<ParamsId>,
@@ -106,7 +106,7 @@ export const blogsController = {
     }
 
     res.status(HttpStatuses.Success).json(targetBlog);
-  },
+  }
 
   async updateBlog(
     req: RequestWithParamsAndBody<ParamsId, BlogInputModel>,
@@ -114,7 +114,7 @@ export const blogsController = {
   ) {
     await blogsService.updateBlog(req.params.id, req.body);
     res.sendStatus(HttpStatuses.NoContent);
-  },
+  }
 
   async deleteBlog(req: RequestWithParams<ParamsId>, res: Response) {
     const deleteResult = await blogsService.deleteBlog(req.params.id);
@@ -125,5 +125,7 @@ export const blogsController = {
     }
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
-};
+  }
+}
+
+export const blogsController = new BlogsController();

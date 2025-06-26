@@ -7,25 +7,25 @@ export interface JwtPayloadRefresh extends JwtPayload {
   deviceId: string;
 }
 
-export const jwtService = {
-  createAccessToken(payload: { userId: string }) {
+class JwtService {
+  createAccessToken(payload: { userId: string }): string {
     return sign(payload, APP_CONFIG.JWT_SECRET_ACCESS, {
       expiresIn: `${APP_CONFIG.ACCESS_TOKEN_TTL}s`,
     });
-  },
+  }
 
-  createRefreshToken(payload: { userId: string; deviceId: string }) {
+  createRefreshToken(payload: { userId: string; deviceId: string }): string {
     return sign(payload, APP_CONFIG.JWT_SECRET_REFRESH, {
       expiresIn: `${APP_CONFIG.REFRESH_TOKEN_TTL}s`,
     });
-  },
+  }
 
   createJwtPair(userId: string, deviceId: string): TokenPairType {
     const accessToken = this.createAccessToken({ userId });
     const refreshToken = this.createRefreshToken({ userId, deviceId });
 
     return { accessToken, refreshToken };
-  },
+  }
 
   decodeToken(token: string) {
     try {
@@ -37,7 +37,7 @@ export const jwtService = {
     } catch (error) {
       console.log(error);
     }
-  },
+  }
 
   verifyToken(token: string, secretKey: string) {
     try {
@@ -46,18 +46,20 @@ export const jwtService = {
       console.log(error);
       return null;
     }
-  },
+  }
 
   verifyAccessToken(token: string): { userId: string } {
     return this.verifyToken(token, APP_CONFIG.JWT_SECRET_ACCESS) as {
       userId: string;
     };
-  },
+  }
 
   verifyRefreshToken(token: string): JwtPayloadRefresh {
     return this.verifyToken(
       token,
       APP_CONFIG.JWT_SECRET_REFRESH
     ) as JwtPayloadRefresh;
-  },
-};
+  }
+}
+
+export const jwtService = new JwtService();

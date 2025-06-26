@@ -31,7 +31,7 @@ import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
 import { ExtensionType } from "../../types/resultObject-types";
 
-export const postsController = {
+class PostsController {
   async getPosts(
     req: RequestWithQuery<PostsRequestQueryType>,
     res: Response<PaginationType<PostViewModel>>
@@ -41,7 +41,7 @@ export const postsController = {
     const posts = await postsQueryRepository.getAllPosts(mapedQueryParams);
 
     res.status(HttpStatuses.Success).json(posts);
-  },
+  }
 
   async getComments(
     req: RequestWithParamsAndQuery<ParamsId, CommentsRequestQueryType>,
@@ -58,7 +58,7 @@ export const postsController = {
     );
 
     res.status(HttpStatuses.Success).json(comments);
-  },
+  }
 
   async createPost(
     req: RequestWithBody<PostInputModel>,
@@ -74,7 +74,7 @@ export const postsController = {
     }
 
     res.status(HttpStatuses.Created).json(newPost);
-  },
+  }
 
   async createComment(
     req: RequestWithParamsAndBody<ParamsId, CommentInputModel>,
@@ -115,7 +115,7 @@ export const postsController = {
     }
 
     res.status(HttpStatuses.Created).json(newComment);
-  },
+  }
 
   async getPostById(
     req: RequestWithParams<ParamsId>,
@@ -129,7 +129,7 @@ export const postsController = {
     }
 
     res.status(HttpStatuses.Success).json(targetPost);
-  },
+  }
 
   async updatePost(
     req: RequestWithParamsAndBody<ParamsId, PostInputModel>,
@@ -137,10 +137,12 @@ export const postsController = {
   ) {
     await postsService.updatePost(req.params.id, req.body);
     res.sendStatus(HttpStatuses.NoContent);
-  },
+  }
 
   async deletePost(req: RequestWithParams<ParamsId>, res: Response) {
     await postsService.deletePost(req.params.id);
     res.sendStatus(HttpStatuses.NoContent);
-  },
-};
+  }
+}
+
+export const postsController = new PostsController();

@@ -5,14 +5,14 @@ import { RequestWithParams } from "../../types/requests-types";
 import { sessionsQueryRepository } from "../../db/mongodb/repositories/sessions-repository/sessions-query-repository";
 import { ErrorWithStatusCode } from "../../middlewares/error-handler";
 
-export const sessionsController = {
+class SessionController {
   async getAllSessions(req: Request, res: Response) {
     const userId = req.user.id;
 
     const sessions = await sessionsQueryRepository.getAllUsersSessions(userId);
 
     res.status(HttpStatuses.Success).json(sessions);
-  },
+  }
 
   async deleteAllSessions(req: Request, res: Response) {
     const userId = req.user.id;
@@ -24,7 +24,7 @@ export const sessionsController = {
     await sessionsService.deleteAllSessions(userId, deviceId);
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
+  }
 
   async deleteSession(
     req: RequestWithParams<{ deviceId: string }>,
@@ -43,5 +43,7 @@ export const sessionsController = {
     await sessionsService.deleteSession(userId, deviceId);
 
     res.sendStatus(HttpStatuses.NoContent);
-  },
-};
+  }
+}
+
+export const sessionsController = new SessionController();
