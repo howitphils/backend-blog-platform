@@ -1,7 +1,7 @@
 import { createTransport } from "nodemailer";
 import { APP_CONFIG } from "../settings";
 
-class NodeMailerService {
+export class NodeMailerService {
   async sendEmail({
     email,
     message,
@@ -30,5 +30,3 @@ class NodeMailerService {
     });
   }
 }
-
-export const nodeMailerService = new NodeMailerService();

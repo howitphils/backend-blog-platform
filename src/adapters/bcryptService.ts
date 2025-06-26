@@ -1,6 +1,6 @@
 import { compare, hash } from "bcryptjs";
 
-class BcryptService {
+export class BcryptService {
   async createHasn(password: string) {
     return hash(password, 8);
   }
@@ -9,5 +9,3 @@ class BcryptService {
     return compare(password, passHash);
   }
 }
-
-export const bcryptService = new BcryptService();

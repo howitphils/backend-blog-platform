@@ -1,7 +1,7 @@
 import { SessionDbType } from "../../../../types/sessions-types";
 import { sessionsCollection } from "../../mongodb";
 
-class SessionRepository {
+export class SessionRepository {
   async createSession(session: SessionDbType) {
     const insertedId = await sessionsCollection.insertOne(session);
     return insertedId;
@@ -48,5 +48,3 @@ class SessionRepository {
     return sessionsCollection.find({ userId }).toArray();
   }
 }
-
-export const sessionsRepository = new SessionRepository();

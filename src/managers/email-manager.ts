@@ -1,8 +1,10 @@
-import { nodeMailerService } from "../adapters/nodemailer-service";
+import { NodeMailerService } from "../adapters/nodemailer-service";
 
-class EmailManager {
+export class EmailManager {
+  constructor(public nodeMailerService: NodeMailerService) {}
+
   async sendEmailForRegistration(email: string, confirmationCode: string) {
-    return nodeMailerService.sendEmail({
+    return this.nodeMailerService.sendEmail({
       email,
       subject: "registration for blog platform",
       message: `<h1>Thank for your registration</h1>
@@ -13,7 +15,7 @@ class EmailManager {
   }
 
   async sendEmailForPasswordRecovery(email: string, recoveryCode: string) {
-    return nodeMailerService.sendEmail({
+    return this.nodeMailerService.sendEmail({
       email,
       subject: "registration for blog platform",
       message: `<h1>Password recovery</h1>
@@ -23,5 +25,3 @@ class EmailManager {
     });
   }
 }
-
-export const emailManager = new EmailManager();

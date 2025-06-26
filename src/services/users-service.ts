@@ -9,7 +9,7 @@ import { uuIdService } from "../adapters/uuIdService";
 import { dateFnsService } from "../adapters/dateFnsService";
 import { APP_CONFIG } from "../settings";
 
-class UsersService {
+export class UsersService {
   async createNewUser(
     user: UserInputModel,
     isAdmin: boolean
@@ -82,5 +82,3 @@ class UsersService {
     return usersRepository.deleteUser(id);
   }
 }
-
-export const usersService = new UsersService();

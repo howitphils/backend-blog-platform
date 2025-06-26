@@ -4,27 +4,38 @@ import {
   UserInfoType,
 } from "../types/login-types";
 import { UserInputModel } from "../types/users-types";
-import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
+import { UsersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
-import { bcryptService } from "../adapters/bcryptService";
-import { usersService } from "./users-service";
-import { emailManager } from "../managers/email-manager";
+import { BcryptService } from "../adapters/bcryptService";
 import { createErrorsObject } from "../routers/controllers/utils";
-import { uuIdService } from "../adapters/uuIdService";
-import { dateFnsService } from "../adapters/dateFnsService";
-import { JwtPayloadRefresh, jwtService } from "../adapters/jwtService";
+import { UuidService } from "../adapters/uuIdService";
+import { JwtPayloadRefresh, JwtService } from "../adapters/jwtService";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
 import { SessionDbType } from "../types/sessions-types";
-import { sessionsRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
+import { SessionRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
 import { APP_CONFIG } from "../settings";
+import { EmailManager } from "../managers/email-manager";
+import { DateFnsService } from "../adapters/dateFnsService";
+import { UsersService } from "./users-service";
 
-class AuthService {
+export class AuthService {
+  constructor(
+    public usersRepository: UsersRepository,
+    public sessionsRepository: SessionRepository,
+    public usersService: UsersService,
+    public bcryptService: BcryptService,
+    public jwtService: JwtService,
+    public uuIdService: UuidService,
+    public emailManager: EmailManager,
+    public dateFnsService: DateFnsService
+  ) {}
+
   async loginUser(userInfoDto: UserInfoType): Promise<TokenPairType> {
     const { loginOrEmail, password } = userInfoDto.usersCredentials;
     const { device_name, ip } = userInfoDto.usersConfigs;
 
-    const targetUser = await usersRepository.getUserByLoginOrEmail(
+    const targetUser = await this.usersRepository.getUserByLoginOrEmail(
       loginOrEmail
     );
 
@@ -35,7 +46,7 @@ class AuthService {
       );
     }
 
-    const isCorrect = await bcryptService.compareHash(
+    const isCorrect = await this.bcryptService.compareHash(
       password,
       targetUser.accountData.passHash
     );
@@ -54,14 +65,14 @@ class AuthService {
       );
     }
 
-    const deviceId = uuIdService.createRandomCode();
+    const deviceId = this.uuIdService.createRandomCode();
 
-    const tokenPair = jwtService.createJwtPair(
+    const tokenPair = this.jwtService.createJwtPair(
       targetUser._id.toString(),
       deviceId
     );
 
-    const { userId, exp, iat } = jwtService.decodeToken(
+    const { userId, exp, iat } = this.jwtService.decodeToken(
       tokenPair.refreshToken
     ) as JwtPayloadRefresh;
 
@@ -74,16 +85,17 @@ class AuthService {
       ip,
     };
 
-    await sessionsRepository.createSession(newSession);
+    await this.sessionsRepository.createSession(newSession);
 
     return tokenPair;
   }
 
   async logout(dto: RefreshTokensAndLogoutDto) {
-    const targetSession = await sessionsRepository.findByDeviceIdAndIssuedAt(
-      dto.issuedAt,
-      dto.deviceId
-    );
+    const targetSession =
+      await this.sessionsRepository.findByDeviceIdAndIssuedAt(
+        dto.issuedAt,
+        dto.deviceId
+      );
 
     if (!targetSession) {
       throw new ErrorWithStatusCode(
@@ -99,11 +111,11 @@ class AuthService {
       );
     }
 
-    await sessionsRepository.deleteSession(dto.userId, dto.deviceId);
+    await this.sessionsRepository.deleteSession(dto.userId, dto.deviceId);
   }
 
   async refreshTokens(dto: RefreshTokensAndLogoutDto): Promise<TokenPairType> {
-    const session = await sessionsRepository.findByDeviceIdAndIssuedAt(
+    const session = await this.sessionsRepository.findByDeviceIdAndIssuedAt(
       dto.issuedAt,
       dto.deviceId
     );
@@ -115,13 +127,13 @@ class AuthService {
       );
     }
 
-    const tokenPair = jwtService.createJwtPair(dto.userId, dto.deviceId);
+    const tokenPair = this.jwtService.createJwtPair(dto.userId, dto.deviceId);
 
-    const { exp, iat } = jwtService.decodeToken(
+    const { exp, iat } = this.jwtService.decodeToken(
       tokenPair.refreshToken
     ) as JwtPayloadRefresh;
 
-    await sessionsRepository.updateSessionIatAndExp(
+    await this.sessionsRepository.updateSessionIatAndExp(
       dto.userId,
       dto.deviceId,
       iat as number,
@@ -132,10 +144,10 @@ class AuthService {
   }
 
   async registerUser(user: UserInputModel) {
-    const createdId = await usersService.createNewUser(user, false);
-    const targetUser = await usersService.getUserById(createdId);
+    const createdId = await this.usersService.createNewUser(user, false);
+    const targetUser = await this.usersService.getUserById(createdId);
 
-    emailManager
+    this.emailManager
       .sendEmailForRegistration(
         targetUser.accountData.email,
         targetUser.emailConfirmation.confirmationCode
@@ -145,21 +157,23 @@ class AuthService {
 
   async recoverPassword(email: string) {
     let recoveryCode: string = "";
-    const user = await usersRepository.findUserByEmail(email);
+    const user = await this.usersRepository.findUserByEmail(email);
 
     if (!user) {
-      recoveryCode = uuIdService.createRandomCode();
+      recoveryCode = this.uuIdService.createRandomCode();
     } else {
       recoveryCode = user.passwordRecovery.recoveryCode;
     }
 
-    emailManager
+    this.emailManager
       .sendEmailForPasswordRecovery(email, recoveryCode)
       .catch((e) => console.log(e));
   }
 
   async confirmPasswordRecovery(newPassword: string, recoveryCode: string) {
-    const user = await usersRepository.findUserByRecoveryCode(recoveryCode);
+    const user = await this.usersRepository.findUserByRecoveryCode(
+      recoveryCode
+    );
 
     if (!user) {
       throw new ErrorWithStatusCode(
@@ -175,13 +189,15 @@ class AuthService {
       );
     }
 
-    const passHash = await bcryptService.createHasn(newPassword);
+    const passHash = await this.bcryptService.createHasn(newPassword);
 
-    await usersRepository.updatePasswordHash(user._id, passHash);
+    await this.usersRepository.updatePasswordHash(user._id, passHash);
   }
 
   async confirmRegistration(code: string): Promise<boolean> {
-    const targetUser = await usersRepository.getUserByConfirmationCode(code);
+    const targetUser = await this.usersRepository.getUserByConfirmationCode(
+      code
+    );
 
     if (!targetUser) {
       throw new ErrorWithStatusCode(
@@ -207,11 +223,11 @@ class AuthService {
       );
     }
 
-    return usersRepository.updateIsConfirmedStatus(targetUser._id, true);
+    return this.usersRepository.updateIsConfirmedStatus(targetUser._id, true);
   }
 
   async resendConfirmationCode(email: string) {
-    const user = await usersRepository.getUserByLoginOrEmail(email);
+    const user = await this.usersRepository.getUserByLoginOrEmail(email);
 
     if (!user) {
       throw new ErrorWithStatusCode(
@@ -229,13 +245,13 @@ class AuthService {
       );
     }
 
-    await usersRepository.updateConfirmationCodeAndExpirationDate(
+    await this.usersRepository.updateConfirmationCodeAndExpirationDate(
       user._id,
-      uuIdService.createRandomCode(),
-      dateFnsService.addToCurrentDate()
+      this.uuIdService.createRandomCode(),
+      this.dateFnsService.addToCurrentDate()
     );
 
-    const updatedUser = await usersRepository.getUserByLoginOrEmail(email);
+    const updatedUser = await this.usersRepository.getUserByLoginOrEmail(email);
 
     if (!updatedUser) {
       throw new ErrorWithStatusCode(
@@ -244,7 +260,7 @@ class AuthService {
       );
     }
 
-    emailManager
+    this.emailManager
       .sendEmailForRegistration(
         email,
         updatedUser.emailConfirmation.confirmationCode
@@ -266,7 +282,7 @@ class AuthService {
       return resultObject;
     }
 
-    const verifiedUser = jwtService.verifyAccessToken(accessToken);
+    const verifiedUser = this.jwtService.verifyAccessToken(accessToken);
 
     if (!verifiedUser) {
       console.log("not verified");
@@ -288,5 +304,3 @@ class AuthService {
     };
   }
 }
-
-export const authService = new AuthService();

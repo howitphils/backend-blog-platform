@@ -7,7 +7,7 @@ export interface JwtPayloadRefresh extends JwtPayload {
   deviceId: string;
 }
 
-class JwtService {
+export class JwtService {
   createAccessToken(payload: { userId: string }): string {
     return sign(payload, APP_CONFIG.JWT_SECRET_ACCESS, {
       expiresIn: `${APP_CONFIG.ACCESS_TOKEN_TTL}s`,
@@ -61,5 +61,3 @@ class JwtService {
     ) as JwtPayloadRefresh;
   }
 }
-
-export const jwtService = new JwtService();

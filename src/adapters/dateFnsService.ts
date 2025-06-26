@@ -1,6 +1,6 @@
 import { add, subSeconds } from "date-fns";
 
-class DateFnsService {
+export class DateFnsService {
   addToCurrentDate(hours?: number, minutes?: number) {
     return add(new Date(), {
       hours: hours || 2,
@@ -12,5 +12,3 @@ class DateFnsService {
     return subSeconds(new Date(), seconds);
   }
 }
-
-export const dateFnsService = new DateFnsService();

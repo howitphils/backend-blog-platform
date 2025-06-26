@@ -2,7 +2,7 @@ import { ObjectId, WithId } from "mongodb";
 import { UserDbType } from "../../../../types/users-types";
 import { usersCollection } from "../../mongodb";
 
-class UsersRepository {
+export class UsersRepository {
   // Создание нового юзера
   async createNewUser(user: UserDbType): Promise<ObjectId> {
     const createResult = await usersCollection.insertOne(user);
@@ -104,5 +104,3 @@ class UsersRepository {
     return result.matchedCount === 1;
   }
 }
-
-export const usersRepository = new UsersRepository();
