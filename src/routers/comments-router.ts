@@ -1,14 +1,18 @@
 import { Router } from "express";
 
 import { bodyValidationResult } from "../middlewares/validation-result";
-import { commentsController } from "./controllers/comments-controller";
 import { commentsBodyValidators } from "../middlewares/body-validations/comments-body-validators";
 import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 import { validateParamsId } from "../middlewares/validate-paramsId";
+import { commentsController } from "../composition-root";
 
 export const commentsRouter = Router();
 
-commentsRouter.get("/:id", validateParamsId, commentsController.getCommentById);
+commentsRouter.get(
+  "/:id",
+  validateParamsId,
+  commentsController.getCommentById.bind(commentsController)
+);
 
 commentsRouter.put(
   "/:id",
@@ -16,12 +20,12 @@ commentsRouter.put(
   validateParamsId,
   commentsBodyValidators,
   bodyValidationResult,
-  commentsController.updateComment
+  commentsController.updateComment.bind(commentsController)
 );
 
 commentsRouter.delete(
   "/:id",
   jwtAuthGuard,
   validateParamsId,
-  commentsController.deleteComment
+  commentsController.deleteComment.bind(commentsController)
 );

@@ -7,7 +7,7 @@ import {
 import { postsCollection } from "../../mongodb";
 import { PaginationType } from "../../../../types/common-types";
 
-class PostsQueryRepository {
+export class PostsQueryRepository {
   // Получение всех постов с учетом query параметров
   async getAllPosts(
     filters: PostsMapedQueryType
@@ -87,5 +87,3 @@ class PostsQueryRepository {
     };
   }
 }
-
-export const postsQueryRepository = new PostsQueryRepository();

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { APP_CONFIG } from "../../settings";
 import { HttpStatuses } from "../../types/http-statuses";
-import { jwtService } from "../../adapters/jwtService";
+import { jwtService } from "../../composition-root";
 
 export const refreshTokenValidator = (
   req: Request,

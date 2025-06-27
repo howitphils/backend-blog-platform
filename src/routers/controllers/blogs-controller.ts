@@ -1,9 +1,5 @@
 import { Response } from "express";
-import { blogsService } from "../../services/blogs-service";
-import { blogsQueryRepository } from "../../db/mongodb/repositories/blogs-repository/blogs-query-repositoy";
-import { postsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
 import { mapBlogsQueryParams, mapPostsQueryParams } from "./utils";
-import { postsService } from "../../services/posts-service";
 
 import {
   BlogInputModel,
@@ -25,15 +21,26 @@ import {
 } from "../../types/requests-types";
 import { PaginationType, ParamsId } from "../../types/common-types";
 import { HttpStatuses } from "../../types/http-statuses";
+import { BlogsQueryRepository } from "../../db/mongodb/repositories/blogs-repository/blogs-query-repositoy";
+import { BlogsService } from "../../services/blogs-service";
+import { PostsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
+import { PostsService } from "../../services/posts-service";
 
-class BlogsController {
+export class BlogsController {
+  constructor(
+    public blogsQueryRepository: BlogsQueryRepository,
+    public blogsService: BlogsService,
+    public postsQueryRepository: PostsQueryRepository,
+    public postsService: PostsService
+  ) {}
+
   async getBlogs(
     req: RequestWithQuery<BlogsRequestQueryType>,
     res: Response<PaginationType<BlogViewModel>>
   ) {
     const mapedQueryParams = mapBlogsQueryParams(req.query);
 
-    const blogs = await blogsQueryRepository.getAllBlogs(mapedQueryParams);
+    const blogs = await this.blogsQueryRepository.getAllBlogs(mapedQueryParams);
 
     res.status(HttpStatuses.Success).json(blogs);
   }
@@ -42,12 +49,12 @@ class BlogsController {
     req: RequestWithParamsAndQuery<ParamsId, PostsRequestQueryType>,
     res: Response<PaginationType<PostViewModel>>
   ) {
-    await blogsService.getBlogById(req.params.id);
+    await this.blogsService.getBlogById(req.params.id);
 
     const mapedQueryParams = mapPostsQueryParams(req.query);
     const convertedId = req.params.id.toString();
 
-    const posts = await postsQueryRepository.getAllPostsByBlogId(
+    const posts = await this.postsQueryRepository.getAllPostsByBlogId(
       convertedId,
       mapedQueryParams
     );
@@ -59,9 +66,9 @@ class BlogsController {
     req: RequestWithBody<BlogInputModel>,
     res: Response<BlogViewModel>
   ) {
-    const createdBlogId = await blogsService.createNewBlog(req.body);
+    const createdBlogId = await this.blogsService.createNewBlog(req.body);
 
-    const newBlog = await blogsQueryRepository.getBlogById(createdBlogId);
+    const newBlog = await this.blogsQueryRepository.getBlogById(createdBlogId);
 
     if (!newBlog) {
       res.sendStatus(HttpStatuses.NotFound);
@@ -82,9 +89,9 @@ class BlogsController {
       title: req.body.title,
     };
 
-    const newPostId = await postsService.createNewPost(postInputDto);
+    const newPostId = await this.postsService.createNewPost(postInputDto);
 
-    const newPost = await postsQueryRepository.getPostById(newPostId);
+    const newPost = await this.postsQueryRepository.getPostById(newPostId);
 
     if (!newPost) {
       res.sendStatus(HttpStatuses.NotFound);
@@ -98,7 +105,9 @@ class BlogsController {
     req: RequestWithParams<ParamsId>,
     res: Response<BlogViewModel>
   ) {
-    const targetBlog = await blogsQueryRepository.getBlogById(req.params.id);
+    const targetBlog = await this.blogsQueryRepository.getBlogById(
+      req.params.id
+    );
 
     if (!targetBlog) {
       res.sendStatus(HttpStatuses.NotFound);
@@ -112,12 +121,12 @@ class BlogsController {
     req: RequestWithParamsAndBody<ParamsId, BlogInputModel>,
     res: Response
   ) {
-    await blogsService.updateBlog(req.params.id, req.body);
+    await this.blogsService.updateBlog(req.params.id, req.body);
     res.sendStatus(HttpStatuses.NoContent);
   }
 
   async deleteBlog(req: RequestWithParams<ParamsId>, res: Response) {
-    const deleteResult = await blogsService.deleteBlog(req.params.id);
+    const deleteResult = await this.blogsService.deleteBlog(req.params.id);
 
     if (!deleteResult) {
       res.sendStatus(HttpStatuses.NotFound);
@@ -127,5 +136,3 @@ class BlogsController {
     res.sendStatus(HttpStatuses.NoContent);
   }
 }
-
-export const blogsController = new BlogsController();

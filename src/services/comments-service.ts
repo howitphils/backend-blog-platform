@@ -6,16 +6,22 @@ import {
   DeleteCommentDto,
   UpdateCommentDto,
 } from "../types/comments-types";
-import { commentsRepository } from "../db/mongodb/repositories/comments-repository/comments-db-repository";
-import { postsService } from "./posts-service";
-import { usersService } from "./users-service";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
+import { PostsService } from "./posts-service";
+import { CommentsRepository } from "../db/mongodb/repositories/comments-repository/comments-db-repository";
+import { UsersService } from "./users-service";
 
-class CommentsService {
+export class CommentsService {
+  constructor(
+    public postsService: PostsService,
+    public commentsRepository: CommentsRepository,
+    public usersService: UsersService
+  ) {}
+
   async createNewComment(
     dto: CreateCommentDto
   ): Promise<ResultObject<ObjectId | null>> {
-    const targetPost = await postsService.getPostById(dto.postId);
+    const targetPost = await this.postsService.getPostById(dto.postId);
 
     if (!targetPost) {
       return {
@@ -26,7 +32,9 @@ class CommentsService {
       };
     }
 
-    const targetUser = await usersService.getUserById(new ObjectId(dto.userId));
+    const targetUser = await this.usersService.getUserById(
+      new ObjectId(dto.userId)
+    );
     if (!targetUser) {
       return {
         status: ResultStatus.NotFound,
@@ -46,7 +54,9 @@ class CommentsService {
       postId: dto.postId.toString(),
     };
 
-    const newCommentId = await commentsRepository.createComment(newComment);
+    const newCommentId = await this.commentsRepository.createComment(
+      newComment
+    );
 
     return {
       status: ResultStatus.Success,
@@ -58,7 +68,7 @@ class CommentsService {
   async getCommentById(
     id: ObjectId
   ): Promise<ResultObject<CommentDbType | null>> {
-    const comment = await commentsRepository.getCommentById(id);
+    const comment = await this.commentsRepository.getCommentById(id);
 
     if (!comment) {
       return {
@@ -79,7 +89,7 @@ class CommentsService {
   async updateComment(
     dto: UpdateCommentDto
   ): Promise<ResultObject<boolean | null>> {
-    const targetComment = await commentsRepository.getCommentById(
+    const targetComment = await this.commentsRepository.getCommentById(
       dto.commentId
     );
 
@@ -101,7 +111,7 @@ class CommentsService {
       };
     }
 
-    await commentsRepository.updateComment(dto.commentId, dto.commentBody);
+    await this.commentsRepository.updateComment(dto.commentId, dto.commentBody);
 
     return {
       status: ResultStatus.Success,
@@ -113,7 +123,7 @@ class CommentsService {
   async deleteComment(
     dto: DeleteCommentDto
   ): Promise<ResultObject<boolean | null>> {
-    const targetComment = await commentsRepository.getCommentById(
+    const targetComment = await this.commentsRepository.getCommentById(
       dto.commentId
     );
 
@@ -135,7 +145,7 @@ class CommentsService {
       };
     }
 
-    await commentsRepository.deleteComment(dto.commentId);
+    await this.commentsRepository.deleteComment(dto.commentId);
 
     return {
       status: ResultStatus.Success,
@@ -144,5 +154,3 @@ class CommentsService {
     };
   }
 }
-
-export const commentsService = new CommentsService();

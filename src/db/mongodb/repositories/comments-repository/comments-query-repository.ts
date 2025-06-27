@@ -7,7 +7,7 @@ import {
 } from "../../../../types/comments-types";
 import { PaginationType } from "../../../../types/common-types";
 
-class CommentsQueryRepository {
+export class CommentsQueryRepository {
   // Получение всех комментариев с учетом query параметров
   async getAllCommentsForPost(
     filters: CommentsMapedQueryType,
@@ -52,5 +52,3 @@ class CommentsQueryRepository {
     };
   }
 }
-
-export const commentsQueryRepository = new CommentsQueryRepository();

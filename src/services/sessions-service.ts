@@ -1,16 +1,18 @@
-import { sessionsRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
+import { SessionRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { SessionDbType } from "../types/sessions-types";
 
-class SessionService {
+export class SessionService {
+  constructor(public sessionsRepository: SessionRepository) {}
+
   async getAllUsersSessions(userId: string): Promise<SessionDbType[]> {
-    return sessionsRepository.findAllUsersSessions(userId);
+    return this.sessionsRepository.findAllUsersSessions(userId);
   }
 
   async deleteAllSessions(userId: string, deviceId: string): Promise<void> {
-    await sessionsRepository.deleteAllSessions(userId, deviceId);
-    const count = await sessionsRepository.findAllUsersSessions(userId);
+    await this.sessionsRepository.deleteAllSessions(userId, deviceId);
+    const count = await this.sessionsRepository.findAllUsersSessions(userId);
 
     if (count.length !== 1) {
       throw new ErrorWithStatusCode(
@@ -21,7 +23,9 @@ class SessionService {
   }
 
   async deleteSession(userId: string, deviceId: string): Promise<void> {
-    const targetSession = await sessionsRepository.findByDeviceId(deviceId);
+    const targetSession = await this.sessionsRepository.findByDeviceId(
+      deviceId
+    );
 
     if (!targetSession) {
       throw new ErrorWithStatusCode(
@@ -34,8 +38,6 @@ class SessionService {
       throw new ErrorWithStatusCode("Forbidden action", HttpStatuses.Forbidden);
     }
 
-    sessionsRepository.deleteSession(userId, deviceId);
+    this.sessionsRepository.deleteSession(userId, deviceId);
   }
 }
-
-export const sessionsService = new SessionService();

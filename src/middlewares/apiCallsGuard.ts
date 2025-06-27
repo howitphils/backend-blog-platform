@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { apiCallsRepository } from "../db/mongodb/repositories/apiCalls-repository";
-import { dateFnsService } from "../adapters/dateFnsService";
 import { HttpStatuses } from "../types/http-statuses";
 import { APP_CONFIG } from "../settings";
+import { apiCallsRepository, dateFnsService } from "../composition-root";
 
 export const apiCallsGuard = async (
   req: Request,

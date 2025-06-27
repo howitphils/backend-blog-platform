@@ -2,14 +2,14 @@ import { Router } from "express";
 
 import { authGuard } from "../middlewares/auth/basic-auth-validator";
 import { validateParamsId } from "../middlewares/validate-paramsId";
-import { usersController } from "./controllers/users-controller";
 import { userBodyValidators } from "../middlewares/body-validations/users-body-validators";
 import { bodyValidationResult } from "../middlewares/validation-result";
+import { usersController } from "../composition-root";
 
 export const usersRouter = Router();
 
 // Получение юзеров
-usersRouter.get("/", authGuard, usersController.getUsers);
+usersRouter.get("/", authGuard, usersController.getUsers.bind(usersController));
 
 // Создание юзера
 usersRouter.post(
@@ -17,7 +17,7 @@ usersRouter.post(
   authGuard,
   userBodyValidators,
   bodyValidationResult,
-  usersController.createUser
+  usersController.createUser.bind(usersController)
 );
 
 // Удаление юзера
@@ -25,5 +25,5 @@ usersRouter.delete(
   "/:id",
   authGuard,
   validateParamsId,
-  usersController.deleteUser
+  usersController.deleteUser.bind(usersController)
 );

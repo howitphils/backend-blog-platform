@@ -5,7 +5,7 @@ import {
   SessionViewModel,
 } from "../../../../types/sessions-types";
 
-class SessionQueryRepository {
+export class SessionsQueryRepository {
   async getAllUsersSessions(userId: string): Promise<SessionViewModel[]> {
     const sessions = await sessionsCollection.find({ userId }).toArray();
 
@@ -22,5 +22,3 @@ class SessionQueryRepository {
     };
   }
 }
-
-export const sessionsQueryRepository = new SessionQueryRepository();

@@ -3,21 +3,29 @@ import { postsBodyValidator } from "../middlewares/body-validations/posts-body-v
 import { Router } from "express";
 
 import { authGuard } from "../middlewares/auth/basic-auth-validator";
-import { postsController } from "./controllers/posts-controller";
 import { validateParamsId } from "../middlewares/validate-paramsId";
 import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 import { commentsBodyValidators } from "../middlewares/body-validations/comments-body-validators";
+import { postsController } from "../composition-root";
 
 export const postsRouter = Router();
 
 // Получение постов
-postsRouter.get("/", postsController.getPosts);
+postsRouter.get("/", postsController.getPosts.bind(postsController));
 
 // Получение поста по айди
-postsRouter.get("/:id", validateParamsId, postsController.getPostById);
+postsRouter.get(
+  "/:id",
+  validateParamsId,
+  postsController.getPostById.bind(postsController)
+);
 
 // Получение комментариев по айди поста
-postsRouter.get("/:id/comments", validateParamsId, postsController.getComments);
+postsRouter.get(
+  "/:id/comments",
+  validateParamsId,
+  postsController.getComments.bind(postsController)
+);
 
 // Создание комментария к посту
 postsRouter.post(
@@ -26,7 +34,7 @@ postsRouter.post(
   validateParamsId,
   commentsBodyValidators,
   bodyValidationResult,
-  postsController.createComment
+  postsController.createComment.bind(postsController)
 );
 
 // Создание поста
@@ -35,7 +43,7 @@ postsRouter.post(
   authGuard,
   postsBodyValidator,
   bodyValidationResult,
-  postsController.createPost
+  postsController.createPost.bind(postsController)
 );
 
 // Обновление поста
@@ -45,7 +53,7 @@ postsRouter.put(
   validateParamsId,
   postsBodyValidator,
   bodyValidationResult,
-  postsController.updatePost
+  postsController.updatePost.bind(postsController)
 );
 
 // Удаление поста
@@ -53,5 +61,5 @@ postsRouter.delete(
   "/:id",
   authGuard,
   validateParamsId,
-  postsController.deletePost
+  postsController.deletePost.bind(postsController)
 );

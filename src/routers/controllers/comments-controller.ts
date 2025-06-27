@@ -4,26 +4,31 @@ import {
 } from "./../../types/requests-types";
 import { Response } from "express";
 import { UserId } from "../../types/users-types";
-import { commentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
 import {
   CommentInputModel,
   CommentViewModel,
   DeleteCommentDto,
   UpdateCommentDto,
 } from "../../types/comments-types";
-import { commentsService } from "../../services/comments-service";
 import { RequestWithParams } from "../../types/requests-types";
 import { ParamsId } from "../../types/common-types";
 import { ResultStatus } from "../../types/resultObject-types";
 import { HttpStatuses } from "../../types/http-statuses";
 import { convertToHttpCode } from "./utils";
+import { CommentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
+import { CommentsService } from "../../services/comments-service";
 
-class CommentsController {
+export class CommentsController {
+  constructor(
+    public commentsQueryRepository: CommentsQueryRepository,
+    public commentsService: CommentsService
+  ) {}
+
   async getCommentById(
     req: RequestWithParams<ParamsId>,
     res: Response<CommentViewModel>
   ) {
-    const targetComment = await commentsQueryRepository.getCommentById(
+    const targetComment = await this.commentsQueryRepository.getCommentById(
       req.params.id
     );
     if (!targetComment) {
@@ -52,7 +57,9 @@ class CommentsController {
       commentBody,
     };
 
-    const updateResult = await commentsService.updateComment(updateCommentDto);
+    const updateResult = await this.commentsService.updateComment(
+      updateCommentDto
+    );
 
     if (updateResult.status !== ResultStatus.Success) {
       res
@@ -81,7 +88,9 @@ class CommentsController {
       commentId,
     };
 
-    const deleteResult = await commentsService.deleteComment(deleteCommentDto);
+    const deleteResult = await this.commentsService.deleteComment(
+      deleteCommentDto
+    );
 
     if (deleteResult.status !== ResultStatus.Success) {
       res
@@ -93,5 +102,3 @@ class CommentsController {
     res.sendStatus(HttpStatuses.NoContent);
   }
 }
-
-export const commentsController = new CommentsController();

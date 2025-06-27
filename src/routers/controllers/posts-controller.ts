@@ -9,16 +9,12 @@ import {
   mapCommentsQueryParams,
   mapPostsQueryParams,
 } from "./utils";
-import { postsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
-import { postsService } from "../../services/posts-service";
-import { commentsService } from "../../services/comments-service";
 import {
   CommentInputModel,
   CommentsRequestQueryType,
   CommentViewModel,
   CreateCommentDto,
 } from "../../types/comments-types";
-import { commentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
 import {
   RequestWithBody,
   RequestWithParams,
@@ -30,15 +26,26 @@ import { PaginationType, ParamsId } from "../../types/common-types";
 import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
 import { ExtensionType } from "../../types/resultObject-types";
+import { PostsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
+import { PostsService } from "../../services/posts-service";
+import { CommentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
+import { CommentsService } from "../../services/comments-service";
 
-class PostsController {
+export class PostsController {
+  constructor(
+    public postsQueryRepository: PostsQueryRepository,
+    public postsService: PostsService,
+    public commentsQueryRepository: CommentsQueryRepository,
+    public commentsService: CommentsService
+  ) {}
+
   async getPosts(
     req: RequestWithQuery<PostsRequestQueryType>,
     res: Response<PaginationType<PostViewModel>>
   ) {
     const mapedQueryParams = mapPostsQueryParams(req.query);
 
-    const posts = await postsQueryRepository.getAllPosts(mapedQueryParams);
+    const posts = await this.postsQueryRepository.getAllPosts(mapedQueryParams);
 
     res.status(HttpStatuses.Success).json(posts);
   }
@@ -47,12 +54,12 @@ class PostsController {
     req: RequestWithParamsAndQuery<ParamsId, CommentsRequestQueryType>,
     res: Response<PaginationType<CommentViewModel>>
   ) {
-    await postsService.getPostById(req.params.id);
+    await this.postsService.getPostById(req.params.id);
 
     const mapedQueryParams = mapCommentsQueryParams(req.query);
     const convertedPostId = req.params.id.toString();
 
-    const comments = await commentsQueryRepository.getAllCommentsForPost(
+    const comments = await this.commentsQueryRepository.getAllCommentsForPost(
       mapedQueryParams,
       convertedPostId
     );
@@ -64,9 +71,9 @@ class PostsController {
     req: RequestWithBody<PostInputModel>,
     res: Response<PostViewModel>
   ) {
-    const createdId = await postsService.createNewPost(req.body);
+    const createdId = await this.postsService.createNewPost(req.body);
 
-    const newPost = await postsQueryRepository.getPostById(createdId);
+    const newPost = await this.postsQueryRepository.getPostById(createdId);
 
     if (!newPost) {
       res.sendStatus(HttpStatuses.NotFound);
@@ -94,7 +101,7 @@ class PostsController {
       commentBody,
     };
 
-    const createResult = await commentsService.createNewComment(
+    const createResult = await this.commentsService.createNewComment(
       createCommentDto
     );
 
@@ -105,7 +112,7 @@ class PostsController {
       return;
     }
 
-    const newComment = await commentsQueryRepository.getCommentById(
+    const newComment = await this.commentsQueryRepository.getCommentById(
       createResult.data as ObjectId
     );
 
@@ -121,7 +128,9 @@ class PostsController {
     req: RequestWithParams<ParamsId>,
     res: Response<PostViewModel>
   ) {
-    const targetPost = await postsQueryRepository.getPostById(req.params.id);
+    const targetPost = await this.postsQueryRepository.getPostById(
+      req.params.id
+    );
 
     if (!targetPost) {
       res.sendStatus(HttpStatuses.NotFound);
@@ -135,14 +144,12 @@ class PostsController {
     req: RequestWithParamsAndBody<ParamsId, PostInputModel>,
     res: Response
   ) {
-    await postsService.updatePost(req.params.id, req.body);
+    await this.postsService.updatePost(req.params.id, req.body);
     res.sendStatus(HttpStatuses.NoContent);
   }
 
   async deletePost(req: RequestWithParams<ParamsId>, res: Response) {
-    await postsService.deletePost(req.params.id);
+    await this.postsService.deletePost(req.params.id);
     res.sendStatus(HttpStatuses.NoContent);
   }
 }
-
-export const postsController = new PostsController();

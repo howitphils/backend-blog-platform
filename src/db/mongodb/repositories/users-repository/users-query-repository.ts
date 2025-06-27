@@ -8,7 +8,7 @@ import {
 import { ObjectId, WithId } from "mongodb";
 import { PaginationType } from "../../../../types/common-types";
 
-class UsersQueryRepository {
+export class UsersQueryRepository {
   // Получение всех юзеров с учетом query параметров
   async getAllUsers(
     filters: UsersMapedQueryType
@@ -97,5 +97,3 @@ class UsersQueryRepository {
     };
   }
 }
-
-export const usersQueryRepository = new UsersQueryRepository();

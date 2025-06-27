@@ -1,7 +1,6 @@
 import { Router } from "express";
 
 import { bodyValidationResult } from "../middlewares/validation-result";
-import { authController } from "./controllers/auth-controller";
 import { loginBodyValidators } from "../middlewares/body-validations/login-body-validators";
 import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 import { userBodyValidators } from "../middlewares/body-validations/users-body-validators";
@@ -11,6 +10,7 @@ import { refreshTokenValidator } from "../middlewares/auth/cookie-auth-validator
 import { apiCallsGuard } from "../middlewares/apiCallsGuard";
 import { confrimPasswordRecoveryValidators } from "../middlewares/body-validations/confirm-recover-password-body-validators";
 import { APP_CONFIG } from "../settings";
+import { authController } from "../composition-root";
 
 export const authRouter = Router();
 
@@ -19,7 +19,7 @@ authRouter.post(
   apiCallsGuard,
   loginBodyValidators,
   bodyValidationResult,
-  authController.loginUser
+  authController.loginUser.bind(authController)
 );
 
 authRouter.post(
@@ -27,7 +27,7 @@ authRouter.post(
   apiCallsGuard,
   resendEmailBodyValidators,
   bodyValidationResult,
-  authController.recoverPassword
+  authController.recoverPassword.bind(authController)
 );
 
 authRouter.post(
@@ -35,25 +35,25 @@ authRouter.post(
   apiCallsGuard,
   confrimPasswordRecoveryValidators,
   bodyValidationResult,
-  authController.confirmPasswordRecovery
+  authController.confirmPasswordRecovery.bind(authController)
 );
 
 authRouter.post(
   APP_CONFIG.ENDPOINT_PATHS.AUTH.LOGOUT,
   refreshTokenValidator,
-  authController.logout
+  authController.logout.bind(authController)
 );
 
 authRouter.post(
   APP_CONFIG.ENDPOINT_PATHS.AUTH.REFRESH_TOKEN,
   refreshTokenValidator,
-  authController.refreshTokens
+  authController.refreshTokens.bind(authController)
 );
 
 authRouter.get(
   APP_CONFIG.ENDPOINT_PATHS.AUTH.ME,
   jwtAuthGuard,
-  authController.getMyInfo
+  authController.getMyInfo.bind(authController)
 );
 
 authRouter.post(
@@ -61,7 +61,7 @@ authRouter.post(
   apiCallsGuard,
   userBodyValidators,
   bodyValidationResult,
-  authController.registerUser
+  authController.registerUser.bind(authController)
 );
 
 authRouter.post(
@@ -69,7 +69,7 @@ authRouter.post(
   apiCallsGuard,
   confirmationCodeBodyValidators,
   bodyValidationResult,
-  authController.confirmRegistration
+  authController.confirmRegistration.bind(authController)
 );
 
 authRouter.post(
@@ -77,5 +77,5 @@ authRouter.post(
   apiCallsGuard,
   resendEmailBodyValidators,
   bodyValidationResult,
-  authController.resendConfirmation
+  authController.resendConfirmation.bind(authController)
 );

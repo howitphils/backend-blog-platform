@@ -1,14 +1,21 @@
 import { Request, Response } from "express";
 import { LoginInputModel } from "../../types/login-types";
 import { RequestWithBody } from "../../types/requests-types";
-import { usersQueryRepository } from "../../db/mongodb/repositories/users-repository/users-query-repository";
 import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
-import { authService } from "../../services/auth-service";
 import { MeModel, UserInputModel } from "../../types/users-types";
 import { APP_CONFIG } from "../../settings";
+import { AuthService } from "../../services/auth-service";
+import { UsersQueryRepository } from "../../db/mongodb/repositories/users-repository/users-query-repository";
 
-class AuthController {
+// Перевести на this
+
+export class AuthController {
+  constructor(
+    public authService: AuthService,
+    public usersQueryRepository: UsersQueryRepository
+  ) {}
+
   async loginUser(
     req: RequestWithBody<LoginInputModel>,
     res: Response<{ accessToken: string }>
@@ -17,7 +24,7 @@ class AuthController {
     const ip = req.ip || "unknown";
     const device_name = req.headers["user-agent"] || "default_device_name";
 
-    const { accessToken, refreshToken } = await authService.loginUser({
+    const { accessToken, refreshToken } = await this.authService.loginUser({
       usersCredentials: {
         loginOrEmail,
         password,
@@ -49,7 +56,7 @@ class AuthController {
       return;
     }
 
-    const { accessToken, refreshToken } = await authService.refreshTokens({
+    const { accessToken, refreshToken } = await this.authService.refreshTokens({
       userId,
       deviceId,
       issuedAt,
@@ -76,7 +83,7 @@ class AuthController {
       return;
     }
 
-    await authService.logout({ userId, deviceId, issuedAt });
+    await this.authService.logout({ userId, deviceId, issuedAt });
 
     // httpOnly, path, secure должны быть такими же как при создании
     res.clearCookie(APP_CONFIG.REFRESH_TOKEN_COOKIE_NAME, {
@@ -94,7 +101,9 @@ class AuthController {
       return;
     }
 
-    const myInfo = await usersQueryRepository.getMyInfo(new ObjectId(userId));
+    const myInfo = await this.usersQueryRepository.getMyInfo(
+      new ObjectId(userId)
+    );
 
     if (!myInfo) {
       res.sendStatus(HttpStatuses.NotFound);
@@ -105,7 +114,7 @@ class AuthController {
   }
 
   async registerUser(req: RequestWithBody<UserInputModel>, res: Response) {
-    await authService.registerUser({
+    await this.authService.registerUser({
       email: req.body.email,
       login: req.body.login,
       password: req.body.password,
@@ -120,7 +129,7 @@ class AuthController {
   ) {
     const code = req.body.code;
 
-    await authService.confirmRegistration(code);
+    await this.authService.confirmRegistration(code);
 
     res.sendStatus(HttpStatuses.NoContent);
   }
@@ -131,7 +140,7 @@ class AuthController {
   ) {
     const email = req.body.email;
 
-    await authService.resendConfirmationCode(email);
+    await this.authService.resendConfirmationCode(email);
 
     res.sendStatus(HttpStatuses.NoContent);
   }
@@ -142,7 +151,7 @@ class AuthController {
   ) {
     const email = req.body.email;
 
-    await authService.recoverPassword(email);
+    await this.authService.recoverPassword(email);
 
     res.sendStatus(HttpStatuses.NoContent);
   }
@@ -153,10 +162,8 @@ class AuthController {
   ) {
     const { newPassword, recoveryCode } = req.body;
 
-    await authService.confirmPasswordRecovery(newPassword, recoveryCode);
+    await this.authService.confirmPasswordRecovery(newPassword, recoveryCode);
 
     res.sendStatus(HttpStatuses.NoContent);
   }
 }
-
-export const authController = new AuthController();

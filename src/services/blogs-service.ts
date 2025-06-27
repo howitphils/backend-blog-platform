@@ -1,11 +1,13 @@
 import { ObjectId, WithId } from "mongodb";
 
-import { blogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
 import { BlogDbType, BlogInputModel } from "../types/blogs-types";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
+import { BlogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
 
-class BlogsService {
+export class BlogsService {
+  constructor(public blogsRepository: BlogsRepository) {}
+
   async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {
     const newBlog: BlogDbType = {
       name: blog.name,
@@ -15,11 +17,11 @@ class BlogsService {
       isMembership: false,
     };
 
-    return blogsRepository.createNewBlog(newBlog);
+    return this.blogsRepository.createNewBlog(newBlog);
   }
 
   async getBlogById(id: ObjectId): Promise<WithId<BlogDbType>> {
-    const blog = await blogsRepository.getBlogById(id);
+    const blog = await this.blogsRepository.getBlogById(id);
 
     if (!blog) {
       throw new ErrorWithStatusCode(
@@ -35,7 +37,7 @@ class BlogsService {
     id: ObjectId,
     updatedBlog: BlogInputModel
   ): Promise<boolean> {
-    const targetBlog = await blogsRepository.getBlogById(id);
+    const targetBlog = await this.blogsRepository.getBlogById(id);
 
     if (!targetBlog) {
       throw new ErrorWithStatusCode(
@@ -44,11 +46,11 @@ class BlogsService {
       );
     }
 
-    return blogsRepository.updateBlog(id, updatedBlog);
+    return this.blogsRepository.updateBlog(id, updatedBlog);
   }
 
   async deleteBlog(id: ObjectId): Promise<boolean> {
-    const targetBlog = await blogsRepository.getBlogById(id);
+    const targetBlog = await this.blogsRepository.getBlogById(id);
 
     if (!targetBlog) {
       throw new ErrorWithStatusCode(
@@ -57,8 +59,6 @@ class BlogsService {
       );
     }
 
-    return blogsRepository.deleteBlog(id);
+    return this.blogsRepository.deleteBlog(id);
   }
 }
-
-export const blogsService = new BlogsService();

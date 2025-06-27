@@ -7,7 +7,7 @@ import { BlogDbType } from "../../../../types/blogs-types";
 import { blogsCollection } from "../../mongodb";
 import { PaginationType } from "../../../../types/common-types";
 
-class BlogsQueryRepository {
+export class BlogsQueryRepository {
   async getAllBlogs(
     filters: BlogsMapedQueryType
   ): Promise<PaginationType<BlogViewModel>> {
@@ -65,5 +65,3 @@ class BlogsQueryRepository {
     };
   }
 }
-
-export const blogsQueryRepository = new BlogsQueryRepository();

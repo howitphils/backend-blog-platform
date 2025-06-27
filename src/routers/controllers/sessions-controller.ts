@@ -1,15 +1,22 @@
 import { Request, Response } from "express";
-import { sessionsService } from "../../services/sessions-service";
 import { HttpStatuses } from "../../types/http-statuses";
 import { RequestWithParams } from "../../types/requests-types";
-import { sessionsQueryRepository } from "../../db/mongodb/repositories/sessions-repository/sessions-query-repository";
 import { ErrorWithStatusCode } from "../../middlewares/error-handler";
+import { SessionsQueryRepository } from "../../db/mongodb/repositories/sessions-repository/sessions-query-repository";
+import { SessionService } from "../../services/sessions-service";
 
-class SessionController {
+export class SessionsController {
+  constructor(
+    public sessionsQueryRepository: SessionsQueryRepository,
+    public sessionsService: SessionService
+  ) {}
+
   async getAllSessions(req: Request, res: Response) {
     const userId = req.user.id;
 
-    const sessions = await sessionsQueryRepository.getAllUsersSessions(userId);
+    const sessions = await this.sessionsQueryRepository.getAllUsersSessions(
+      userId
+    );
 
     res.status(HttpStatuses.Success).json(sessions);
   }
@@ -21,7 +28,7 @@ class SessionController {
       throw new Error("deviceId is not found in req.user");
     }
 
-    await sessionsService.deleteAllSessions(userId, deviceId);
+    await this.sessionsService.deleteAllSessions(userId, deviceId);
 
     res.sendStatus(HttpStatuses.NoContent);
   }
@@ -40,10 +47,8 @@ class SessionController {
       );
     }
 
-    await sessionsService.deleteSession(userId, deviceId);
+    await this.sessionsService.deleteSession(userId, deviceId);
 
     res.sendStatus(HttpStatuses.NoContent);
   }
 }
-
-export const sessionsController = new SessionController();

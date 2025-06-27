@@ -1,22 +1,29 @@
 import { ObjectId, WithId } from "mongodb";
 import { UserDbType, UserInputModel } from "../types/users-types";
-import { usersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
-import { bcryptService } from "../adapters/bcryptService";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { createErrorsObject } from "../routers/controllers/utils";
-import { uuIdService } from "../adapters/uuIdService";
-import { dateFnsService } from "../adapters/dateFnsService";
 import { APP_CONFIG } from "../settings";
+import { UsersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
+import { BcryptService } from "../adapters/bcryptService";
+import { UuidService } from "../adapters/uuIdService";
+import { DateFnsService } from "../adapters/dateFnsService";
 
 export class UsersService {
+  constructor(
+    public usersRepository: UsersRepository,
+    public bcryptService: BcryptService,
+    public uuIdService: UuidService,
+    public dateFnsService: DateFnsService
+  ) {}
+
   async createNewUser(
     user: UserInputModel,
     isAdmin: boolean
   ): Promise<ObjectId> {
     const { login, email, password } = user;
 
-    const existingUser = await usersRepository.getUserByCredentials(
+    const existingUser = await this.usersRepository.getUserByCredentials(
       login,
       email
     );
@@ -32,10 +39,10 @@ export class UsersService {
       );
     }
 
-    const passHash = await bcryptService.createHasn(password);
+    const passHash = await this.bcryptService.createHasn(password);
 
-    const confirmationCode = uuIdService.createRandomCode();
-    const recoveryCode = uuIdService.createRandomCode();
+    const confirmationCode = this.uuIdService.createRandomCode();
+    const recoveryCode = this.uuIdService.createRandomCode();
 
     const newUser: UserDbType = {
       accountData: {
@@ -46,20 +53,20 @@ export class UsersService {
       },
       emailConfirmation: {
         confirmationCode,
-        expirationDate: dateFnsService.addToCurrentDate(),
+        expirationDate: this.dateFnsService.addToCurrentDate(),
         isConfirmed: isAdmin ? true : false,
       },
       passwordRecovery: {
         recoveryCode,
-        expirationDate: dateFnsService.addToCurrentDate(),
+        expirationDate: this.dateFnsService.addToCurrentDate(),
       },
     };
 
-    return usersRepository.createNewUser(newUser);
+    return this.usersRepository.createNewUser(newUser);
   }
 
   async getUserById(id: ObjectId): Promise<WithId<UserDbType>> {
-    const user = await usersRepository.getUserById(id);
+    const user = await this.usersRepository.getUserById(id);
     if (!user) {
       throw new ErrorWithStatusCode(
         APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND,
@@ -70,7 +77,7 @@ export class UsersService {
   }
 
   async deleteUser(id: ObjectId): Promise<boolean> {
-    const targetUser = await usersRepository.getUserById(id);
+    const targetUser = await this.usersRepository.getUserById(id);
 
     if (!targetUser) {
       throw new ErrorWithStatusCode(
@@ -79,6 +86,6 @@ export class UsersService {
       );
     }
 
-    return usersRepository.deleteUser(id);
+    return this.usersRepository.deleteUser(id);
   }
 }

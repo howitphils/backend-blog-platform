@@ -1,24 +1,24 @@
 import { Router } from "express";
 
 import { refreshTokenValidator } from "../middlewares/auth/cookie-auth-validator";
-import { sessionsController } from "./controllers/sessions-controller";
+import { sessionsController } from "../composition-root";
 
 export const sessionsRouter = Router();
 
 sessionsRouter.get(
   "/devices",
   refreshTokenValidator,
-  sessionsController.getAllSessions
+  sessionsController.getAllSessions.bind(sessionsController)
 );
 
 sessionsRouter.delete(
   "/devices/:deviceId",
   refreshTokenValidator,
-  sessionsController.deleteSession
+  sessionsController.deleteSession.bind(sessionsController)
 );
 
 sessionsRouter.delete(
   "/devices",
   refreshTokenValidator,
-  sessionsController.deleteAllSessions
+  sessionsController.deleteAllSessions.bind(sessionsController)
 );

@@ -1,13 +1,18 @@
 import { ObjectId } from "mongodb";
-import { postsRepository } from "../db/mongodb/repositories/posts-repository/posts-db-repository";
 import { PostDbType, PostInputModel } from "../types/posts-types";
-import { blogsService } from "./blogs-service";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
+import { PostsRepository } from "../db/mongodb/repositories/posts-repository/posts-db-repository";
+import { BlogsService } from "./blogs-service";
 
-class PostsService {
+export class PostsService {
+  constructor(
+    public postsRepository: PostsRepository,
+    public blogsService: BlogsService
+  ) {}
+
   async createNewPost(post: PostInputModel): Promise<ObjectId> {
-    const targetBlog = await blogsService.getBlogById(
+    const targetBlog = await this.blogsService.getBlogById(
       new ObjectId(post.blogId)
     );
 
@@ -27,11 +32,11 @@ class PostsService {
       createdAt: new Date().toISOString(),
     };
 
-    return postsRepository.createNewPost(newPost);
+    return this.postsRepository.createNewPost(newPost);
   }
 
   async getPostById(id: ObjectId): Promise<PostDbType> {
-    const post = await postsRepository.getPostById(id);
+    const post = await this.postsRepository.getPostById(id);
     if (!post) {
       throw new ErrorWithStatusCode(
         "Post does not exist",
@@ -45,7 +50,7 @@ class PostsService {
     id: ObjectId,
     updatedPost: PostInputModel
   ): Promise<boolean> {
-    const targetPost = await postsRepository.getPostById(id);
+    const targetPost = await this.postsRepository.getPostById(id);
 
     if (!targetPost) {
       throw new ErrorWithStatusCode(
@@ -54,11 +59,11 @@ class PostsService {
       );
     }
 
-    return postsRepository.updatePost(id, updatedPost);
+    return this.postsRepository.updatePost(id, updatedPost);
   }
 
   async deletePost(id: ObjectId): Promise<boolean> {
-    const targetPost = await postsRepository.getPostById(id);
+    const targetPost = await this.postsRepository.getPostById(id);
 
     if (!targetPost) {
       throw new ErrorWithStatusCode(
@@ -67,8 +72,6 @@ class PostsService {
       );
     }
 
-    return postsRepository.deletePost(id);
+    return this.postsRepository.deletePost(id);
   }
 }
-
-export const postsService = new PostsService();

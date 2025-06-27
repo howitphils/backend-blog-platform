@@ -5,7 +5,7 @@ import {
   CommentInputModel,
 } from "../../../../types/comments-types";
 
-class CommentsRepository {
+export class CommentsRepository {
   async createComment(comment: CommentDbType): Promise<ObjectId> {
     const createResult = await commentsCollection.insertOne(comment);
     return createResult.insertedId;
@@ -31,5 +31,3 @@ class CommentsRepository {
     return commentsCollection.findOne({ _id });
   }
 }
-
-export const commentsRepository = new CommentsRepository();

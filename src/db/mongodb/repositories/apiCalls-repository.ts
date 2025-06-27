@@ -1,6 +1,6 @@
 import { apiCallsCollection } from "../mongodb";
 
-class ApiCallsRepository {
+export class ApiCallsRepository {
   async getAllCallsCount({
     ip,
     url,
@@ -17,5 +17,3 @@ class ApiCallsRepository {
     return apiCallsCollection.insertOne({ date, ip, url });
   }
 }
-
-export const apiCallsRepository = new ApiCallsRepository();

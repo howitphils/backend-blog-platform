@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { PostDbType, PostInputModel } from "../../../../types/posts-types";
 import { postsCollection } from "../../mongodb";
 
-class PostsRepository {
+export class PostsRepository {
   async getAllPosts(): Promise<PostDbType[]> {
     return postsCollection.find({}).toArray();
   }
@@ -29,5 +29,3 @@ class PostsRepository {
     return deleteResult.deletedCount === 1;
   }
 }
-
-export const postsRepository = new PostsRepository();
