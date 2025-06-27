@@ -178,7 +178,11 @@ export class AuthService {
     if (!user) {
       throw new ErrorWithStatusCode(
         APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_INCORRECT,
-        HttpStatuses.BadRequest
+        HttpStatuses.BadRequest,
+        createErrorsObject(
+          "recoveryCode",
+          APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_INCORRECT
+        )
       );
     }
 
