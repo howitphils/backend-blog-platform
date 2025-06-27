@@ -31,8 +31,8 @@ import { UsersController } from "./routers/controllers/users-controller";
 const bcryptService = new BcryptService();
 export const dateFnsService = new DateFnsService();
 export const jwtService = new JwtService();
-const nodeMailerService = new NodeMailerService();
-const uuIdService = new UuidService();
+export const nodeMailerService = new NodeMailerService();
+export const uuIdService = new UuidService();
 const emailManager = new EmailManager(nodeMailerService);
 
 // Repositories

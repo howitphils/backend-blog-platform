@@ -1,9 +1,9 @@
-import { jwtService } from "./../../src/adapters/jwtService";
-import { authService } from "./../../src/services/auth-service";
+import { authService, jwtService } from "../../src/composition-root";
 import { ResultStatus } from "../../src/types/resultObject-types";
 
 describe("/unit tests for check access token", () => {
-  const checkAccessTokenUseCase = authService.checkAccessToken;
+  const checkAccessTokenUseCase =
+    authService.checkAccessToken.bind(authService);
   it("should return an error if auth type is not Bearer", () => {
     const res = checkAccessTokenUseCase("Basic asdad");
 

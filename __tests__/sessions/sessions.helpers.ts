@@ -13,10 +13,13 @@ export const devicesTestHelper = {
 
     return res.body;
   },
-  async loginUser(count: number, userDto: UserInputModel): Promise<string[]> {
+  async loginUser(
+    loginsCount: number,
+    userDto: UserInputModel
+  ): Promise<string[]> {
     const refreshTokens: string[] = [];
 
-    for (let i = 1; i <= count; i++) {
+    for (let i = 1; i <= loginsCount; i++) {
       const res = await req
         .post(APP_CONFIG.MAIN_PATHS.AUTH + "/login")
         .send({

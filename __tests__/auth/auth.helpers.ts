@@ -5,8 +5,7 @@ import {
 } from "../../src/db/mongodb/mongodb";
 import { UserDbType } from "../../src/types/users-types";
 import { SessionDbType, SessionTestType } from "../../src/types/sessions-types";
-import { uuIdService } from "../../src/adapters/uuIdService";
-import { dateFnsService } from "../../src/adapters/dateFnsService";
+import { dateFnsService, uuIdService } from "../../src/composition-root";
 
 type RegisterUserPayloadType = {
   login: string;

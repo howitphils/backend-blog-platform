@@ -1,15 +1,18 @@
 import { clearCollections, createUserDto, req } from "../test-helpers";
-import { nodeMailerService } from "../../src/adapters/nodemailer-service";
-import { authService } from "../../src/services/auth-service";
+
 import { ErrorWithStatusCode } from "../../src/middlewares/error-handler";
 import { runDb, usersCollection } from "../../src/db/mongodb/mongodb";
 import { MongoClient } from "mongodb";
 import { APP_CONFIG } from "../../src/settings";
 import { HttpStatuses } from "../../src/types/http-statuses";
 import { testSeeder } from "./auth.helpers";
-import { uuIdService } from "../../src/adapters/uuIdService";
-import { dateFnsService } from "../../src/adapters/dateFnsService";
 import { UserDbType } from "../../src/types/users-types";
+import {
+  authService,
+  dateFnsService,
+  nodeMailerService,
+  uuIdService,
+} from "../../src/composition-root";
 
 describe("/auth", () => {
   let client: MongoClient;
@@ -30,7 +33,7 @@ describe("/auth", () => {
       await clearCollections();
     });
 
-    const registerUserUseCase = authService.registerUser;
+    const registerUserUseCase = authService.registerUser.bind(authService);
 
     it("should accept user's data and send an email", async () => {
       const userDto = createUserDto({});
@@ -68,7 +71,8 @@ describe("/auth", () => {
       await clearCollections();
     });
 
-    const confirmEmailUseCase = authService.confirmRegistration;
+    const confirmEmailUseCase =
+      authService.confirmRegistration.bind(authService);
 
     it("should not confirm the email for not existing user and throw an error", async () => {
       try {
@@ -149,7 +153,8 @@ describe("/auth", () => {
       await clearCollections();
     });
 
-    const codeResendingUseCase = authService.resendConfirmationCode;
+    const codeResendingUseCase =
+      authService.resendConfirmationCode.bind(authService);
 
     nodeMailerService.sendEmail = jest.fn().mockResolvedValue(true);
 
@@ -247,7 +252,7 @@ describe("/auth", () => {
       await clearCollections();
     });
 
-    const refreshTokensUseCase = authService.refreshTokens;
+    const refreshTokensUseCase = authService.refreshTokens.bind(authService);
     it("should get an error if session does not exist", async () => {
       try {
         await refreshTokensUseCase({
@@ -268,7 +273,7 @@ describe("/auth", () => {
       await clearCollections();
     });
 
-    const logoutUseCase = authService.logout;
+    const logoutUseCase = authService.logout.bind(authService);
     it("should get an error if session does not exist", async () => {
       try {
         await logoutUseCase({
@@ -335,7 +340,8 @@ describe("/auth", () => {
       expect(pass).not.toBe(updatedUser.accountData.passHash);
     });
 
-    const confirmPasswordRecoveryUseCase = authService.confirmPasswordRecovery;
+    const confirmPasswordRecoveryUseCase =
+      authService.confirmPasswordRecovery.bind(authService);
 
     it("should return an error if recovery code is incorrect", async () => {
       try {
