@@ -25,12 +25,21 @@ import { BlogsQueryRepository } from "../../db/mongodb/repositories/blogs-reposi
 import { BlogsService } from "../../services/blogs-service";
 import { PostsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
 import { PostsService } from "../../services/posts-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class BlogsController {
   constructor(
+    @inject(BlogsQueryRepository)
     public blogsQueryRepository: BlogsQueryRepository,
+
+    @inject(BlogsService)
     public blogsService: BlogsService,
+
+    @inject(PostsQueryRepository)
     public postsQueryRepository: PostsQueryRepository,
+
+    @inject(PostsService)
     public postsService: PostsService
   ) {}
 

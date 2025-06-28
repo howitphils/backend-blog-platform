@@ -17,10 +17,15 @@ import { HttpStatuses } from "../../types/http-statuses";
 import { convertToHttpCode } from "./utils";
 import { CommentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
 import { CommentsService } from "../../services/comments-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class CommentsController {
   constructor(
+    @inject(CommentsQueryRepository)
     public commentsQueryRepository: CommentsQueryRepository,
+
+    @inject(CommentsService)
     public commentsService: CommentsService
   ) {}
 

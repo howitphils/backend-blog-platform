@@ -27,81 +27,99 @@ import { SessionsQueryRepository } from "./db/mongodb/repositories/sessions-repo
 import { PostsController } from "./routers/controllers/posts-controller";
 import { SessionsController } from "./routers/controllers/sessions-controller";
 import { UsersController } from "./routers/controllers/users-controller";
+import { Container } from "inversify";
 
-const bcryptService = new BcryptService();
-export const dateFnsService = new DateFnsService();
-export const jwtService = new JwtService();
-export const nodeMailerService = new NodeMailerService();
-export const uuIdService = new UuidService();
-const emailManager = new EmailManager(nodeMailerService);
+// // Adapters
+// const bcryptService = new BcryptService();
+// export const dateFnsService = new DateFnsService();
+// export const jwtService = new JwtService();
+// export const nodeMailerService = new NodeMailerService();
+// export const uuIdService = new UuidService();
+// const emailManager = new EmailManager(nodeMailerService);
 
-// Repositories
-export const apiCallsRepository = new ApiCallsRepository();
-const usersRepository = new UsersRepository();
-const sessionsRepository = new SessionRepository();
-const blogsRepository = new BlogsRepository();
-const postsRepository = new PostsRepository();
-const commentsRepository = new CommentsRepository();
+// // Repositories
+// export const apiCallsRepository = new ApiCallsRepository();
+// const usersRepository = new UsersRepository();
+// const sessionsRepository = new SessionRepository();
+// const blogsRepository = new BlogsRepository();
+// const postsRepository = new PostsRepository();
+// const commentsRepository = new CommentsRepository();
 
-// Query Repositories
-const usersQueryRepository = new UsersQueryRepository();
-const blogsQueryRepository = new BlogsQueryRepository();
-const postsQueryRepository = new PostsQueryRepository();
-const commentsQueryRepository = new CommentsQueryRepository();
-const sessionsQueryRepository = new SessionsQueryRepository();
+// // Query Repositories
+// const usersQueryRepository = new UsersQueryRepository();
+// const blogsQueryRepository = new BlogsQueryRepository();
+// const postsQueryRepository = new PostsQueryRepository();
+// const commentsQueryRepository = new CommentsQueryRepository();
+// const sessionsQueryRepository = new SessionsQueryRepository();
 
-// Services
-const blogsService = new BlogsService(blogsRepository);
-const postsService = new PostsService(postsRepository, blogsService);
-const usersService = new UsersService(
-  usersRepository,
-  bcryptService,
-  uuIdService,
-  dateFnsService
-);
-export const authService = new AuthService(
-  usersRepository,
-  sessionsRepository,
-  usersService,
-  bcryptService,
-  jwtService,
-  uuIdService,
-  emailManager,
-  dateFnsService
-);
-const commentsService = new CommentsService(
-  postsService,
-  commentsRepository,
-  usersService
-);
-const sessionsService = new SessionService(sessionsRepository);
+// // Services
+// const blogsService = new BlogsService(blogsRepository);
+// const postsService = new PostsService(postsRepository, blogsService);
+// const usersService = new UsersService(
+//   usersRepository,
+//   bcryptService,
+//   uuIdService,
+//   dateFnsService
+// );
+// export const authService = new AuthService(
+//   usersRepository,
+//   sessionsRepository,
+//   usersService,
+//   bcryptService,
+//   jwtService,
+//   uuIdService,
+//   emailManager,
+//   dateFnsService
+// );
+// const commentsService = new CommentsService(
+//   postsService,
+//   commentsRepository,
+//   usersService
+// );
+// const sessionsService = new SessionService(sessionsRepository);
 
-// Controllers
-export const authController = new AuthController(
-  authService,
-  usersQueryRepository
-);
-export const blogsController = new BlogsController(
-  blogsQueryRepository,
-  blogsService,
-  postsQueryRepository,
-  postsService
-);
-export const postsController = new PostsController(
-  postsQueryRepository,
-  postsService,
-  commentsQueryRepository,
-  commentsService
-);
-export const commentsController = new CommentsController(
-  commentsQueryRepository,
-  commentsService
-);
-export const sessionsController = new SessionsController(
-  sessionsQueryRepository,
-  sessionsService
-);
-export const usersController = new UsersController(
-  usersQueryRepository,
-  usersService
-);
+// // Controllers
+// export const authController = new AuthController(
+//   authService,
+//   usersQueryRepository
+// );
+// export const blogsController = new BlogsController(
+//   blogsQueryRepository,
+//   blogsService,
+//   postsQueryRepository,
+//   postsService
+// );
+// export const postsController = new PostsController(
+//   postsQueryRepository,
+//   postsService,
+//   commentsQueryRepository,
+//   commentsService
+// );
+// export const commentsController = new CommentsController(
+//   commentsQueryRepository,
+//   commentsService
+// );
+// export const sessionsController = new SessionsController(
+//   sessionsQueryRepository,
+//   sessionsService
+// );
+// export const usersController = new UsersController(
+//   usersQueryRepository,
+//   usersService
+// );
+
+const container = new Container();
+
+container.bind(UsersController).to(UsersController);
+container.bind(AuthController).to(AuthController);
+container.bind(CommentsController).to(CommentsController);
+container.bind(BlogsController).to(BlogsController);
+container.bind(PostsController).to(PostsController);
+container.bind(SessionsController).to(SessionsController);
+
+export const usersController = container.get(UsersController);
+export const commentsController = container.get(CommentsController);
+export const authController = container.get(AuthController);
+export const blogsController = container.get(BlogsController);
+export const postsController = container.get(PostsController);
+export const sessionsController = container.get(SessionsController);

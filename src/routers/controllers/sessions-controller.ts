@@ -4,10 +4,15 @@ import { RequestWithParams } from "../../types/requests-types";
 import { ErrorWithStatusCode } from "../../middlewares/error-handler";
 import { SessionsQueryRepository } from "../../db/mongodb/repositories/sessions-repository/sessions-query-repository";
 import { SessionService } from "../../services/sessions-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class SessionsController {
   constructor(
+    @inject(SessionsQueryRepository)
     public sessionsQueryRepository: SessionsQueryRepository,
+
+    @inject(SessionService)
     public sessionsService: SessionService
   ) {}
 

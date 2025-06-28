@@ -7,12 +7,15 @@ import { MeModel, UserInputModel } from "../../types/users-types";
 import { APP_CONFIG } from "../../settings";
 import { AuthService } from "../../services/auth-service";
 import { UsersQueryRepository } from "../../db/mongodb/repositories/users-repository/users-query-repository";
+import { inject, injectable } from "inversify";
 
-// Перевести на this
-
+@injectable()
 export class AuthController {
   constructor(
+    @inject(AuthService)
     public authService: AuthService,
+
+    @inject(UsersQueryRepository)
     public usersQueryRepository: UsersQueryRepository
   ) {}
 

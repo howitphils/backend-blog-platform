@@ -16,10 +16,15 @@ import {
 import { HttpStatuses } from "../../types/http-statuses";
 import { UsersQueryRepository } from "../../db/mongodb/repositories/users-repository/users-query-repository";
 import { UsersService } from "../../services/users-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class UsersController {
   constructor(
+    @inject(UsersQueryRepository)
     public usersQueryRepository: UsersQueryRepository,
+
+    @inject(UsersService)
     public usersService: UsersService
   ) {}
 

@@ -30,12 +30,21 @@ import { PostsQueryRepository } from "../../db/mongodb/repositories/posts-reposi
 import { PostsService } from "../../services/posts-service";
 import { CommentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
 import { CommentsService } from "../../services/comments-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class PostsController {
   constructor(
+    @inject(PostsQueryRepository)
     public postsQueryRepository: PostsQueryRepository,
+
+    @inject(PostsService)
     public postsService: PostsService,
+
+    @inject(CommentsQueryRepository)
     public commentsQueryRepository: CommentsQueryRepository,
+
+    @inject(CommentsService)
     public commentsService: CommentsService
   ) {}
 
