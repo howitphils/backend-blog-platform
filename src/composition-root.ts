@@ -114,8 +114,6 @@ import { Container } from "inversify";
 export const container = new Container();
 
 // Регистрация Класса в контейнере
-
-// Adapters
 container.bind(DateFnsService).to(DateFnsService);
 container.bind(JwtService).to(JwtService);
 container.bind(NodeMailerService).to(NodeMailerService);

@@ -9,7 +9,7 @@ import { inject, injectable } from "inversify";
 @injectable()
 export class BlogsService {
   constructor(
-    @inject(BlogsRepository) public blogsRepository: BlogsRepository
+    @inject(BlogsRepository) private blogsRepository: BlogsRepository
   ) {}
 
   async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {

@@ -24,33 +24,33 @@ import { inject, injectable } from "inversify";
 export class AuthService {
   constructor(
     @inject(UsersRepository)
-    public usersRepository: UsersRepository,
+    private usersRepository: UsersRepository,
 
     @inject(SessionRepository)
-    public sessionsRepository: SessionRepository,
+    private sessionsRepository: SessionRepository,
 
     @inject(UsersService)
-    public usersService: UsersService,
+    private usersService: UsersService,
 
     @inject(BcryptService)
-    public bcryptService: BcryptService,
+    private bcryptService: BcryptService,
 
     @inject(JwtService)
-    public jwtService: JwtService,
+    private jwtService: JwtService,
 
     @inject(UuidService)
-    public uuIdService: UuidService,
+    private uuIdService: UuidService,
 
     @inject(EmailManager)
-    public emailManager: EmailManager,
+    private emailManager: EmailManager,
 
     @inject(DateFnsService)
-    public dateFnsService: DateFnsService
+    private dateFnsService: DateFnsService
   ) {}
 
-  async loginUser(userInfoDto: UserInfoType): Promise<TokenPairType> {
-    const { loginOrEmail, password } = userInfoDto.usersCredentials;
-    const { device_name, ip } = userInfoDto.usersConfigs;
+  async loginUser(dto: UserInfoType): Promise<TokenPairType> {
+    const { loginOrEmail, password } = dto.usersCredentials;
+    const { device_name, ip } = dto.usersConfigs;
 
     const targetUser = await this.usersRepository.getUserByLoginOrEmail(
       loginOrEmail
@@ -70,7 +70,7 @@ export class AuthService {
 
     if (!isCorrect) {
       throw new ErrorWithStatusCode(
-        "Incorrect user's credentials",
+        APP_CONFIG.ERROR_MESSAGES.INCORRECT_CREDENTIALS,
         HttpStatuses.Unauthorized
       );
     }
@@ -109,14 +109,14 @@ export class AuthService {
 
     if (!targetSession) {
       throw new ErrorWithStatusCode(
-        "Session is not found",
+        APP_CONFIG.ERROR_MESSAGES.SESSION_NOT_FOUND,
         HttpStatuses.Unauthorized
       );
     }
 
     if (targetSession.iat !== dto.issuedAt) {
       throw new ErrorWithStatusCode(
-        "Token is not valid",
+        APP_CONFIG.ERROR_MESSAGES.REFRESH_TOKEN_IS_NOT_VALID,
         HttpStatuses.Unauthorized
       );
     }
@@ -132,7 +132,7 @@ export class AuthService {
 
     if (!session) {
       throw new ErrorWithStatusCode(
-        "Session is not found",
+        APP_CONFIG.ERROR_MESSAGES.SESSION_NOT_FOUND,
         HttpStatuses.Unauthorized
       );
     }
@@ -153,8 +153,8 @@ export class AuthService {
     return tokenPair;
   }
 
-  async registerUser(user: UserInputModel) {
-    const createdId = await this.usersService.createNewUser(user, false);
+  async registerUser(dto: UserInputModel) {
+    const createdId = await this.usersService.createNewUser(dto, false);
     const targetUser = await this.usersService.getUserById(createdId);
 
     this.emailManager
@@ -190,7 +190,7 @@ export class AuthService {
         APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_INCORRECT,
         HttpStatuses.BadRequest,
         createErrorsObject(
-          "recoveryCode",
+          APP_CONFIG.ERROR_FIELDS.RECOVERY_CODE,
           APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_INCORRECT
         )
       );
@@ -208,32 +208,41 @@ export class AuthService {
     await this.usersRepository.updatePasswordHash(user._id, passHash);
   }
 
-  async confirmRegistration(code: string): Promise<boolean> {
+  async confirmRegistration(confirmationCode: string): Promise<boolean> {
     const targetUser = await this.usersRepository.getUserByConfirmationCode(
-      code
+      confirmationCode
     );
 
     if (!targetUser) {
       throw new ErrorWithStatusCode(
         APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND,
         HttpStatuses.BadRequest,
-        createErrorsObject("code", "Confirmation code is incorrect")
+        createErrorsObject(
+          APP_CONFIG.ERROR_FIELDS.CONFIRMATION_CODE,
+          APP_CONFIG.ERROR_MESSAGES.CONFIRMATION_CODE_INCORRECT
+        )
       );
     }
 
     if (targetUser.emailConfirmation.expirationDate < new Date()) {
       throw new ErrorWithStatusCode(
-        "Confirmation code is already expired",
+        APP_CONFIG.ERROR_MESSAGES.CONFIRMATION_CODE_EXPIRED,
         HttpStatuses.BadRequest,
-        createErrorsObject("code", "Confirmation code is already expired")
+        createErrorsObject(
+          APP_CONFIG.ERROR_FIELDS.CONFIRMATION_CODE,
+          APP_CONFIG.ERROR_MESSAGES.CONFIRMATION_CODE_EXPIRED
+        )
       );
     }
 
     if (targetUser.emailConfirmation.isConfirmed) {
       throw new ErrorWithStatusCode(
-        "Email is already confirmed",
+        APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED,
         HttpStatuses.BadRequest,
-        createErrorsObject("code", "Email is already confirmed")
+        createErrorsObject(
+          APP_CONFIG.ERROR_FIELDS.CONFIRMATION_CODE,
+          APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED
+        )
       );
     }
 
@@ -245,17 +254,23 @@ export class AuthService {
 
     if (!user) {
       throw new ErrorWithStatusCode(
-        "User with this email does not exist",
+        APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND,
         HttpStatuses.BadRequest,
-        createErrorsObject("email", "User with this email does not exist")
+        createErrorsObject(
+          APP_CONFIG.ERROR_FIELDS.EMAIL,
+          APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND
+        )
       );
     }
 
     if (user.emailConfirmation.isConfirmed) {
       throw new ErrorWithStatusCode(
-        "User with this email is already confirmed",
+        APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED,
         HttpStatuses.BadRequest,
-        createErrorsObject("email", "Email is already confirmed")
+        createErrorsObject(
+          APP_CONFIG.ERROR_FIELDS.EMAIL,
+          APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED
+        )
       );
     }
 
@@ -267,17 +282,10 @@ export class AuthService {
 
     const updatedUser = await this.usersRepository.getUserByLoginOrEmail(email);
 
-    if (!updatedUser) {
-      throw new ErrorWithStatusCode(
-        "Updated user was not found",
-        HttpStatuses.NotFound
-      );
-    }
-
     this.emailManager
       .sendEmailForRegistration(
         email,
-        updatedUser.emailConfirmation.confirmationCode
+        updatedUser!.emailConfirmation.confirmationCode
       )
       .catch((e) => console.log(e));
   }

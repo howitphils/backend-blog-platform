@@ -22,10 +22,10 @@ import { inject, injectable } from "inversify";
 export class UsersController {
   constructor(
     @inject(UsersQueryRepository)
-    public usersQueryRepository: UsersQueryRepository,
+    private usersQueryRepository: UsersQueryRepository,
 
     @inject(UsersService)
-    public usersService: UsersService
+    private usersService: UsersService
   ) {}
 
   async getUsers(

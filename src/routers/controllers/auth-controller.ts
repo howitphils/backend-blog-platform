@@ -13,10 +13,10 @@ import { inject, injectable } from "inversify";
 export class AuthController {
   constructor(
     @inject(AuthService)
-    public authService: AuthService,
+    private authService: AuthService,
 
     @inject(UsersQueryRepository)
-    public usersQueryRepository: UsersQueryRepository
+    private usersQueryRepository: UsersQueryRepository
   ) {}
 
   async loginUser(

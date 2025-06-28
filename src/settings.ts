@@ -57,5 +57,16 @@ export const APP_CONFIG = {
     USER_NOT_FOUND: "User is not found",
     RECOVERY_CODE_IS_EXPIRED: "Recovery code is expired",
     RECOVERY_CODE_IS_INCORRECT: "Recovery code is incorrect",
+    INCORRECT_CREDENTIALS: "Incorrect user's credentials",
+    SESSION_NOT_FOUND: "Sessions is not found",
+    REFRESH_TOKEN_IS_NOT_VALID: "Refresh token is not valid",
+    CONFIRMATION_CODE_INCORRECT: "Confirmation code is incorrect",
+    CONFIRMATION_CODE_EXPIRED: "Confirmation code is already expired",
+    EMAIL_ALREADY_CONFIRMED: "Email is already confirmed",
+  },
+  ERROR_FIELDS: {
+    RECOVERY_CODE: "recoveryCode",
+    CONFIRMATION_CODE: "confirmationCode",
+    EMAIL: "email",
   },
 };

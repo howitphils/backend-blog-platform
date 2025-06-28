@@ -10,10 +10,10 @@ import { inject, injectable } from "inversify";
 export class SessionsController {
   constructor(
     @inject(SessionsQueryRepository)
-    public sessionsQueryRepository: SessionsQueryRepository,
+    private sessionsQueryRepository: SessionsQueryRepository,
 
     @inject(SessionService)
-    public sessionsService: SessionService
+    private sessionsService: SessionService
   ) {}
 
   async getAllSessions(req: Request, res: Response) {

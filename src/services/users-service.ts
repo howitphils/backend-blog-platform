@@ -14,13 +14,16 @@ import { inject, injectable } from "inversify";
 export class UsersService {
   constructor(
     @inject(UsersRepository)
-    public usersRepository: UsersRepository,
+    private usersRepository: UsersRepository,
+
     @inject(BcryptService)
-    public bcryptService: BcryptService,
+    private bcryptService: BcryptService,
+
     @inject(UuidService)
-    public uuIdService: UuidService,
+    private uuIdService: UuidService,
+
     @inject(DateFnsService)
-    public dateFnsService: DateFnsService
+    private dateFnsService: DateFnsService
   ) {}
 
   async createNewUser(

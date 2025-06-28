@@ -31,16 +31,16 @@ import { inject, injectable } from "inversify";
 export class BlogsController {
   constructor(
     @inject(BlogsQueryRepository)
-    public blogsQueryRepository: BlogsQueryRepository,
+    private blogsQueryRepository: BlogsQueryRepository,
 
     @inject(BlogsService)
-    public blogsService: BlogsService,
+    private blogsService: BlogsService,
 
     @inject(PostsQueryRepository)
-    public postsQueryRepository: PostsQueryRepository,
+    private postsQueryRepository: PostsQueryRepository,
 
     @inject(PostsService)
-    public postsService: PostsService
+    private postsService: PostsService
   ) {}
 
   async getBlogs(

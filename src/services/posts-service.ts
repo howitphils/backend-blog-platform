@@ -10,10 +10,10 @@ import { inject, injectable } from "inversify";
 export class PostsService {
   constructor(
     @inject(PostsRepository)
-    public postsRepository: PostsRepository,
+    private postsRepository: PostsRepository,
 
     @inject(BlogsService)
-    public blogsService: BlogsService
+    private blogsService: BlogsService
   ) {}
 
   async createNewPost(post: PostInputModel): Promise<ObjectId> {

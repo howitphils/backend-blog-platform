@@ -23,10 +23,10 @@ import { inject, injectable } from "inversify";
 export class CommentsController {
   constructor(
     @inject(CommentsQueryRepository)
-    public commentsQueryRepository: CommentsQueryRepository,
+    private commentsQueryRepository: CommentsQueryRepository,
 
     @inject(CommentsService)
-    public commentsService: CommentsService
+    private commentsService: CommentsService
   ) {}
 
   async getCommentById(

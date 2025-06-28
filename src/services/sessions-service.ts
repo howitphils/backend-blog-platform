@@ -7,7 +7,7 @@ import { SessionDbType } from "../types/sessions-types";
 @injectable()
 export class SessionService {
   constructor(
-    @inject(SessionRepository) public sessionsRepository: SessionRepository
+    @inject(SessionRepository) private sessionsRepository: SessionRepository
   ) {}
 
   async getAllUsersSessions(userId: string): Promise<SessionDbType[]> {

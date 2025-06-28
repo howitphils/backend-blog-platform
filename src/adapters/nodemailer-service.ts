@@ -13,8 +13,6 @@ export class NodeMailerService {
     subject: string;
     message: string;
   }) {
-    console.log("Email will be sent");
-
     const transporter = createTransport({
       service: APP_CONFIG.NODEMAILER_MAIL_SERVICE,
       auth: {

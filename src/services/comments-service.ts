@@ -16,13 +16,13 @@ import { inject, injectable } from "inversify";
 export class CommentsService {
   constructor(
     @inject(PostsService)
-    public postsService: PostsService,
+    private postsService: PostsService,
 
     @inject(CommentsRepository)
-    public commentsRepository: CommentsRepository,
+    private commentsRepository: CommentsRepository,
 
     @inject(UsersService)
-    public usersService: UsersService
+    private usersService: UsersService
   ) {}
 
   async createNewComment(
