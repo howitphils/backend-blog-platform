@@ -6,7 +6,10 @@ import { authGuard } from "../middlewares/auth/basic-auth-validator";
 import { validateParamsId } from "../middlewares/validate-paramsId";
 import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 import { commentsBodyValidators } from "../middlewares/body-validations/comments-body-validators";
-import { postsController } from "../composition-root";
+import { container } from "../composition-root";
+import { PostsController } from "./controllers/posts-controller";
+
+const postsController = container.get(PostsController);
 
 export const postsRouter = Router();
 

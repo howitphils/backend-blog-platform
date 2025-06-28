@@ -29,6 +29,8 @@ import { SessionsController } from "./routers/controllers/sessions-controller";
 import { UsersController } from "./routers/controllers/users-controller";
 import { Container } from "inversify";
 
+// Dependency Injection
+
 // // Adapters
 // const bcryptService = new BcryptService();
 // export const dateFnsService = new DateFnsService();
@@ -111,18 +113,15 @@ import { Container } from "inversify";
 // Автоматичеси создает объекты и внедряет его зависимости
 export const container = new Container();
 
+// Регистрация Класса в контейнере
+
 // Adapters
 container.bind(DateFnsService).to(DateFnsService);
-container.bind(JwtService).to(JwtService); // Заработал мок
-container.bind(NodeMailerService).to(NodeMailerService).inSingletonScope();
+container.bind(JwtService).to(JwtService);
+container.bind(NodeMailerService).to(NodeMailerService);
 container.bind(UuidService).to(UuidService);
 container.bind(EmailManager).to(EmailManager);
 container.bind(BcryptService).to(BcryptService);
-
-export const dateFnsService = container.get(DateFnsService);
-export const jwtService = container.get(JwtService);
-export const nodeMailerService = container.get(NodeMailerService);
-export const uuIdService = container.get(UuidService);
 
 // Repositories
 container.bind(UsersRepository).to(UsersRepository);
@@ -131,8 +130,6 @@ container.bind(BlogsRepository).to(BlogsRepository);
 container.bind(PostsRepository).to(PostsRepository);
 container.bind(CommentsRepository).to(CommentsRepository);
 container.bind(ApiCallsRepository).to(ApiCallsRepository);
-
-export const apiCallsRepository = container.get(ApiCallsRepository);
 
 // Query Repositories
 container.bind(UsersQueryRepository).to(UsersQueryRepository);
@@ -149,20 +146,9 @@ container.bind(SessionService).to(SessionService);
 container.bind(UsersService).to(UsersService);
 container.bind(CommentsService).to(CommentsService);
 
-export const authService = container.get(AuthService);
-
-// Регистрация Класса в контейнере
 container.bind(UsersController).to(UsersController);
 container.bind(AuthController).to(AuthController);
 container.bind(CommentsController).to(CommentsController);
 container.bind(BlogsController).to(BlogsController);
 container.bind(PostsController).to(PostsController);
 container.bind(SessionsController).to(SessionsController);
-
-// Получение готового объекта с нужными зависимостями
-export const usersController = container.get(UsersController);
-export const commentsController = container.get(CommentsController);
-export const authController = container.get(AuthController);
-export const blogsController = container.get(BlogsController);
-export const postsController = container.get(PostsController);
-export const sessionsController = container.get(SessionsController);

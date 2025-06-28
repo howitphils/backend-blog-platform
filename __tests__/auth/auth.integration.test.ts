@@ -7,12 +7,11 @@ import { APP_CONFIG } from "../../src/settings";
 import { HttpStatuses } from "../../src/types/http-statuses";
 import { testSeeder } from "./auth.helpers";
 import { UserDbType } from "../../src/types/users-types";
-import {
-  authService,
-  dateFnsService,
-  nodeMailerService,
-  uuIdService,
-} from "../../src/composition-root";
+import { NodeMailerService } from "../../src/adapters/nodemailer-service";
+import { AuthService } from "../../src/services/auth-service";
+import { container } from "../../src/composition-root";
+import { UuidService } from "../../src/adapters/uuIdService";
+import { DateFnsService } from "../../src/adapters/dateFnsService";
 
 describe("/auth", () => {
   let client: MongoClient;
@@ -20,7 +19,7 @@ describe("/auth", () => {
   beforeAll(async () => {
     client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
 
-    nodeMailerService.sendEmail = jest.fn().mockResolvedValue(true);
+    NodeMailerService.prototype.sendEmail = jest.fn().mockResolvedValue(true);
   });
 
   afterAll(async () => {
@@ -33,6 +32,8 @@ describe("/auth", () => {
       await clearCollections();
     });
 
+    const authService = container.get(AuthService);
+
     const registerUserUseCase = authService.registerUser.bind(authService);
 
     it("should accept user's data and send an email", async () => {
@@ -42,7 +43,7 @@ describe("/auth", () => {
 
       const usersCount = await usersCollection.countDocuments();
 
-      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
+      expect(NodeMailerService.prototype.sendEmail).toHaveBeenCalledTimes(1);
       expect(usersCount).toBe(1);
     });
 
@@ -61,7 +62,7 @@ describe("/auth", () => {
 
       const usersCount = await usersCollection.countDocuments();
 
-      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
+      expect(NodeMailerService.prototype.sendEmail).toHaveBeenCalledTimes(1);
       expect(usersCount).toBe(1);
     });
   });
@@ -70,6 +71,9 @@ describe("/auth", () => {
     afterAll(async () => {
       await clearCollections();
     });
+
+    const authService = container.get(AuthService);
+    const uuIdService = container.get(UuidService);
 
     const confirmEmailUseCase =
       authService.confirmRegistration.bind(authService);
@@ -153,10 +157,10 @@ describe("/auth", () => {
       await clearCollections();
     });
 
+    const authService = container.get(AuthService);
+
     const codeResendingUseCase =
       authService.resendConfirmationCode.bind(authService);
-
-    nodeMailerService.sendEmail = jest.fn().mockResolvedValue(true);
 
     it("should throw an error if user does not exist ", async () => {
       try {
@@ -220,6 +224,10 @@ describe("/auth", () => {
       const { email, login, pass } = testSeeder.createUserDto({
         email: "someemail@gmail.com",
       });
+
+      const uuIdService = container.get(UuidService);
+      const dateFnsService = container.get(DateFnsService);
+
       const startCode = uuIdService.createRandomCode();
       const startExpirationDate = dateFnsService.addToCurrentDate();
 
@@ -243,7 +251,7 @@ describe("/auth", () => {
       expect(updatedUser?.emailConfirmation.expirationDate).not.toBe(
         startExpirationDate
       );
-      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(2);
+      expect(NodeMailerService.prototype.sendEmail).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -252,7 +260,10 @@ describe("/auth", () => {
       await clearCollections();
     });
 
+    const authService = container.get(AuthService);
+
     const refreshTokensUseCase = authService.refreshTokens.bind(authService);
+
     it("should get an error if session does not exist", async () => {
       try {
         await refreshTokensUseCase({
@@ -273,6 +284,8 @@ describe("/auth", () => {
       await clearCollections();
     });
 
+    const authService = container.get(AuthService);
+
     const logoutUseCase = authService.logout.bind(authService);
     it("should get an error if session does not exist", async () => {
       try {
@@ -290,30 +303,15 @@ describe("/auth", () => {
     });
   });
 
-  describe("password recovery", () => {
-    afterAll(async () => {
-      await clearCollections();
-    });
-
-    it("should send an email even if user is not registered", async () => {
-      jest.resetAllMocks();
-
-      await req
-        .post(
-          APP_CONFIG.MAIN_PATHS.AUTH +
-            APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
-        )
-        .send({ email: "some@email.com" })
-        .expect(HttpStatuses.NoContent);
-
-      expect(nodeMailerService.sendEmail).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe("password recovery confirmation", () => {
     afterAll(async () => {
       await clearCollections();
     });
+
+    const authService = container.get(AuthService);
+
+    const confirmPasswordRecoveryUseCase =
+      authService.confirmPasswordRecovery.bind(authService);
 
     it("should update the password", async () => {
       const { email, login, pass } = testSeeder.createUserDto({});
@@ -340,9 +338,6 @@ describe("/auth", () => {
       expect(pass).not.toBe(updatedUser.accountData.passHash);
     });
 
-    const confirmPasswordRecoveryUseCase =
-      authService.confirmPasswordRecovery.bind(authService);
-
     it("should return an error if recovery code is incorrect", async () => {
       try {
         await confirmPasswordRecoveryUseCase("123456", "incorrect");
@@ -361,6 +356,8 @@ describe("/auth", () => {
     });
 
     it("should return an error if recovery code has been expired", async () => {
+      const dateFnsService = container.get(DateFnsService);
+
       const { email, login, pass } = testSeeder.createUserDto({
         email: "new_email@mail.com",
         login: "uniqueLogin",

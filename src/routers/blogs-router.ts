@@ -5,7 +5,10 @@ import { authGuard } from "../middlewares/auth/basic-auth-validator";
 import { bodyValidationResult } from "../middlewares/validation-result";
 import { validateParamsId } from "../middlewares/validate-paramsId";
 import { postsBodyValidator } from "../middlewares/body-validations/posts-body-validators";
-import { blogsController } from "../composition-root";
+import { container } from "../composition-root";
+import { BlogsController } from "./controllers/blogs-controller";
+
+const blogsController = container.get(BlogsController);
 
 export const blogsRouter = Router();
 

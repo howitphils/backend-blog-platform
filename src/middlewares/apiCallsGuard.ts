@@ -1,7 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { HttpStatuses } from "../types/http-statuses";
 import { APP_CONFIG } from "../settings";
-import { apiCallsRepository, dateFnsService } from "../composition-root";
+import { container } from "../composition-root";
+import { ApiCallsRepository } from "../db/mongodb/repositories/apiCalls-repository";
+import { DateFnsService } from "../adapters/dateFnsService";
+
+const apiCallsRepository = container.get(ApiCallsRepository);
+const dateFnsService = container.get(DateFnsService);
 
 export const apiCallsGuard = async (
   req: Request,

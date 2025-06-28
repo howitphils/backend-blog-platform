@@ -1,10 +1,13 @@
+import { container } from "./../composition-root";
 import { Router } from "express";
 
 import { bodyValidationResult } from "../middlewares/validation-result";
 import { commentsBodyValidators } from "../middlewares/body-validations/comments-body-validators";
 import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 import { validateParamsId } from "../middlewares/validate-paramsId";
-import { commentsController } from "../composition-root";
+import { CommentsController } from "./controllers/comments-controller";
+
+const commentsController = container.get(CommentsController);
 
 export const commentsRouter = Router();
 

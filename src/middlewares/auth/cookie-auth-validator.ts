@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { APP_CONFIG } from "../../settings";
 import { HttpStatuses } from "../../types/http-statuses";
-import { jwtService } from "../../composition-root";
+import { container } from "../../composition-root";
+import { JwtService } from "../../adapters/jwtService";
+
+const jwtService = container.get(JwtService);
 
 export const refreshTokenValidator = (
   req: Request,

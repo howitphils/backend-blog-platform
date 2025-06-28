@@ -1,7 +1,10 @@
 import { Response, NextFunction, Request } from "express";
 import { HttpStatuses } from "../../types/http-statuses";
 import { ResultStatus } from "../../types/resultObject-types";
-import { authService } from "../../composition-root";
+import { container } from "../../composition-root";
+import { AuthService } from "../../services/auth-service";
+
+const authService = container.get(AuthService);
 
 export const jwtAuthGuard = (
   req: Request<{}>,

@@ -10,7 +10,10 @@ import { refreshTokenValidator } from "../middlewares/auth/cookie-auth-validator
 import { apiCallsGuard } from "../middlewares/apiCallsGuard";
 import { confrimPasswordRecoveryValidators } from "../middlewares/body-validations/confirm-recover-password-body-validators";
 import { APP_CONFIG } from "../settings";
-import { authController } from "../composition-root";
+import { container } from "../composition-root";
+import { AuthController } from "./controllers/auth-controller";
+
+const authController = container.get(AuthController);
 
 export const authRouter = Router();
 

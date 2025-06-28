@@ -75,13 +75,6 @@ export class AuthService {
       );
     }
 
-    // if (!targetUser.emailConfirmation.isConfirmed) {
-    //   throw new ErrorWithStatusCode(
-    //     "User is not confirmed",
-    //     HttpStatuses.Unauthorized
-    //   );
-    // }
-
     const deviceId = this.uuIdService.createRandomCode();
 
     const tokenPair = this.jwtService.createJwtPair(

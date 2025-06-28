@@ -185,6 +185,16 @@ describe("/auth", () => {
       await clearCollections();
     });
 
+    it("should return successful status even if user is not registered", async () => {
+      await req
+        .post(
+          APP_CONFIG.MAIN_PATHS.AUTH +
+            APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
+        )
+        .send({ email: "some@email.com" })
+        .expect(HttpStatuses.NoContent);
+    });
+
     it("should return an error for incorrect email", async () => {
       const res = await req
         .post(
@@ -199,7 +209,7 @@ describe("/auth", () => {
     });
 
     it("should return an error for too many requests", async () => {
-      for (let i = 0; i < APP_CONFIG.USER_LOGINS_TEST_COUNT; i++) {
+      for (let i = 0; i < APP_CONFIG.USER_LOGINS_TEST_COUNT - 1; i++) {
         await req
           .post(
             APP_CONFIG.MAIN_PATHS.AUTH +

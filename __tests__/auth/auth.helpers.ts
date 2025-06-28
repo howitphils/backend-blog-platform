@@ -1,3 +1,4 @@
+import { container } from "./../../src/composition-root";
 import { WithId } from "mongodb";
 import {
   sessionsCollection,
@@ -5,7 +6,11 @@ import {
 } from "../../src/db/mongodb/mongodb";
 import { UserDbType } from "../../src/types/users-types";
 import { SessionDbType, SessionTestType } from "../../src/types/sessions-types";
-import { dateFnsService, uuIdService } from "../../src/composition-root";
+import { DateFnsService } from "../../src/adapters/dateFnsService";
+import { UuidService } from "../../src/adapters/uuIdService";
+
+const dateFnsService = container.get(DateFnsService);
+const uuIdService = container.get(UuidService);
 
 type RegisterUserPayloadType = {
   login: string;

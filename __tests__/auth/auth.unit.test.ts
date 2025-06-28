@@ -1,6 +1,9 @@
+import { container } from "./../../src/composition-root";
 import { JwtService } from "../../src/adapters/jwtService";
-import { authService } from "../../src/composition-root";
 import { ResultStatus } from "../../src/types/resultObject-types";
+import { AuthService } from "../../src/services/auth-service";
+
+const authService = container.get(AuthService);
 
 describe("/unit tests for check access token", () => {
   const checkAccessTokenUseCase =
@@ -23,8 +26,6 @@ describe("/unit tests for check access token", () => {
     JwtService.prototype.verifyToken = jest.fn().mockReturnValue({ userId: 1 });
 
     const res = checkAccessTokenUseCase("Bearer token");
-
-    console.log(res);
 
     expect(res.status).toBe(ResultStatus.Success);
     expect(res.data).toBe(1);
