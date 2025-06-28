@@ -8,6 +8,8 @@ export const apiCallsGuard = async (
   res: Response,
   next: NextFunction
 ) => {
+  //TODO: написать тесты на проверку количества запросов
+
   const { originalUrl, ip } = req;
   const secondsAgoDate = dateFnsService.rollBackBySeconds(
     APP_CONFIG.REQUEST_LIMIT_PERIOD

@@ -345,13 +345,17 @@ describe("/auth", () => {
 
     it("should return an error if recovery code is incorrect", async () => {
       try {
-        await confirmPasswordRecoveryUseCase("123456", "incorrect_code");
+        await confirmPasswordRecoveryUseCase("123456", "incorrect");
         fail("Error exprected");
       } catch (error: any) {
         expect(error).toBeInstanceOf(ErrorWithStatusCode);
         expect(error.message).toBe(
           APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_INCORRECT
         );
+        expect(error.errorObj.errorsMessages[0]).toEqual({
+          message: APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_INCORRECT,
+          field: "recoveryCode",
+        });
         expect(error.statusCode).toBe(HttpStatuses.BadRequest);
       }
     });

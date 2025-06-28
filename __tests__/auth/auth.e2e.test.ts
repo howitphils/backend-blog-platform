@@ -193,13 +193,32 @@ describe("/auth", () => {
           APP_CONFIG.MAIN_PATHS.AUTH +
             APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
         )
-        .send({ email: "incorrect_email" })
+        .send({ email: "invalid^gmail.cm" })
         .expect(HttpStatuses.BadRequest);
 
       expect(res.body.errorsMessages[0].field).toBe("email");
       expect(res.body.errorsMessages[0].message).toBe("Must be an email");
     });
+
+    it("should return an error for too many requests", async () => {
+      for (let i = 0; i < APP_CONFIG.USER_LOGINS_TEST_COUNT; i++) {
+        await req
+          .post(
+            APP_CONFIG.MAIN_PATHS.AUTH +
+              APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
+          )
+          .expect(HttpStatuses.BadRequest);
+      }
+
+      await req
+        .post(
+          APP_CONFIG.MAIN_PATHS.AUTH +
+            APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
+        )
+        .expect(HttpStatuses.TooManyRequests);
+    });
   });
+
   describe("confirm password recovery", () => {
     afterAll(async () => {
       await clearCollections();
@@ -231,6 +250,24 @@ describe("/auth", () => {
 
       expect(res.body.errorsMessages[0].field).toBe("recoveryCode");
       expect(res.body.errorsMessages[0].message).toBe("Must be a string");
+    });
+
+    it("should return an error for too many requests", async () => {
+      for (let i = 0; i < APP_CONFIG.USER_LOGINS_TEST_COUNT - 1; i++) {
+        await req
+          .post(
+            APP_CONFIG.MAIN_PATHS.AUTH +
+              APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY
+          )
+          .expect(HttpStatuses.BadRequest);
+      }
+
+      await req
+        .post(
+          APP_CONFIG.MAIN_PATHS.AUTH +
+            APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY
+        )
+        .expect(HttpStatuses.TooManyRequests);
     });
   });
 });
