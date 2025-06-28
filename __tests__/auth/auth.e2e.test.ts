@@ -131,8 +131,6 @@ describe("/auth", () => {
         .split(";")[0]
         .split("=")[1];
 
-      console.log("compare: ", oldRefreshToken === newRefreshToken);
-
       expect(res.body).toEqual({
         accessToken: expect.any(String),
       });

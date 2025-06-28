@@ -1,10 +1,14 @@
+import { inject, injectable } from "inversify";
 import { SessionRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { SessionDbType } from "../types/sessions-types";
 
+@injectable()
 export class SessionService {
-  constructor(public sessionsRepository: SessionRepository) {}
+  constructor(
+    @inject(SessionRepository) public sessionsRepository: SessionRepository
+  ) {}
 
   async getAllUsersSessions(userId: string): Promise<SessionDbType[]> {
     return this.sessionsRepository.findAllUsersSessions(userId);

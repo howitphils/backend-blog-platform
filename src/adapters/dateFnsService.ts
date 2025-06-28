@@ -1,5 +1,7 @@
 import { add, subSeconds } from "date-fns";
+import { injectable } from "inversify";
 
+@injectable()
 export class DateFnsService {
   addToCurrentDate(hours?: number, minutes?: number) {
     return add(new Date(), {

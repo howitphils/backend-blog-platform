@@ -8,12 +8,18 @@ import { UsersRepository } from "../db/mongodb/repositories/users-repository/use
 import { BcryptService } from "../adapters/bcryptService";
 import { UuidService } from "../adapters/uuIdService";
 import { DateFnsService } from "../adapters/dateFnsService";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class UsersService {
   constructor(
+    @inject(UsersRepository)
     public usersRepository: UsersRepository,
+    @inject(BcryptService)
     public bcryptService: BcryptService,
+    @inject(UuidService)
     public uuIdService: UuidService,
+    @inject(DateFnsService)
     public dateFnsService: DateFnsService
   ) {}
 

@@ -4,9 +4,13 @@ import { BlogDbType, BlogInputModel } from "../types/blogs-types";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { BlogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class BlogsService {
-  constructor(public blogsRepository: BlogsRepository) {}
+  constructor(
+    @inject(BlogsRepository) public blogsRepository: BlogsRepository
+  ) {}
 
   async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {
     const newBlog: BlogDbType = {

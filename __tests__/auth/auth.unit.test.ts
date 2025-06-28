@@ -1,4 +1,5 @@
-import { authService, jwtService } from "../../src/composition-root";
+import { JwtService } from "../../src/adapters/jwtService";
+import { authService } from "../../src/composition-root";
 import { ResultStatus } from "../../src/types/resultObject-types";
 
 describe("/unit tests for check access token", () => {
@@ -18,10 +19,12 @@ describe("/unit tests for check access token", () => {
     expect(res.errorMessage).toBe("Token is not verified");
   });
 
-  it("should return an error if token is not verified", () => {
-    jwtService.verifyToken = jest.fn().mockReturnValue({ userId: 1 });
+  it("should successfuly verify token", () => {
+    JwtService.prototype.verifyToken = jest.fn().mockReturnValue({ userId: 1 });
 
-    const res = checkAccessTokenUseCase("Bearer asdasd");
+    const res = checkAccessTokenUseCase("Bearer token");
+
+    console.log(res);
 
     expect(res.status).toBe(ResultStatus.Success);
     expect(res.data).toBe(1);

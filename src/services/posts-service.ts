@@ -4,10 +4,15 @@ import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { PostsRepository } from "../db/mongodb/repositories/posts-repository/posts-db-repository";
 import { BlogsService } from "./blogs-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class PostsService {
   constructor(
+    @inject(PostsRepository)
     public postsRepository: PostsRepository,
+
+    @inject(BlogsService)
     public blogsService: BlogsService
   ) {}
 

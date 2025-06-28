@@ -10,11 +10,18 @@ import { ResultObject, ResultStatus } from "../types/resultObject-types";
 import { PostsService } from "./posts-service";
 import { CommentsRepository } from "../db/mongodb/repositories/comments-repository/comments-db-repository";
 import { UsersService } from "./users-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class CommentsService {
   constructor(
+    @inject(PostsService)
     public postsService: PostsService,
+
+    @inject(CommentsRepository)
     public commentsRepository: CommentsRepository,
+
+    @inject(UsersService)
     public usersService: UsersService
   ) {}
 

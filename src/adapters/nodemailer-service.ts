@@ -1,6 +1,8 @@
 import { createTransport } from "nodemailer";
 import { APP_CONFIG } from "../settings";
+import { injectable } from "inversify";
 
+@injectable()
 export class NodeMailerService {
   async sendEmail({
     email,

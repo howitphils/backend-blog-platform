@@ -18,16 +18,33 @@ import { APP_CONFIG } from "../settings";
 import { EmailManager } from "../managers/email-manager";
 import { DateFnsService } from "../adapters/dateFnsService";
 import { UsersService } from "./users-service";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class AuthService {
   constructor(
+    @inject(UsersRepository)
     public usersRepository: UsersRepository,
+
+    @inject(SessionRepository)
     public sessionsRepository: SessionRepository,
+
+    @inject(UsersService)
     public usersService: UsersService,
+
+    @inject(BcryptService)
     public bcryptService: BcryptService,
+
+    @inject(JwtService)
     public jwtService: JwtService,
+
+    @inject(UuidService)
     public uuIdService: UuidService,
+
+    @inject(EmailManager)
     public emailManager: EmailManager,
+
+    @inject(DateFnsService)
     public dateFnsService: DateFnsService
   ) {}
 
@@ -58,12 +75,12 @@ export class AuthService {
       );
     }
 
-    if (!targetUser.emailConfirmation.isConfirmed) {
-      throw new ErrorWithStatusCode(
-        "User is not confirmed",
-        HttpStatuses.Unauthorized
-      );
-    }
+    // if (!targetUser.emailConfirmation.isConfirmed) {
+    //   throw new ErrorWithStatusCode(
+    //     "User is not confirmed",
+    //     HttpStatuses.Unauthorized
+    //   );
+    // }
 
     const deviceId = this.uuIdService.createRandomCode();
 
@@ -152,22 +169,22 @@ export class AuthService {
         targetUser.accountData.email,
         targetUser.emailConfirmation.confirmationCode
       )
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        console.log("registration");
+        console.log(e);
+      });
   }
 
   async recoverPassword(email: string) {
-    let recoveryCode: string = "";
     const user = await this.usersRepository.findUserByEmail(email);
 
-    if (!user) {
-      recoveryCode = this.uuIdService.createRandomCode();
-    } else {
-      recoveryCode = user.passwordRecovery.recoveryCode;
-    }
+    if (!user) return;
 
     this.emailManager
-      .sendEmailForPasswordRecovery(email, recoveryCode)
-      .catch((e) => console.log(e));
+      .sendEmailForPasswordRecovery(email, user.passwordRecovery.recoveryCode)
+      .catch((e) => {
+        console.log("password recovery", e);
+      });
   }
 
   async confirmPasswordRecovery(newPassword: string, recoveryCode: string) {

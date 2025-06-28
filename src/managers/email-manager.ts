@@ -1,7 +1,11 @@
+import { inject, injectable } from "inversify";
 import { NodeMailerService } from "../adapters/nodemailer-service";
 
+@injectable()
 export class EmailManager {
-  constructor(public nodeMailerService: NodeMailerService) {}
+  constructor(
+    @inject(NodeMailerService) public nodeMailerService: NodeMailerService
+  ) {}
 
   async sendEmailForRegistration(email: string, confirmationCode: string) {
     return this.nodeMailerService.sendEmail({

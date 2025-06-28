@@ -1,12 +1,14 @@
 import { decode, JwtPayload, sign, verify } from "jsonwebtoken";
 import { APP_CONFIG } from "../settings";
 import { TokenPairType } from "../types/login-types";
+import { injectable } from "inversify";
 
 export interface JwtPayloadRefresh extends JwtPayload {
   userId: string;
   deviceId: string;
 }
 
+@injectable()
 export class JwtService {
   createAccessToken(payload: { userId: string }): string {
     return sign(payload, APP_CONFIG.JWT_SECRET_ACCESS, {
@@ -43,7 +45,6 @@ export class JwtService {
     try {
       return verify(token, secretKey);
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
