@@ -6,9 +6,9 @@ import { createErrorsObject } from "../routers/controllers/utils";
 import { APP_CONFIG } from "../settings";
 import { UsersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { BcryptService } from "../adapters/bcryptService";
-import { UuidService } from "../adapters/uuIdService";
-import { DateFnsService } from "../adapters/dateFnsService";
 import { inject, injectable } from "inversify";
+import { DateFnsService } from "../adapters/dateFnsService";
+import { UuidService } from "../adapters/uuIdService";
 
 @injectable()
 export class UsersService {
@@ -19,11 +19,11 @@ export class UsersService {
     @inject(BcryptService)
     private bcryptService: BcryptService,
 
-    @inject(UuidService)
-    private uuIdService: UuidService,
-
     @inject(DateFnsService)
-    private dateFnsService: DateFnsService
+    private dateFnsService: DateFnsService,
+
+    @inject(UuidService)
+    private uuIdService: UuidService
   ) {}
 
   async createNewUser(
@@ -42,7 +42,7 @@ export class UsersService {
         existingUser.accountData.email === email ? "email" : "login";
 
       throw new ErrorWithStatusCode(
-        "User already exists",
+        APP_CONFIG.ERROR_MESSAGES.USER_ALREADY_EXISTS,
         HttpStatuses.BadRequest,
         createErrorsObject(field, `User with this ${field} already exists`)
       );
@@ -52,6 +52,8 @@ export class UsersService {
 
     const confirmationCode = this.uuIdService.createRandomCode();
     const recoveryCode = this.uuIdService.createRandomCode();
+
+    // const newUser: User = new User(email, login, passHash, isAdmin);
 
     const newUser: UserDbType = {
       accountData: {

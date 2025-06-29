@@ -259,7 +259,7 @@ describe("/blogs", () => {
       await req
         .get(
           APP_CONFIG.MAIN_PATHS.BLOGS +
-            `/${blogId.slice(0, -1) + "a"}` +
+            `/${blogId.slice(0, -2) + "ab"}` +
             "/posts"
         )
         .expect(HttpStatuses.NotFound);
@@ -313,7 +313,9 @@ describe("/blogs", () => {
       const newPostDto = createPostForBlogDto({});
 
       await req
-        .post(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
+        .post(
+          APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}/posts`
+        )
         .set(basicAuth)
         .send(newPostDto)
         .expect(HttpStatuses.NotFound);

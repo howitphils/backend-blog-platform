@@ -169,7 +169,7 @@ describe("/auth", () => {
       } catch (error: any) {
         expect(error).toBeInstanceOf(ErrorWithStatusCode);
         expect(error).toHaveProperty("errorObj");
-        expect(error.message).toBe("User with this email does not exist");
+        expect(error.message).toBe(APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND);
         expect(error.statusCode).toBe(HttpStatuses.BadRequest);
       }
     });
@@ -192,7 +192,9 @@ describe("/auth", () => {
       } catch (error: any) {
         expect(error).toBeInstanceOf(ErrorWithStatusCode);
         expect(error).toHaveProperty("errorObj");
-        expect(error.message).toBe("User with this email is already confirmed");
+        expect(error.message).toBe(
+          APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED
+        );
         expect(error.statusCode).toBe(HttpStatuses.BadRequest);
       }
     });
@@ -215,7 +217,9 @@ describe("/auth", () => {
       } catch (error: any) {
         expect(error).toBeInstanceOf(ErrorWithStatusCode);
         expect(error).toHaveProperty("errorObj");
-        expect(error.message).toBe("User with this email is already confirmed");
+        expect(error.message).toBe(
+          APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED
+        );
         expect(error.statusCode).toBe(HttpStatuses.BadRequest);
       }
     });

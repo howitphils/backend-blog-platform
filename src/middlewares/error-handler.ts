@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import { HttpStatuses } from "../types/http-statuses";
 import { OutputErrorsType } from "../types/output-errors-types";
 
@@ -34,4 +34,6 @@ export const errorHandler = (
 
   console.log(JSON.stringify(err));
   res.status(HttpStatuses.ServerError).json({ message: "Unexpected error" });
+
+  return;
 };
