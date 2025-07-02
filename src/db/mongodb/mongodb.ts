@@ -23,6 +23,15 @@ const blogsSchema = new mongoose.Schema<BlogDbType>({
   isMembership: { type: Boolean },
 });
 
+const postsSchema = new mongoose.Schema<PostDbType>({
+  title: { type: String },
+  blogId: { type: String },
+  blogName: { type: String },
+  content: { type: String },
+  createdAt: { type: String },
+  shortDescription: { type: String },
+});
+
 export const runDb = async (url: string, dbName: string | undefined) => {
   const client = new MongoClient(url);
   const db = client.db(dbName);
