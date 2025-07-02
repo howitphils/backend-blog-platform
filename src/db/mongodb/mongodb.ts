@@ -6,6 +6,7 @@ import { UserDbType } from "../../types/users-types";
 import { CommentDbType } from "../../types/comments-types";
 import { SessionDbType } from "../../types/sessions-types";
 import { ApiCallType } from "../../types/apiCalls";
+import mongoose from "mongoose";
 
 export let blogsCollection: Collection<BlogDbType>;
 export let postsCollection: Collection<PostDbType>;
@@ -13,6 +14,14 @@ export let usersCollection: Collection<UserDbType>;
 export let commentsCollection: Collection<CommentDbType>;
 export let sessionsCollection: Collection<SessionDbType>;
 export let apiCallsCollection: Collection<ApiCallType>;
+
+const blogsSchema = new mongoose.Schema<BlogDbType>({
+  name: { type: String, required: true },
+  description: { type: String },
+  websiteUrl: { type: String },
+  createdAt: { type: String },
+  isMembership: { type: Boolean },
+});
 
 export const runDb = async (url: string, dbName: string | undefined) => {
   const client = new MongoClient(url);
@@ -39,10 +48,12 @@ export const runDb = async (url: string, dbName: string | undefined) => {
   );
 
   try {
-    await client.connect();
+    await mongoose.connect(url + "/" + dbName);
+    // await client.connect();
     console.log("connected to db");
   } catch (error) {
-    await client.close();
+    // await client.close();
+    await mongoose.disconnect();
   }
   return client;
 };
