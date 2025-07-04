@@ -25,7 +25,7 @@ export class BlogsService {
   }
 
   async getBlogById(id: ObjectId): Promise<WithId<BlogDbType>> {
-    const blog = await this.blogsRepository.getBlogById(id);
+    const blog = await this.blogsRepository.getBlogById(id.toString());
 
     if (!blog) {
       throw new ErrorWithStatusCode(
@@ -41,7 +41,7 @@ export class BlogsService {
     id: ObjectId,
     updatedBlog: BlogInputModel
   ): Promise<boolean> {
-    const targetBlog = await this.blogsRepository.getBlogById(id);
+    const targetBlog = await this.blogsRepository.getBlogById(id.toString());
 
     if (!targetBlog) {
       throw new ErrorWithStatusCode(
@@ -54,7 +54,7 @@ export class BlogsService {
   }
 
   async deleteBlog(id: ObjectId): Promise<boolean> {
-    const targetBlog = await this.blogsRepository.getBlogById(id);
+    const targetBlog = await this.blogsRepository.getBlogById(id.toString());
 
     if (!targetBlog) {
       throw new ErrorWithStatusCode(

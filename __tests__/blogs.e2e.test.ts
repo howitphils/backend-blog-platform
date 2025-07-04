@@ -1,5 +1,5 @@
 import { HttpStatuses } from "./../src/types/http-statuses";
-import { MongoClient } from "mongodb";
+// import { MongoClient } from "mongodb";
 import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
 import { APP_CONFIG } from "../src/settings";
 import {
@@ -11,16 +11,22 @@ import {
   makeIncorrect,
   req,
 } from "./test-helpers";
+// import mongoose from "mongoose";
+import mongoose from "mongoose";
 
 describe("/blogs", () => {
-  let client: MongoClient;
+  // let client: MongoClient;
 
   beforeAll(async () => {
-    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
+    await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
+    // await mongoose.connect(
+    //   APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
+    // );
   });
 
   afterAll(async () => {
-    await client.close();
+    // await client.close();
+    await mongoose.disconnect();
     console.log("Connection closed");
   });
 
@@ -61,7 +67,9 @@ describe("/blogs", () => {
         isMembership: false,
       });
 
-      const response = await req.get(APP_CONFIG.MAIN_PATHS.BLOGS).expect(200);
+      const response = await req
+        .get(APP_CONFIG.MAIN_PATHS.BLOGS)
+        .expect(HttpStatuses.Success);
 
       expect(response.body.items.length).toBe(1);
     });

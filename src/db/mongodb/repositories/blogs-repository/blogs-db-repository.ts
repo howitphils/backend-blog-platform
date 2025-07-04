@@ -1,19 +1,30 @@
 import { ObjectId, WithId } from "mongodb";
 import { BlogDbType, BlogInputModel } from "../../../../types/blogs-types";
-import { blogsCollection } from "../../mongodb";
+// import { blogsCollection } from "../../mongodb";
 import { injectable } from "inversify";
+import mongoose from "mongoose";
+
+const blogsSchema = new mongoose.Schema<BlogDbType>({
+  name: { type: String, required: true },
+  description: { type: String },
+  websiteUrl: { type: String },
+  createdAt: { type: String },
+  isMembership: { type: Boolean },
+});
+
+export const BlogsModel = mongoose.model("Blog", blogsSchema);
 
 @injectable()
 export class BlogsRepository {
   // Создание нового блога
   async createNewBlog(blog: BlogDbType): Promise<ObjectId> {
-    const createResult = await blogsCollection.insertOne(blog);
-    return createResult.insertedId;
+    const createResult = await BlogsModel.insertOne(blog);
+    return createResult._id;
   }
 
   // Получение блога по айди
-  async getBlogById(_id: ObjectId): Promise<WithId<BlogDbType> | null> {
-    return blogsCollection.findOne({ _id });
+  async getBlogById(id: string): Promise<WithId<BlogDbType> | null> {
+    return BlogsModel.findById(id);
   }
 
   // Обновление блога
@@ -21,7 +32,7 @@ export class BlogsRepository {
     _id: ObjectId,
     updatedBlog: BlogInputModel
   ): Promise<boolean> {
-    const updateResult = await blogsCollection.updateOne(
+    const updateResult = await BlogsModel.updateOne(
       { _id },
       { $set: { ...updatedBlog } }
     );
@@ -30,8 +41,8 @@ export class BlogsRepository {
   }
 
   // Удаление блога
-  async deleteBlog(_id: ObjectId): Promise<boolean> {
-    const deleteResult = await blogsCollection.deleteOne({ _id });
+  async deleteBlog(id: ObjectId): Promise<boolean> {
+    const deleteResult = await BlogsModel.deleteOne({ _id: id });
     return deleteResult.deletedCount === 1;
   }
 }
