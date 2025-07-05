@@ -6,8 +6,8 @@ import { CommentDbType } from "../../types/comments-types";
 import { SessionDbType } from "../../types/sessions-types";
 import { ApiCallType } from "../../types/apiCalls";
 import mongoose from "mongoose";
-import { BlogsModel } from "./repositories/blogs-repository/blogs-db-repository";
 import { PostsModel } from "./repositories/posts-repository/post-entity";
+import { BlogsModel } from "./repositories/blogs-repository/blogs-entity";
 
 export let blogsCollection: Collection<BlogDbType>;
 export let postsCollection: Collection<PostDbType>;

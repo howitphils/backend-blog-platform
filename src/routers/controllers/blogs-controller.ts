@@ -5,6 +5,7 @@ import {
   BlogInputModel,
   BlogsRequestQueryType,
   BlogViewModel,
+  UpdateBlogInputModel,
 } from "../../types/blogs-types";
 import {
   PostForBlogInputModel,
@@ -127,7 +128,7 @@ export class BlogsController {
   }
 
   async updateBlog(
-    req: RequestWithParamsAndBody<ParamsId, BlogInputModel>,
+    req: RequestWithParamsAndBody<ParamsId, UpdateBlogInputModel>,
     res: Response
   ) {
     await this.blogsService.updateBlog(req.params.id, req.body);

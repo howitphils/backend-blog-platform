@@ -1,10 +1,15 @@
-import { ObjectId, WithId } from "mongodb";
+import { WithId } from "mongodb";
 
-import { BlogDbType, BlogInputModel } from "../types/blogs-types";
+import {
+  BlogDbType,
+  BlogInputModel,
+  UpdateBlogInputModel,
+} from "../types/blogs-types";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { BlogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
 import { inject, injectable } from "inversify";
+import { BlogsModel } from "../db/mongodb/repositories/blogs-repository/blogs-entity";
 
 @injectable()
 export class BlogsService {
@@ -13,15 +18,16 @@ export class BlogsService {
   ) {}
 
   async createNewBlog(blog: BlogInputModel): Promise<string> {
-    const newBlog: BlogDbType = {
-      name: blog.name,
-      description: blog.description,
-      websiteUrl: blog.websiteUrl,
-      createdAt: new Date().toISOString(),
-      isMembership: false,
-    };
+    // const { description, name, websiteUrl } = blog;
 
-    return this.blogsRepository.createNewBlog(newBlog);
+    // const newBlog: BlogDbType = new Blog(name, description, websiteUrl);
+
+    const dbBlog = new BlogsModel(blog);
+
+    dbBlog.createdAt = new Date().toISOString();
+    dbBlog.isMembership = false;
+
+    return this.blogsRepository.save(dbBlog);
   }
 
   async getBlogById(id: string): Promise<WithId<BlogDbType>> {
@@ -37,7 +43,10 @@ export class BlogsService {
     return blog;
   }
 
-  async updateBlog(id: string, updatedBlog: BlogInputModel): Promise<boolean> {
+  async updateBlog(
+    id: string,
+    updatedBlog: UpdateBlogInputModel
+  ): Promise<void> {
     const targetBlog = await this.blogsRepository.getBlogById(id);
 
     if (!targetBlog) {
@@ -47,10 +56,14 @@ export class BlogsService {
       );
     }
 
-    return this.blogsRepository.updateBlog(id, updatedBlog);
+    targetBlog.name = updatedBlog.newName;
+    targetBlog.description = updatedBlog.newDescription;
+    targetBlog.websiteUrl = updatedBlog.newWebsiteUrl;
+
+    await this.blogsRepository.save(targetBlog);
   }
 
-  async deleteBlog(id: string): Promise<boolean> {
+  async deleteBlog(id: string): Promise<void> {
     const targetBlog = await this.blogsRepository.getBlogById(id);
 
     if (!targetBlog) {
@@ -60,6 +73,6 @@ export class BlogsService {
       );
     }
 
-    return this.blogsRepository.deleteBlog(id);
+    await targetBlog.deleteOne();
   }
 }

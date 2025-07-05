@@ -4,6 +4,12 @@ export type BlogInputModel = {
   websiteUrl: string;
 };
 
+export type UpdateBlogInputModel = {
+  newName: string;
+  newDescription: string;
+  newWebsiteUrl: string;
+};
+
 export type BlogViewModel = {
   id: string;
   name: string;

@@ -1,10 +1,14 @@
-import { WithId } from "mongodb";
 import { BlogDbType, BlogInputModel } from "../../../../types/blogs-types";
 import { injectable } from "inversify";
-import { BlogsModel } from "./blogs-entity";
+import { BlogDbDocument, BlogsModel } from "./blogs-entity";
 
 @injectable()
 export class BlogsRepository {
+  async save(blog: BlogDbDocument): Promise<string> {
+    const result = await blog.save();
+    return result.id;
+  }
+
   // Создание нового блога
   async createNewBlog(blog: BlogDbType): Promise<string> {
     const dbBlog = new BlogsModel(blog);
@@ -15,7 +19,7 @@ export class BlogsRepository {
   }
 
   // Получение блога по айди
-  async getBlogById(id: string): Promise<WithId<BlogDbType> | null> {
+  async getBlogById(id: string): Promise<BlogDbDocument | null> {
     return BlogsModel.findById(id);
   }
 
