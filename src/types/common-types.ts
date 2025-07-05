@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 export type PaginationType<T> = {
   pagesCount: number;
   page: number;
@@ -9,5 +7,5 @@ export type PaginationType<T> = {
 };
 
 export type ParamsId = {
-  id: ObjectId;
+  id: string;
 };

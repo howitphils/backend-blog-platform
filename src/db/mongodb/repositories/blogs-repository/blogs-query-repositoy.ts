@@ -2,11 +2,11 @@ import {
   BlogViewModel,
   BlogsMapedQueryType,
 } from "../../../../types/blogs-types";
-import { ObjectId, WithId } from "mongodb";
+import { WithId } from "mongodb";
 import { BlogDbType } from "../../../../types/blogs-types";
-import { blogsCollection } from "../../mongodb";
+// import { blogsCollection } from "../../mongodb";
 import { PaginationType } from "../../../../types/common-types";
-import { BlogsModel } from "./blogs-db-repository";
+import { BlogsModel } from "./blogs-entity";
 
 export class BlogsQueryRepository {
   async getAllBlogs(
@@ -21,8 +21,8 @@ export class BlogsQueryRepository {
     )
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize);
-    // .toArray();
+      .limit(pageSize)
+      .lean();
 
     // Подсчет общего количества блогов
     const totalCount = await BlogsModel.countDocuments(
@@ -42,8 +42,8 @@ export class BlogsQueryRepository {
     };
   }
 
-  async getBlogById(_id: ObjectId): Promise<BlogViewModel | null> {
-    const targetBlog = await BlogsModel.findOne({ _id });
+  async getBlogById(id: string): Promise<BlogViewModel | null> {
+    const targetBlog = await BlogsModel.findById(id);
     if (targetBlog) {
       return this._mapFromDbToViewModel(targetBlog);
     } else {

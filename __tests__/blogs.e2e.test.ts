@@ -1,6 +1,5 @@
 import { HttpStatuses } from "./../src/types/http-statuses";
-// import { MongoClient } from "mongodb";
-import { clearCollections, runDb } from "../src/db/mongodb/mongodb";
+import { clearCollections } from "../src/db/mongodb/mongodb";
 import { APP_CONFIG } from "../src/settings";
 import {
   basicAuth,
@@ -11,21 +10,16 @@ import {
   makeIncorrect,
   req,
 } from "./test-helpers";
-// import mongoose from "mongoose";
 import mongoose from "mongoose";
 
 describe("/blogs", () => {
-  // let client: MongoClient;
-
   beforeAll(async () => {
-    await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
-    // await mongoose.connect(
-    //   APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
-    // );
+    await mongoose.connect(
+      APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
+    );
   });
 
   afterAll(async () => {
-    // await client.close();
     await mongoose.disconnect();
     console.log("Connection closed");
   });

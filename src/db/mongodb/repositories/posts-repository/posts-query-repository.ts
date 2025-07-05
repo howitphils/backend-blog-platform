@@ -4,8 +4,8 @@ import {
   PostsMapedQueryType,
   PostViewModel,
 } from "../../../../types/posts-types";
-import { postsCollection } from "../../mongodb";
 import { PaginationType } from "../../../../types/common-types";
+import { PostsModel } from "./post-entity";
 
 export class PostsQueryRepository {
   // Получение всех постов с учетом query параметров
@@ -15,15 +15,14 @@ export class PostsQueryRepository {
     const { pageNumber, pageSize, sortBy, sortDirection } = filters;
 
     // Получаем посты с учетом query параметров
-    const posts = await postsCollection
-      .find({})
+    const posts = await PostsModel.find({})
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .toArray();
+      .lean();
 
     // Получаем число всех постов
-    const totalCount = await postsCollection.countDocuments();
+    const totalCount = await PostsModel.countDocuments();
 
     return {
       page: pageNumber,
@@ -42,15 +41,14 @@ export class PostsQueryRepository {
     const { pageNumber, pageSize, sortBy, sortDirection } = filters;
 
     // Получаем посты конкретного блога с учетом query параметров и айди блога
-    const posts = await postsCollection
-      .find({ blogId })
+    const posts = await PostsModel.find({ blogId })
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize)
-      .toArray();
+      .lean();
 
     // Получаем число постов конкретного блога
-    const totalCount = await postsCollection.countDocuments({
+    const totalCount = await PostsModel.countDocuments({
       blogId,
     });
 
@@ -65,7 +63,7 @@ export class PostsQueryRepository {
 
   async getPostById(_id: ObjectId): Promise<PostViewModel | null> {
     // Получаем пост по id
-    const post = await postsCollection.findOne({ _id });
+    const post = await PostsModel.findById(_id);
     // Если пост не найден, возвращаем null
     if (!post) {
       return null;

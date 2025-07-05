@@ -12,7 +12,7 @@ export class BlogsService {
     @inject(BlogsRepository) private blogsRepository: BlogsRepository
   ) {}
 
-  async createNewBlog(blog: BlogInputModel): Promise<ObjectId> {
+  async createNewBlog(blog: BlogInputModel): Promise<string> {
     const newBlog: BlogDbType = {
       name: blog.name,
       description: blog.description,
@@ -24,8 +24,8 @@ export class BlogsService {
     return this.blogsRepository.createNewBlog(newBlog);
   }
 
-  async getBlogById(id: ObjectId): Promise<WithId<BlogDbType>> {
-    const blog = await this.blogsRepository.getBlogById(id.toString());
+  async getBlogById(id: string): Promise<WithId<BlogDbType>> {
+    const blog = await this.blogsRepository.getBlogById(id);
 
     if (!blog) {
       throw new ErrorWithStatusCode(
@@ -37,11 +37,8 @@ export class BlogsService {
     return blog;
   }
 
-  async updateBlog(
-    id: ObjectId,
-    updatedBlog: BlogInputModel
-  ): Promise<boolean> {
-    const targetBlog = await this.blogsRepository.getBlogById(id.toString());
+  async updateBlog(id: string, updatedBlog: BlogInputModel): Promise<boolean> {
+    const targetBlog = await this.blogsRepository.getBlogById(id);
 
     if (!targetBlog) {
       throw new ErrorWithStatusCode(
@@ -53,8 +50,8 @@ export class BlogsService {
     return this.blogsRepository.updateBlog(id, updatedBlog);
   }
 
-  async deleteBlog(id: ObjectId): Promise<boolean> {
-    const targetBlog = await this.blogsRepository.getBlogById(id.toString());
+  async deleteBlog(id: string): Promise<boolean> {
+    const targetBlog = await this.blogsRepository.getBlogById(id);
 
     if (!targetBlog) {
       throw new ErrorWithStatusCode(

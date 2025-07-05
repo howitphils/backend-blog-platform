@@ -1,6 +1,5 @@
 import { PostDbType } from "./../../types/posts-types";
 import { Collection } from "mongodb";
-// import { APP_CONFIG } from "../../settings";
 import { BlogDbType } from "../../types/blogs-types";
 import { UserDbType } from "../../types/users-types";
 import { CommentDbType } from "../../types/comments-types";
@@ -8,6 +7,7 @@ import { SessionDbType } from "../../types/sessions-types";
 import { ApiCallType } from "../../types/apiCalls";
 import mongoose from "mongoose";
 import { BlogsModel } from "./repositories/blogs-repository/blogs-db-repository";
+import { PostsModel } from "./repositories/posts-repository/post-entity";
 
 export let blogsCollection: Collection<BlogDbType>;
 export let postsCollection: Collection<PostDbType>;
@@ -15,17 +15,6 @@ export let usersCollection: Collection<UserDbType>;
 export let commentsCollection: Collection<CommentDbType>;
 export let sessionsCollection: Collection<SessionDbType>;
 export let apiCallsCollection: Collection<ApiCallType>;
-
-const postsSchema = new mongoose.Schema<PostDbType>({
-  title: { type: String },
-  blogId: { type: String },
-  blogName: { type: String },
-  content: { type: String },
-  createdAt: { type: String },
-  shortDescription: { type: String },
-});
-
-export const PostsModel = mongoose.model("Post", postsSchema);
 
 export const runDb = async (url: string, dbName: string | undefined) => {
   // const client = new MongoClient(url);
@@ -63,18 +52,9 @@ export const runDb = async (url: string, dbName: string | undefined) => {
 
 export const clearCollections = async () => {
   await BlogsModel.deleteMany({});
-  // await postsCollection.deleteMany({});
+  await PostsModel.deleteMany({});
   // await usersCollection.deleteMany({});
   // await commentsCollection.deleteMany({});
   // await sessionsCollection.deleteMany({});
   // await apiCallsCollection.deleteMany({});
 };
-
-// export const clearCollections = async () => {
-//   await BlogsModel.deleteMany({});
-//   await postsCollection.deleteMany({});
-//   await usersCollection.deleteMany({});
-//   await commentsCollection.deleteMany({});
-//   await sessionsCollection.deleteMany({});
-//   await apiCallsCollection.deleteMany({});
-// };

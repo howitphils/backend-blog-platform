@@ -19,8 +19,5 @@ export const validateParamsId = (
     return;
   }
 
-  // Преобразование id в ObjectId и запись в параметры запроса
-  req.params.id = new ObjectId(incomingId);
-
   next();
 };

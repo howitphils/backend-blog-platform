@@ -1,22 +1,28 @@
 import { ObjectId } from "mongodb";
 import { PostDbType, PostInputModel } from "../../../../types/posts-types";
 import { postsCollection } from "../../mongodb";
+import { PostDbDocument, PostsModel } from "./post-entity";
 
 export class PostsRepository {
-  async getAllPosts(): Promise<PostDbType[]> {
-    return postsCollection.find({}).toArray();
+  async save(post: PostDbDocument) {
+    await post.save();
   }
 
   async createNewPost(post: PostDbType): Promise<ObjectId> {
-    const createResult = await postsCollection.insertOne(post);
-    return createResult.insertedId;
+    const dbPost = new PostsModel(post);
+
+    const createResult = await dbPost.save();
+
+    return createResult._id;
   }
 
   async getPostById(_id: ObjectId): Promise<PostDbType | null> {
-    return postsCollection.findOne({ _id });
+    return PostsModel.findById(_id);
   }
 
   async updatePost(_id: ObjectId, post: PostInputModel): Promise<boolean> {
+    // const dbPost = await PostsModel.findById(_id);
+
     const updateResult = await postsCollection.updateOne(
       { _id },
       { $set: { ...post } }

@@ -5,6 +5,7 @@ import { HttpStatuses } from "../types/http-statuses";
 import { PostsRepository } from "../db/mongodb/repositories/posts-repository/posts-db-repository";
 import { BlogsService } from "./blogs-service";
 import { inject, injectable } from "inversify";
+import { PostsModel } from "../db/mongodb/repositories/posts-repository/post-entity";
 
 @injectable()
 export class PostsService {
@@ -17,9 +18,7 @@ export class PostsService {
   ) {}
 
   async createNewPost(post: PostInputModel): Promise<ObjectId> {
-    const targetBlog = await this.blogsService.getBlogById(
-      new ObjectId(post.blogId)
-    );
+    const targetBlog = await this.blogsService.getBlogById(post.blogId);
 
     if (!targetBlog) {
       throw new ErrorWithStatusCode(
@@ -37,7 +36,11 @@ export class PostsService {
       createdAt: new Date().toISOString(),
     };
 
-    return this.postsRepository.createNewPost(newPost);
+    const dbPost = new PostsModel(newPost);
+
+    await this.postsRepository.save(dbPost);
+
+    return dbPost._id;
   }
 
   async getPostById(id: ObjectId): Promise<PostDbType> {

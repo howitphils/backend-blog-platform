@@ -1,25 +1,17 @@
-import { ObjectId, WithId } from "mongodb";
+import { WithId } from "mongodb";
 import { BlogDbType, BlogInputModel } from "../../../../types/blogs-types";
-// import { blogsCollection } from "../../mongodb";
 import { injectable } from "inversify";
-import mongoose from "mongoose";
-
-const blogsSchema = new mongoose.Schema<BlogDbType>({
-  name: { type: String, required: true },
-  description: { type: String },
-  websiteUrl: { type: String },
-  createdAt: { type: String },
-  isMembership: { type: Boolean },
-});
-
-export const BlogsModel = mongoose.model("Blog", blogsSchema);
+import { BlogsModel } from "./blogs-entity";
 
 @injectable()
 export class BlogsRepository {
   // Создание нового блога
-  async createNewBlog(blog: BlogDbType): Promise<ObjectId> {
-    const createResult = await BlogsModel.insertOne(blog);
-    return createResult._id;
+  async createNewBlog(blog: BlogDbType): Promise<string> {
+    const dbBlog = new BlogsModel(blog);
+
+    const result = await dbBlog.save();
+
+    return result.id;
   }
 
   // Получение блога по айди
@@ -28,12 +20,9 @@ export class BlogsRepository {
   }
 
   // Обновление блога
-  async updateBlog(
-    _id: ObjectId,
-    updatedBlog: BlogInputModel
-  ): Promise<boolean> {
+  async updateBlog(id: string, updatedBlog: BlogInputModel): Promise<boolean> {
     const updateResult = await BlogsModel.updateOne(
-      { _id },
+      { id },
       { $set: { ...updatedBlog } }
     );
 
@@ -41,8 +30,15 @@ export class BlogsRepository {
   }
 
   // Удаление блога
-  async deleteBlog(id: ObjectId): Promise<boolean> {
-    const deleteResult = await BlogsModel.deleteOne({ _id: id });
-    return deleteResult.deletedCount === 1;
+  async deleteBlog(id: string): Promise<boolean> {
+    const blog = await BlogsModel.findById(id);
+
+    if (!blog) {
+      return false;
+    }
+
+    await blog.deleteOne();
+
+    return true;
   }
 }
