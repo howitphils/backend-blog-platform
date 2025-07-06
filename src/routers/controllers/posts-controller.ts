@@ -98,7 +98,7 @@ export class PostsController {
     const userId = req.user.id;
 
     if (!userId) {
-      throw new Error("User in not found in create comment req");
+      throw new Error("User is not found in create comment req");
     }
 
     const postId = req.params.id;
