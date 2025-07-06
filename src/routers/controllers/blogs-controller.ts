@@ -136,12 +136,7 @@ export class BlogsController {
   }
 
   async deleteBlog(req: RequestWithParams<ParamsId>, res: Response) {
-    const deleteResult = await this.blogsService.deleteBlog(req.params.id);
-
-    if (!deleteResult) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
-    }
+    await this.blogsService.deleteBlog(req.params.id);
 
     res.sendStatus(HttpStatuses.NoContent);
   }

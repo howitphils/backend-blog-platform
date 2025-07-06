@@ -1,11 +1,11 @@
-import { commentsCollection } from "../../mongodb";
-import { ObjectId, WithId } from "mongodb";
+import { WithId } from "mongodb";
 import {
   CommentDbType,
   CommentsMapedQueryType,
   CommentViewModel,
 } from "../../../../types/comments-types";
 import { PaginationType } from "../../../../types/common-types";
+import { CommentsModel } from "./comments-entity";
 
 export class CommentsQueryRepository {
   // Получение всех комментариев с учетом query параметров
@@ -16,15 +16,13 @@ export class CommentsQueryRepository {
     const { pageNumber, pageSize, sortBy, sortDirection } = filters;
 
     // Получаем посты с учетом query параметров
-    const comments = await commentsCollection
-      .find({ postId })
+    const comments = await CommentsModel.find({ postId })
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
-      .toArray();
+      .limit(pageSize);
 
     // Получаем число всех постов
-    const totalCount = await commentsCollection.countDocuments({ postId });
+    const totalCount = await CommentsModel.countDocuments({ postId });
 
     return {
       page: pageNumber,
@@ -35,8 +33,8 @@ export class CommentsQueryRepository {
     };
   }
 
-  async getCommentById(_id: ObjectId): Promise<CommentViewModel | null> {
-    const targetComment = await commentsCollection.findOne({ _id });
+  async getCommentById(id: string): Promise<CommentViewModel | null> {
+    const targetComment = await CommentsModel.findById(id);
     if (!targetComment) return null;
     return this._mapFromDbToViewModel(targetComment);
   }

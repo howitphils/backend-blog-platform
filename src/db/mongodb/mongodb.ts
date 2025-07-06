@@ -8,6 +8,7 @@ import { ApiCallType } from "../../types/apiCalls";
 import mongoose from "mongoose";
 import { PostsModel } from "./repositories/posts-repository/post-entity";
 import { BlogsModel } from "./repositories/blogs-repository/blogs-entity";
+import { CommentsModel } from "./repositories/comments-repository/comments-entity";
 
 export let blogsCollection: Collection<BlogDbType>;
 export let postsCollection: Collection<PostDbType>;
@@ -54,7 +55,7 @@ export const clearCollections = async () => {
   await BlogsModel.deleteMany({});
   await PostsModel.deleteMany({});
   // await usersCollection.deleteMany({});
-  // await commentsCollection.deleteMany({});
+  await CommentsModel.deleteMany({});
   // await sessionsCollection.deleteMany({});
   // await apiCallsCollection.deleteMany({});
 };

@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 export type CommentInputModel = {
   content: string;
 };
@@ -39,17 +37,17 @@ export type CommentsMapedQueryType = {
 
 export type CreateCommentDto = {
   userId: string;
-  postId: ObjectId;
+  postId: string;
   commentBody: CommentInputModel;
 };
 
 export type UpdateCommentDto = {
   userId: string;
-  commentId: ObjectId;
+  commentId: string;
   commentBody: CommentInputModel;
 };
 
 export type DeleteCommentDto = {
   userId: string;
-  commentId: ObjectId;
+  commentId: string;
 };

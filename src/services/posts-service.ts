@@ -17,7 +17,7 @@ export class PostsService {
     private blogsService: BlogsService
   ) {}
 
-  async createNewPost(post: PostInputModel): Promise<ObjectId> {
+  async createNewPost(post: PostInputModel): Promise<string> {
     const targetBlog = await this.blogsService.getBlogById(post.blogId);
 
     if (!targetBlog) {
@@ -38,12 +38,10 @@ export class PostsService {
 
     const dbPost = new PostsModel(newPost);
 
-    await this.postsRepository.save(dbPost);
-
-    return dbPost._id;
+    return this.postsRepository.save(dbPost);
   }
 
-  async getPostById(id: ObjectId): Promise<PostDbType> {
+  async getPostById(id: string): Promise<PostDbType> {
     const post = await this.postsRepository.getPostById(id);
     if (!post) {
       throw new ErrorWithStatusCode(
@@ -70,7 +68,7 @@ export class PostsService {
     return this.postsRepository.updatePost(id, updatedPost);
   }
 
-  async deletePost(id: ObjectId): Promise<boolean> {
+  async deletePost(id: string): Promise<boolean> {
     const targetPost = await this.postsRepository.getPostById(id);
 
     if (!targetPost) {

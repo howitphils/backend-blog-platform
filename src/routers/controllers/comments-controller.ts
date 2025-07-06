@@ -49,8 +49,7 @@ export class CommentsController {
   ) {
     const userId = req.user?.id;
     if (!userId) {
-      res.sendStatus(HttpStatuses.ServerError);
-      return;
+      throw new Error("User id does not exist in comments req");
     }
 
     const commentId = req.params.id;
