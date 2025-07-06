@@ -1,4 +1,4 @@
-import { ObjectId, WithId } from "mongodb";
+import { WithId } from "mongodb";
 import {
   PostDbType,
   PostsMapedQueryType,
@@ -61,9 +61,9 @@ export class PostsQueryRepository {
     };
   }
 
-  async getPostById(_id: ObjectId): Promise<PostViewModel | null> {
+  async getPostById(id: string): Promise<PostViewModel | null> {
     // Получаем пост по id
-    const post = await PostsModel.findById(_id);
+    const post = await PostsModel.findById(id);
     // Если пост не найден, возвращаем null
     if (!post) {
       return null;

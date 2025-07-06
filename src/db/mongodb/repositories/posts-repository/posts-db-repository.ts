@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { PostDbType } from "../../../../types/posts-types";
 import { PostDbDocument, PostsModel } from "./post-entity";
 
@@ -8,15 +7,15 @@ export class PostsRepository {
     return result.id;
   }
 
-  async createNewPost(post: PostDbType): Promise<ObjectId> {
+  async createNewPost(post: PostDbType): Promise<string> {
     const dbPost = new PostsModel(post);
 
     const createResult = await dbPost.save();
 
-    return createResult._id;
+    return createResult.id;
   }
 
-  async getPostById(id: string): Promise<PostDbType | null> {
+  async getPostById(id: string): Promise<PostDbDocument | null> {
     return PostsModel.findById(id);
   }
 

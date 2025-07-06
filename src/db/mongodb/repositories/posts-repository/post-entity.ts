@@ -9,13 +9,13 @@ export class Post {
   createdAt: string;
 
   constructor(
-    name: string,
+    title: string,
     shortDescription: string,
     content: string,
     blogId: string,
     blogName: string
   ) {
-    this.title = name;
+    this.title = title;
     this.shortDescription = shortDescription;
     this.content = content;
     this.blogId = blogId;

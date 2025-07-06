@@ -64,6 +64,8 @@ export const APP_CONFIG = {
     CONFIRMATION_CODE_INCORRECT: "Confirmation code is incorrect",
     CONFIRMATION_CODE_EXPIRED: "Confirmation code is already expired",
     EMAIL_ALREADY_CONFIRMED: "Email is already confirmed",
+    POST_NOT_FOUND: "Post does not exist",
+    BLOG_NOT_FOUND: "Blog does not exist",
   },
   ERROR_FIELDS: {
     RECOVERY_CODE: "recoveryCode",
