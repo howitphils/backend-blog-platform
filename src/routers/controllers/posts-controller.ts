@@ -23,7 +23,6 @@ import {
   RequestWithQuery,
 } from "../../types/requests-types";
 import { PaginationType, ParamsId } from "../../types/common-types";
-import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
 import { ExtensionType } from "../../types/resultObject-types";
 import { PostsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
@@ -96,11 +95,12 @@ export class PostsController {
     req: RequestWithParamsAndBody<ParamsId, CommentInputModel>,
     res: Response<CommentViewModel | ExtensionType[]>
   ) {
-    const userId = req.user?.id;
+    const userId = req.user.id;
+
     if (!userId) {
-      res.sendStatus(HttpStatuses.ServerError);
-      return;
+      throw new Error("User in not found in create comment req");
     }
+
     const postId = req.params.id;
     const commentBody = req.body;
 
@@ -116,13 +116,13 @@ export class PostsController {
 
     if (createResult.status !== "Success") {
       res
-        .sendStatus(convertToHttpCode(createResult.status))
+        .status(convertToHttpCode(createResult.status))
         .json(createResult.extensions);
       return;
     }
 
     const newComment = await this.commentsQueryRepository.getCommentById(
-      createResult.data as ObjectId
+      createResult.data as string
     );
 
     if (!newComment) {

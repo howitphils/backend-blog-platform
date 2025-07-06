@@ -11,6 +11,10 @@ import { PostsService } from "./posts-service";
 import { CommentsRepository } from "../db/mongodb/repositories/comments-repository/comments-db-repository";
 import { UsersService } from "./users-service";
 import { inject, injectable } from "inversify";
+import {
+  Comment,
+  CommentsModel,
+} from "../db/mongodb/repositories/comments-repository/comments-entity";
 
 @injectable()
 export class CommentsService {
@@ -27,7 +31,7 @@ export class CommentsService {
 
   async createNewComment(
     dto: CreateCommentDto
-  ): Promise<ResultObject<ObjectId | null>> {
+  ): Promise<ResultObject<string | null>> {
     const targetPost = await this.postsService.getPostById(dto.postId);
 
     if (!targetPost) {
@@ -42,6 +46,7 @@ export class CommentsService {
     const targetUser = await this.usersService.getUserById(
       new ObjectId(dto.userId)
     );
+
     if (!targetUser) {
       return {
         status: ResultStatus.NotFound,
@@ -51,24 +56,23 @@ export class CommentsService {
       };
     }
 
-    const newComment: CommentDbType = {
-      content: dto.commentBody.content,
-      commentatorInfo: {
-        userId: dto.userId,
-        userLogin: targetUser.accountData.login,
-      },
-      createdAt: new Date().toISOString(),
-      postId: dto.postId.toString(),
-    };
+    const { commentBody, postId, userId } = dto;
 
-    const newCommentId = await this.commentsRepository.createComment(
-      newComment
+    const newComment = new Comment(
+      commentBody.content,
+      userId,
+      targetUser.accountData.login,
+      postId
     );
+
+    const dbComment = new CommentsModel(newComment);
+
+    const result = await dbComment.save();
 
     return {
       status: ResultStatus.Success,
       extensions: [],
-      data: newCommentId,
+      data: result.id,
     };
   }
 
