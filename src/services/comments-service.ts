@@ -77,7 +77,7 @@ export class CommentsService {
   }
 
   async getCommentById(
-    id: ObjectId
+    id: string
   ): Promise<ResultObject<CommentDbType | null>> {
     const comment = await this.commentsRepository.getCommentById(id);
 
@@ -122,7 +122,9 @@ export class CommentsService {
       };
     }
 
-    await this.commentsRepository.updateComment(dto.commentId, dto.commentBody);
+    targetComment.content = dto.commentBody.content;
+
+    await targetComment.save();
 
     return {
       status: ResultStatus.Success,
@@ -156,7 +158,7 @@ export class CommentsService {
       };
     }
 
-    await this.commentsRepository.deleteComment(dto.commentId);
+    await targetComment.deleteOne();
 
     return {
       status: ResultStatus.Success,

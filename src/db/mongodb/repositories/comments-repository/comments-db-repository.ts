@@ -1,9 +1,3 @@
-import { ObjectId, WithId } from "mongodb";
-import { commentsCollection } from "../../mongodb";
-import {
-  CommentDbType,
-  CommentInputModel,
-} from "../../../../types/comments-types";
 import { CommentDbDocument, CommentsModel } from "./comments-entity";
 
 export class CommentsRepository {
@@ -12,7 +6,7 @@ export class CommentsRepository {
     return result.id;
   }
 
-  async getCommentById(id: string): Promise<WithId<CommentDbType> | null> {
+  async getCommentById(id: string): Promise<CommentDbDocument | null> {
     return CommentsModel.findById(id);
   }
 

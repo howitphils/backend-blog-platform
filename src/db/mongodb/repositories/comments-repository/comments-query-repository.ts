@@ -1,11 +1,9 @@
-import { WithId } from "mongodb";
 import {
-  CommentDbType,
   CommentsMapedQueryType,
   CommentViewModel,
 } from "../../../../types/comments-types";
 import { PaginationType } from "../../../../types/common-types";
-import { CommentsModel } from "./comments-entity";
+import { CommentDbDocument, CommentsModel } from "./comments-entity";
 
 export class CommentsQueryRepository {
   // Получение всех комментариев с учетом query параметров
@@ -40,10 +38,10 @@ export class CommentsQueryRepository {
   }
 
   // Преобразование комментарий из формата базы данных в формат, который ожидает клиент
-  _mapFromDbToViewModel(comment: WithId<CommentDbType>): CommentViewModel {
-    const { _id, commentatorInfo, content, createdAt } = comment;
+  _mapFromDbToViewModel(comment: CommentDbDocument): CommentViewModel {
+    const { id, commentatorInfo, content, createdAt } = comment;
     return {
-      id: _id!.toString(),
+      id,
       commentatorInfo,
       content,
       createdAt,
