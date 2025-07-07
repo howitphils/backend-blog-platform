@@ -17,7 +17,7 @@ export class Blog {
   }
 }
 
-const blogsSchema = new mongoose.Schema<BlogDbType>({
+const BlogsSchema = new mongoose.Schema<BlogDbType>({
   name: { type: String, required: true },
   description: { type: String },
   websiteUrl: { type: String },
@@ -31,5 +31,5 @@ export type BlogDbDocument = mongoose.HydratedDocument<BlogDbType>;
 
 export const BlogsModel = mongoose.model<BlogDbType, BlogModel>(
   "Blog",
-  blogsSchema
+  BlogsSchema
 );

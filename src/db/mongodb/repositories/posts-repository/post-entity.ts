@@ -24,7 +24,7 @@ export class Post {
   }
 }
 
-const postsSchema = new mongoose.Schema<Post>({
+const PostsSchema = new mongoose.Schema<Post>({
   title: { type: String },
   blogId: { type: String },
   blogName: { type: String },
@@ -37,4 +37,4 @@ type PostModel = mongoose.Model<Post>;
 
 export type PostDbDocument = mongoose.HydratedDocument<Post>;
 
-export const PostsModel = mongoose.model<Post, PostModel>("Post", postsSchema);
+export const PostsModel = mongoose.model<Post, PostModel>("Post", PostsSchema);
