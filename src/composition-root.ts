@@ -114,6 +114,7 @@ import { Container } from "inversify";
 export const container = new Container();
 
 // Регистрация Класса в контейнере
+// Adapters
 container.bind(DateFnsService).to(DateFnsService);
 container.bind(JwtService).to(JwtService);
 container.bind(NodeMailerService).to(NodeMailerService);
@@ -144,6 +145,7 @@ container.bind(SessionService).to(SessionService);
 container.bind(UsersService).to(UsersService);
 container.bind(CommentsService).to(CommentsService);
 
+// Controllers
 container.bind(UsersController).to(UsersController);
 container.bind(AuthController).to(AuthController);
 container.bind(CommentsController).to(CommentsController);

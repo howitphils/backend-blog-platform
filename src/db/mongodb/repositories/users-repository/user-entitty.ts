@@ -1,4 +1,10 @@
 import mongoose from "mongoose";
+import { container } from "../../../../composition-root";
+import { UuidService } from "../../../../adapters/uuIdService";
+import { DateFnsService } from "../../../../adapters/dateFnsService";
+
+const uuIdService = container.get(UuidService);
+const dateFnsService = container.get(DateFnsService);
 
 export class User {
   accountData: {
@@ -42,13 +48,25 @@ export class User {
 }
 
 const UsersSchema = new mongoose.Schema<User>({
-  accountData,
-  emailConfirmation,
-  passwordRecovery,
+  accountData: {
+    login: { type: String, unique: true, required: true },
+    email: { type: String, unique: true, required: true },
+    passHash: { type: String },
+    createdAt: { type: String },
+  },
+  emailConfirmation: {
+    confirmationCode: { type: String },
+    expirationDate: { type: Date },
+    isConfirmed: { type: Boolean },
+  },
+  passwordRecovery: {
+    recoveryCode: { type: String },
+    expirationDate: { type: Date },
+  },
 });
 
 type UserModel = mongoose.Model<User>;
 
 export type UserDbDocument = mongoose.HydratedDocument<User>;
 
-export const BlogsModel = mongoose.model<User, UserModel>("Blog", UsersSchema);
+export const BlogsModel = mongoose.model<User, UserModel>("User", UsersSchema);
