@@ -1,4 +1,3 @@
-// import { db } from "./../src/db/mongodb/mongo";
 import { APP_CONFIG } from "../src/settings";
 import {
   basicAuth,
