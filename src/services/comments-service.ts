@@ -1,5 +1,3 @@
-import { ObjectId } from "mongodb";
-
 import {
   CommentDbType,
   CreateCommentDto,
@@ -43,9 +41,7 @@ export class CommentsService {
       };
     }
 
-    const targetUser = await this.usersService.getUserById(
-      new ObjectId(dto.userId)
-    );
+    const targetUser = await this.usersService.getUserById(dto.userId);
 
     if (!targetUser) {
       return {

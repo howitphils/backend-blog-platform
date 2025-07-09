@@ -9,6 +9,7 @@ import mongoose from "mongoose";
 import { PostsModel } from "./repositories/posts-repository/post-entity";
 import { BlogsModel } from "./repositories/blogs-repository/blogs-entity";
 import { CommentsModel } from "./repositories/comments-repository/comments-entity";
+import { UserModel } from "./repositories/users-repository/user-entitty";
 
 export let blogsCollection: Collection<BlogDbType>;
 export let postsCollection: Collection<PostDbType>;
@@ -54,7 +55,7 @@ export const runDb = async (url: string, dbName: string | undefined) => {
 export const clearCollections = async () => {
   await BlogsModel.deleteMany({});
   await PostsModel.deleteMany({});
-  // await usersCollection.deleteMany({});
+  await UserModel.deleteMany({});
   await CommentsModel.deleteMany({});
   // await sessionsCollection.deleteMany({});
   // await apiCallsCollection.deleteMany({});

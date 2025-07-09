@@ -20,10 +20,13 @@ export class Comment {
 }
 
 const CommentsSchema = new mongoose.Schema<Comment>({
-  content: { type: String },
-  commentatorInfo: { userId: { type: String }, userLogin: { type: String } },
-  createdAt: { type: String },
-  postId: { type: String },
+  content: { type: String, required: true },
+  commentatorInfo: {
+    userId: { type: String, required: true },
+    userLogin: { type: String, required: true },
+  },
+  createdAt: { type: String, required: true },
+  postId: { type: String, required: true },
 });
 
 type CommentsModel = mongoose.Model<Comment>;

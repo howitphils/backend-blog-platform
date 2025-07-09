@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
-import { container } from "../../../../composition-root";
 import { UuidService } from "../../../../adapters/uuIdService";
 import { DateFnsService } from "../../../../adapters/dateFnsService";
-
-const uuIdService = container.get(UuidService);
-const dateFnsService = container.get(DateFnsService);
 
 export class User {
   accountData: {
@@ -27,6 +23,8 @@ export class User {
     email: string,
     login: string,
     passHash: string,
+    uuIdService: UuidService,
+    dateFnsService: DateFnsService,
     isAdmin?: boolean
   ) {
     this.accountData = {

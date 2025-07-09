@@ -1,10 +1,6 @@
 import { WithId } from "mongodb";
 
-import {
-  BlogDbType,
-  BlogInputModel,
-  UpdateBlogInputModel,
-} from "../types/blogs-types";
+import { BlogDbType, BlogInputModel } from "../types/blogs-types";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { BlogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
@@ -43,10 +39,7 @@ export class BlogsService {
     return blog;
   }
 
-  async updateBlog(
-    id: string,
-    updatedBlog: UpdateBlogInputModel
-  ): Promise<void> {
+  async updateBlog(id: string, updatedBlog: BlogInputModel): Promise<void> {
     const targetBlog = await this.blogsRepository.getBlogById(id);
 
     if (!targetBlog) {
@@ -56,9 +49,9 @@ export class BlogsService {
       );
     }
 
-    targetBlog.name = updatedBlog.newName;
-    targetBlog.description = updatedBlog.newDescription;
-    targetBlog.websiteUrl = updatedBlog.newWebsiteUrl;
+    targetBlog.name = updatedBlog.name;
+    targetBlog.description = updatedBlog.description;
+    targetBlog.websiteUrl = updatedBlog.websiteUrl;
 
     await this.blogsRepository.save(targetBlog);
   }

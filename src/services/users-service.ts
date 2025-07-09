@@ -11,6 +11,8 @@ import {
   UserDbDocument,
   UserModel,
 } from "../db/mongodb/repositories/users-repository/user-entitty";
+import { DateFnsService } from "../adapters/dateFnsService";
+import { UuidService } from "../adapters/uuIdService";
 
 @injectable()
 export class UsersService {
@@ -19,12 +21,14 @@ export class UsersService {
     private usersRepository: UsersRepository,
 
     @inject(BcryptService)
-    private bcryptService: BcryptService // @inject(DateFnsService)
-  ) // private dateFnsService: DateFnsService,
+    private bcryptService: BcryptService,
 
-  // @inject(UuidService)
-  // private uuIdService: UuidService
-  {}
+    @inject(DateFnsService)
+    private dateFnsService: DateFnsService,
+
+    @inject(UuidService)
+    private uuIdService: UuidService
+  ) {}
 
   async createNewUser(
     userDto: UserInputModel,
@@ -53,7 +57,14 @@ export class UsersService {
     // const confirmationCode = this.uuIdService.createRandomCode();
     // const recoveryCode = this.uuIdService.createRandomCode();
 
-    const newUser: User = new User(email, login, passHash, isAdmin);
+    const newUser: User = new User(
+      email,
+      login,
+      passHash,
+      this.uuIdService,
+      this.dateFnsService,
+      isAdmin
+    );
 
     // const newUser: UserDbType = {
     //   accountData: {

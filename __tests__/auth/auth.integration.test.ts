@@ -1,8 +1,7 @@
 import { clearCollections, createUserDto, req } from "../test-helpers";
 
 import { ErrorWithStatusCode } from "../../src/middlewares/error-handler";
-import { runDb, usersCollection } from "../../src/db/mongodb/mongodb";
-import { MongoClient } from "mongodb";
+import { usersCollection } from "../../src/db/mongodb/mongodb";
 import { APP_CONFIG } from "../../src/settings";
 import { HttpStatuses } from "../../src/types/http-statuses";
 import { testSeeder } from "./auth.helpers";
