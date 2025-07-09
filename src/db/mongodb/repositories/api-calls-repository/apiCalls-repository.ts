@@ -1,4 +1,4 @@
-import { apiCallsCollection } from "../mongodb";
+import { ApiCallsModel } from "./api-call-entity";
 
 export class ApiCallsRepository {
   async getAllCallsCount({
@@ -10,10 +10,10 @@ export class ApiCallsRepository {
     url: string;
     date: Date;
   }) {
-    return apiCallsCollection.countDocuments({ ip, url, date: { $gte: date } });
+    return ApiCallsModel.countDocuments({ ip, url, date: { $gte: date } });
   }
 
   async insertCall({ ip, url, date }: { ip: string; url: string; date: Date }) {
-    return apiCallsCollection.insertOne({ date, ip, url });
+    return ApiCallsModel.insertOne({ date, ip, url });
   }
 }

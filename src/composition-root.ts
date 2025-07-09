@@ -4,7 +4,7 @@ import { DateFnsService } from "./adapters/dateFnsService";
 import { JwtService } from "./adapters/jwtService";
 import { NodeMailerService } from "./adapters/nodemailer-service";
 import { UuidService } from "./adapters/uuIdService";
-import { ApiCallsRepository } from "./db/mongodb/repositories/apiCalls-repository";
+import { ApiCallsRepository } from "./db/mongodb/repositories/api-calls-repository/apiCalls-repository";
 import { SessionRepository } from "./db/mongodb/repositories/sessions-repository/session-repository";
 import { UsersRepository } from "./db/mongodb/repositories/users-repository/users-db-repository";
 import { UsersQueryRepository } from "./db/mongodb/repositories/users-repository/users-query-repository";

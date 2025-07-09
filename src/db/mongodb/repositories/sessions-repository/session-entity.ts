@@ -3,16 +3,16 @@ import mongoose from "mongoose";
 export class Session {
   userId: string;
   deviceId: string;
-  iat: Date;
-  exp: Date;
+  iat: number;
+  exp: number;
   ip: string;
   device_name: string;
 
   constructor(
     userId: string,
     deviceId: string,
-    iat: Date,
-    exp: Date,
+    iat: number,
+    exp: number,
     ip: string,
     deviceName: string
   ) {

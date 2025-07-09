@@ -80,9 +80,7 @@ export class AuthController {
     const deviceId = req.user?.deviceId;
 
     if (!userId || !deviceId || !issuedAt) {
-      res.sendStatus(HttpStatuses.ServerError);
-      console.log("user is not found in request");
-      return;
+      throw new Error("user is not found in request");
     }
 
     await this.authService.logout({ userId, deviceId, issuedAt });
