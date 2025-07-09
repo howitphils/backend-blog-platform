@@ -1,25 +1,20 @@
-import { ObjectId, WithId } from "mongodb";
-import { UserDbType } from "../../../../types/users-types";
-import { usersCollection } from "../../mongodb";
+import { UserDbDocument, UserModel } from "./user-entitty";
 
 export class UsersRepository {
-  // Создание нового юзера
-  async createNewUser(user: UserDbType): Promise<ObjectId> {
-    const createResult = await usersCollection.insertOne(user);
-    return createResult.insertedId;
+  async save(user: UserDbDocument): Promise<string> {
+    const result = await user.save();
+    return result.id;
   }
 
-  // Удаление юзера
-  async deleteUser(_id: ObjectId): Promise<boolean> {
-    const deleteResult = await usersCollection.deleteOne({ _id });
-    return deleteResult.deletedCount === 1;
+  async getUserById(id: string): Promise<UserDbDocument | null> {
+    return UserModel.findById(id);
   }
 
   // Получение юзера по логин/мейлу (для логинизации)
   async getUserByLoginOrEmail(
     loginOrEmail: string
-  ): Promise<WithId<UserDbType> | null> {
-    return usersCollection.findOne({
+  ): Promise<UserDbDocument | null> {
+    return UserModel.findOne({
       $or: [
         { "accountData.email": { $regex: loginOrEmail, $options: "i" } },
         { "accountData.login": { $regex: loginOrEmail, $options: "i" } },
@@ -31,8 +26,8 @@ export class UsersRepository {
   async getUserByCredentials(
     login: string,
     email: string
-  ): Promise<WithId<UserDbType> | null> {
-    return usersCollection.findOne({
+  ): Promise<UserDbDocument | null> {
+    return UserModel.findOne({
       $or: [
         { "accountData.email": { $regex: email, $options: "i" } },
         { "accountData.login": { $regex: login, $options: "i" } },
@@ -42,28 +37,28 @@ export class UsersRepository {
 
   async getUserByConfirmationCode(
     confirmationCode: string
-  ): Promise<WithId<UserDbType> | null> {
-    return usersCollection.findOne({
+  ): Promise<UserDbDocument | null> {
+    return UserModel.findOne({
       "emailConfirmation.confirmationCode": confirmationCode,
     });
   }
 
-  async updateIsConfirmedStatus(_id: ObjectId, newStatus: boolean) {
-    const updateResult = await usersCollection.updateOne(
-      { _id },
-      { $set: { "emailConfirmation.isConfirmed": newStatus } }
-    );
+  // async updateIsConfirmedStatus(id: string, newStatus: boolean) {
+  //   const updateResult = await UserModel.updateOne(
+  //     { id },
+  //     { $set: { "emailConfirmation.isConfirmed": newStatus } }
+  //   );
 
-    return updateResult.matchedCount === 1;
-  }
+  //   return updateResult.matchedCount === 1;
+  // }
 
   async updateConfirmationCodeAndExpirationDate(
-    _id: ObjectId,
+    id: string,
     newCode: string,
     newDate: Date
   ) {
-    const updateResult = await usersCollection.updateOne(
-      { _id },
+    const updateResult = await UserModel.updateOne(
+      { id },
       {
         $set: {
           "emailConfirmation.confirmationCode": newCode,
@@ -75,32 +70,20 @@ export class UsersRepository {
     return updateResult.matchedCount === 1;
   }
 
-  async getUserById(_id: ObjectId): Promise<WithId<UserDbType> | null> {
-    return usersCollection.findOne({ _id });
+  async findUserByRecoveryCode(code: string): Promise<UserDbDocument | null> {
+    return UserModel.findOne({ "passwordRecovery.recoveryCode": code });
   }
 
-  async findUserByRefreshToken(
-    token: string
-  ): Promise<WithId<UserDbType> | null> {
-    return usersCollection.findOne({ usedTokens: { $in: [token] } });
+  async findUserByEmail(email: string): Promise<UserDbDocument | null> {
+    return UserModel.findOne({ "accountData.email": email });
   }
 
-  async findUserByRecoveryCode(
-    code: string
-  ): Promise<WithId<UserDbType> | null> {
-    return usersCollection.findOne({ "passwordRecovery.recoveryCode": code });
-  }
+  // async updatePasswordHash(userId: string, hash: string): Promise<boolean> {
+  //   const result = await UserModel.updateOne(
+  //     { _id: userId },
+  //     { $set: { "accountData.passHash": hash } }
+  //   );
 
-  async findUserByEmail(email: string): Promise<WithId<UserDbType> | null> {
-    return usersCollection.findOne({ "accountData.email": email });
-  }
-
-  async updatePasswordHash(userId: ObjectId, hash: string): Promise<boolean> {
-    const result = await usersCollection.updateOne(
-      { _id: userId },
-      { $set: { "accountData.passHash": hash } }
-    );
-
-    return result.matchedCount === 1;
-  }
+  //   return result.matchedCount === 1;
+  // }
 }

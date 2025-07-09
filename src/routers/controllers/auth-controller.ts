@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { LoginInputModel } from "../../types/login-types";
 import { RequestWithBody } from "../../types/requests-types";
-import { ObjectId } from "mongodb";
 import { HttpStatuses } from "../../types/http-statuses";
 import { MeModel, UserInputModel } from "../../types/users-types";
 import { APP_CONFIG } from "../../settings";
@@ -104,9 +103,7 @@ export class AuthController {
       return;
     }
 
-    const myInfo = await this.usersQueryRepository.getMyInfo(
-      new ObjectId(userId)
-    );
+    const myInfo = await this.usersQueryRepository.getMyInfo(userId);
 
     if (!myInfo) {
       res.sendStatus(HttpStatuses.NotFound);

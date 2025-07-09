@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatuses } from "../types/http-statuses";
 import { OutputErrorsType } from "../types/output-errors-types";
+import { MongooseError } from "mongoose";
 
 export class ErrorWithStatusCode extends Error {
   public readonly statusCode: number;
@@ -30,6 +31,11 @@ export const errorHandler = (
       res.status(err.statusCode).json({ message: err.message });
     }
     return;
+  } else if (err instanceof MongooseError) {
+    console.log(err);
+    res
+      .status(HttpStatuses.BadRequest)
+      .json({ message: "Incorrect input data" });
   }
 
   console.log(JSON.stringify(err));

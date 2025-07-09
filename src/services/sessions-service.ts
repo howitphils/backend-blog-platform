@@ -19,9 +19,8 @@ export class SessionService {
     const count = await this.sessionsRepository.findAllUsersSessions(userId);
 
     if (count.length !== 1) {
-      throw new ErrorWithStatusCode(
-        "Session collection for this user was not cleared properly",
-        HttpStatuses.ServerError
+      throw new Error(
+        "Session collection for this user was not cleared properly"
       );
     }
   }

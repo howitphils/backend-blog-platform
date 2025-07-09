@@ -51,17 +51,17 @@ const UsersSchema = new mongoose.Schema<User>({
   accountData: {
     login: { type: String, unique: true, required: true },
     email: { type: String, unique: true, required: true },
-    passHash: { type: String },
-    createdAt: { type: String },
+    passHash: { type: String, required: true },
+    createdAt: { type: String, required: true },
   },
   emailConfirmation: {
-    confirmationCode: { type: String },
-    expirationDate: { type: Date },
-    isConfirmed: { type: Boolean },
+    confirmationCode: { type: String, required: true },
+    expirationDate: { type: Date, required: true },
+    isConfirmed: { type: Boolean, required: true },
   },
   passwordRecovery: {
-    recoveryCode: { type: String },
-    expirationDate: { type: Date },
+    recoveryCode: { type: String, required: true },
+    expirationDate: { type: Date, required: true },
   },
 });
 
@@ -69,4 +69,4 @@ type UserModel = mongoose.Model<User>;
 
 export type UserDbDocument = mongoose.HydratedDocument<User>;
 
-export const BlogsModel = mongoose.model<User, UserModel>("User", UsersSchema);
+export const UserModel = mongoose.model<User, UserModel>("User", UsersSchema);

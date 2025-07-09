@@ -203,12 +203,14 @@ export class AuthService {
       );
     }
 
-    const passHash = await this.bcryptService.createHasn(newPassword);
+    const passHash = await this.bcryptService.createHash(newPassword);
 
-    await this.usersRepository.updatePasswordHash(user._id, passHash);
+    user.accountData.passHash = passHash;
+
+    await this.usersRepository.save(user);
   }
 
-  async confirmRegistration(confirmationCode: string): Promise<boolean> {
+  async confirmRegistration(confirmationCode: string): Promise<void> {
     const targetUser = await this.usersRepository.getUserByConfirmationCode(
       confirmationCode
     );
@@ -246,7 +248,9 @@ export class AuthService {
       );
     }
 
-    return this.usersRepository.updateIsConfirmedStatus(targetUser._id, true);
+    targetUser.emailConfirmation.isConfirmed = true;
+
+    await this.usersRepository.save(targetUser);
   }
 
   async resendConfirmationCode(email: string) {
@@ -274,11 +278,13 @@ export class AuthService {
       );
     }
 
-    await this.usersRepository.updateConfirmationCodeAndExpirationDate(
-      user._id,
-      this.uuIdService.createRandomCode(),
-      this.dateFnsService.addToCurrentDate()
-    );
+    user.emailConfirmation.confirmationCode =
+      this.uuIdService.createRandomCode();
+
+    user.emailConfirmation.expirationDate =
+      this.dateFnsService.addToCurrentDate();
+
+    await this.usersRepository.save(user);
 
     const updatedUser = await this.usersRepository.getUserByLoginOrEmail(email);
 

@@ -1,5 +1,4 @@
 import { Response } from "express";
-import { ObjectId } from "mongodb";
 import { mapUsersQueryParams } from "./utils";
 
 import {
@@ -40,27 +39,20 @@ export class UsersController {
   }
 
   async createUser(req: RequestWithBody<UserInputModel>, res: Response) {
-    const createResult = await this.usersService.createNewUser(req.body, true);
+    const createdUserId = await this.usersService.createNewUser(req.body, true);
 
-    const newUser = await this.usersQueryRepository.getUserById(
-      createResult as ObjectId
-    );
+    const newUser = await this.usersQueryRepository.getUserById(createdUserId);
 
     if (!newUser) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
+      throw new Error("User is not found in create user method");
     }
 
     res.status(HttpStatuses.Created).json(newUser);
   }
 
   async deleteUser(req: RequestWithParams<ParamsId>, res: Response) {
-    const isDeleted = await this.usersService.deleteUser(req.params.id);
+    await this.usersService.deleteUser(req.params.id);
 
-    if (!isDeleted) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
-    }
     res.sendStatus(HttpStatuses.NoContent);
   }
 }

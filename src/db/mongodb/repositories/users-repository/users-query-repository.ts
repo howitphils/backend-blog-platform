@@ -1,12 +1,10 @@
-import { usersCollection } from "../../mongodb";
 import {
   MeModel,
-  UserDbType,
   UsersMapedQueryType,
   UserViewModel,
 } from "../../../../types/users-types";
-import { ObjectId, WithId } from "mongodb";
 import { PaginationType } from "../../../../types/common-types";
+import { UserDbDocument, UserModel } from "./user-entitty";
 
 export class UsersQueryRepository {
   // Получение всех юзеров с учетом query параметров
@@ -44,16 +42,14 @@ export class UsersQueryRepository {
       }
     };
 
-    // Получаем юзеров с учетом query параметров
-    const users = await usersCollection
-      .find(createFilter())
+    // Получаем юзеров с учётом query параметров
+    const users = await UserModel.find(createFilter())
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
-      .toArray();
+      .limit(pageSize);
 
     // Получаем число всех юзеров
-    const totalCount = await usersCollection.countDocuments(createFilter());
+    const totalCount = await UserModel.countDocuments(createFilter());
 
     return {
       page: pageNumber,
@@ -64,34 +60,34 @@ export class UsersQueryRepository {
     };
   }
 
-  async getUserById(_id: ObjectId): Promise<UserViewModel | null> {
-    const targetUser = await usersCollection.findOne({ _id });
+  async getUserById(id: string): Promise<UserViewModel | null> {
+    const targetUser = await UserModel.findById(id);
     if (!targetUser) return null;
 
     return this._mapFromDbToViewModel(targetUser);
   }
 
-  async getMyInfo(_id: ObjectId): Promise<MeModel | null> {
-    const targetUser = await usersCollection.findOne({ _id });
+  async getMyInfo(id: string): Promise<MeModel | null> {
+    const targetUser = await UserModel.findById(id);
     if (!targetUser) return null;
 
     return this._createMeModel(targetUser);
   }
 
   // Преобразование юзера из формата базы данных в формат, который ожидает клиент
-  _mapFromDbToViewModel(user: WithId<UserDbType>): UserViewModel {
+  _mapFromDbToViewModel(user: UserDbDocument): UserViewModel {
     const { createdAt, email, login } = user.accountData;
     return {
-      id: user._id!.toString(),
+      id: user.id,
       login: login,
       email: email,
       createdAt: createdAt,
     };
   }
 
-  _createMeModel(user: WithId<UserDbType>): MeModel {
+  _createMeModel(user: UserDbDocument): MeModel {
     return {
-      userId: user._id.toString(),
+      userId: user.id,
       email: user.accountData.email,
       login: user.accountData.login,
     };

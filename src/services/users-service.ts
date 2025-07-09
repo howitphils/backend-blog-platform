@@ -1,14 +1,16 @@
-import { ObjectId, WithId } from "mongodb";
-import { UserDbType, UserInputModel } from "../types/users-types";
+import { UserInputModel } from "../types/users-types";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
-import { createErrorsObject } from "../routers/controllers/utils";
 import { APP_CONFIG } from "../settings";
 import { UsersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { BcryptService } from "../adapters/bcryptService";
 import { inject, injectable } from "inversify";
-import { DateFnsService } from "../adapters/dateFnsService";
-import { UuidService } from "../adapters/uuIdService";
+
+import {
+  User,
+  UserDbDocument,
+  UserModel,
+} from "../db/mongodb/repositories/users-repository/user-entitty";
 
 @injectable()
 export class UsersService {
@@ -17,77 +19,79 @@ export class UsersService {
     private usersRepository: UsersRepository,
 
     @inject(BcryptService)
-    private bcryptService: BcryptService,
+    private bcryptService: BcryptService // @inject(DateFnsService)
+  ) // private dateFnsService: DateFnsService,
 
-    @inject(DateFnsService)
-    private dateFnsService: DateFnsService,
-
-    @inject(UuidService)
-    private uuIdService: UuidService
-  ) {}
+  // @inject(UuidService)
+  // private uuIdService: UuidService
+  {}
 
   async createNewUser(
-    user: UserInputModel,
+    userDto: UserInputModel,
     isAdmin: boolean
-  ): Promise<ObjectId> {
-    const { login, email, password } = user;
+  ): Promise<string> {
+    const { login, email, password } = userDto;
 
-    const existingUser = await this.usersRepository.getUserByCredentials(
-      login,
-      email
-    );
+    // const existingUser = await this.usersRepository.getUserByCredentials(
+    //   login,
+    //   email
+    // );
 
-    if (existingUser) {
-      const field =
-        existingUser.accountData.email === email ? "email" : "login";
+    // if (existingUser) {
+    //   const field =
+    //     existingUser.accountData.email === email ? "email" : "login";
 
-      throw new ErrorWithStatusCode(
-        APP_CONFIG.ERROR_MESSAGES.USER_ALREADY_EXISTS,
-        HttpStatuses.BadRequest,
-        createErrorsObject(field, `User with this ${field} already exists`)
-      );
-    }
+    //   throw new ErrorWithStatusCode(
+    //     APP_CONFIG.ERROR_MESSAGES.USER_ALREADY_EXISTS,
+    //     HttpStatuses.BadRequest,
+    //     createErrorsObject(field, `User with this ${field} already exists`)
+    //   );
+    // }
 
-    const passHash = await this.bcryptService.createHasn(password);
+    const passHash = await this.bcryptService.createHash(password);
 
-    const confirmationCode = this.uuIdService.createRandomCode();
-    const recoveryCode = this.uuIdService.createRandomCode();
+    // const confirmationCode = this.uuIdService.createRandomCode();
+    // const recoveryCode = this.uuIdService.createRandomCode();
 
-    // const newUser: User = new User(email, login, passHash, isAdmin);
+    const newUser: User = new User(email, login, passHash, isAdmin);
 
-    const newUser: UserDbType = {
-      accountData: {
-        email: user.email,
-        login: user.login,
-        passHash,
-        createdAt: new Date().toISOString(),
-      },
-      emailConfirmation: {
-        confirmationCode,
-        expirationDate: this.dateFnsService.addToCurrentDate(),
-        isConfirmed: isAdmin ? true : false,
-      },
-      passwordRecovery: {
-        recoveryCode,
-        expirationDate: this.dateFnsService.addToCurrentDate(),
-      },
-    };
+    // const newUser: UserDbType = {
+    //   accountData: {
+    //     email: user.email,
+    //     login: user.login,
+    //     passHash,
+    //     createdAt: new Date().toISOString(),
+    //   },
+    //   emailConfirmation: {
+    //     confirmationCode,
+    //     expirationDate: this.dateFnsService.addToCurrentDate(),
+    //     isConfirmed: isAdmin ? true : false,
+    //   },
+    //   passwordRecovery: {
+    //     recoveryCode,
+    //     expirationDate: this.dateFnsService.addToCurrentDate(),
+    //   },
+    // };
 
-    return this.usersRepository.createNewUser(newUser);
+    const newDbUser = new UserModel(newUser);
+
+    return this.usersRepository.save(newDbUser);
   }
 
-  async getUserById(id: ObjectId): Promise<WithId<UserDbType>> {
+  async getUserById(id: string): Promise<UserDbDocument> {
     const user = await this.usersRepository.getUserById(id);
+
     if (!user) {
       throw new ErrorWithStatusCode(
         APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND,
         HttpStatuses.NotFound
       );
     }
+
     return user;
   }
 
-  async deleteUser(id: string): Promise<boolean> {
+  async deleteUser(id: string): Promise<void> {
     const targetUser = await this.usersRepository.getUserById(id);
 
     if (!targetUser) {
@@ -97,6 +101,6 @@ export class UsersService {
       );
     }
 
-    return this.usersRepository.deleteUser(id);
+    await targetUser.deleteOne();
   }
 }

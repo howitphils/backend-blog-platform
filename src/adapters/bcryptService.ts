@@ -3,7 +3,7 @@ import { injectable } from "inversify";
 
 @injectable()
 export class BcryptService {
-  async createHasn(password: string) {
+  async createHash(password: string) {
     return hash(password, 8);
   }
 
