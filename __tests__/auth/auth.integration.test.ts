@@ -12,21 +12,19 @@ import { AuthService } from "../../src/services/auth-service";
 import { container } from "../../src/composition-root";
 import { UuidService } from "../../src/adapters/uuIdService";
 import { DateFnsService } from "../../src/adapters/dateFnsService";
+import mongoose from "mongoose";
 
 describe("/auth", () => {
-  let client: MongoClient;
-
   beforeAll(async () => {
-    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
-
-    NodeMailerService.prototype.sendEmail = jest.fn().mockResolvedValue(true);
+    await mongoose.connect(
+      APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
+    );
   });
 
   afterAll(async () => {
-    await client.close();
+    await mongoose.disconnect();
     console.log("Connection closed");
   });
-
   describe("registration", () => {
     afterAll(async () => {
       await clearCollections();
