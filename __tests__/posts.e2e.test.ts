@@ -18,17 +18,17 @@ import {
 import { MongoClient } from "mongodb";
 import { runDb } from "../src/db/mongodb/mongodb";
 import { HttpStatuses } from "../src/types/http-statuses";
+import mongoose from "mongoose";
 
 describe("/posts", () => {
-  let client: MongoClient;
-
   beforeAll(async () => {
-    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
-    await clearCollections();
+    await mongoose.connect(
+      APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
+    );
   });
 
   afterAll(async () => {
-    await client.close();
+    await mongoose.disconnect();
     console.log("Connection closed");
   });
 
