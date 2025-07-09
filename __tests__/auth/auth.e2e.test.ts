@@ -11,16 +11,17 @@ import {
 import { MongoClient } from "mongodb";
 import { runDb } from "../../src/db/mongodb/mongodb";
 import { clearCollections } from "../test-helpers";
+import mongoose from "mongoose";
 
 describe("/auth", () => {
-  let client: MongoClient;
-
   beforeAll(async () => {
-    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
+    await mongoose.connect(
+      APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
+    );
   });
 
   afterAll(async () => {
-    await client.close();
+    await mongoose.disconnect();
     console.log("Connection closed");
   });
 
