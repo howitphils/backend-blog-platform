@@ -8,8 +8,6 @@ import {
   jwtAuth,
   req,
 } from "../test-helpers";
-import { MongoClient } from "mongodb";
-import { runDb } from "../../src/db/mongodb/mongodb";
 import { clearCollections } from "../test-helpers";
 import mongoose from "mongoose";
 

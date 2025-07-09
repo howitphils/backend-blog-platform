@@ -7,23 +7,19 @@ import {
   getTokenPair,
   req,
 } from "../test-helpers";
-import { MongoClient } from "mongodb";
-import { runDb } from "../../src/db/mongodb/mongodb";
-import { clearCollections } from "../test-helpers";
 import { SessionViewModel } from "../../src/types/sessions-types";
 import { devicesTestHelper } from "./sessions.helpers";
+import mongoose from "mongoose";
 
 describe("/devices", () => {
-  let client: MongoClient;
-
   beforeAll(async () => {
-    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
+    await mongoose.connect(
+      APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
+    );
   });
 
   afterAll(async () => {
-    await clearCollections();
-
-    await client.close();
+    await mongoose.disconnect();
     console.log("Connection closed");
   });
 

@@ -1,18 +1,18 @@
 import { APP_CONFIG } from "../src/settings";
 import { req } from "./test-helpers";
-import { runDb } from "../src/db/mongodb/mongodb";
-import { MongoClient } from "mongodb";
+
 import { HttpStatuses } from "../src/types/http-statuses";
+import mongoose from "mongoose";
 
 describe("/testing", () => {
-  let client: MongoClient;
-
   beforeAll(async () => {
-    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
+    await mongoose.connect(
+      APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
+    );
   });
 
   afterAll(async () => {
-    await client.close();
+    await mongoose.disconnect();
     console.log("Connection closed");
   });
 

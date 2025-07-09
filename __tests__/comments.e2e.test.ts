@@ -8,20 +8,20 @@ import {
   makeIncorrect,
   req,
 } from "./test-helpers";
-import { MongoClient } from "mongodb";
-import { runDb } from "../src/db/mongodb/mongodb";
+
 import { HttpStatuses } from "../src/types/http-statuses";
 import { UserViewModel } from "../src/types/users-types";
+import mongoose from "mongoose";
 
 describe("/comments", () => {
-  let client: MongoClient;
-
   beforeAll(async () => {
-    client = await runDb(APP_CONFIG.MONGO_URL, APP_CONFIG.TEST_DB_NAME);
+    await mongoose.connect(
+      APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
+    );
   });
 
   afterAll(async () => {
-    await client.close();
+    await mongoose.disconnect();
     console.log("Connection closed");
   });
 

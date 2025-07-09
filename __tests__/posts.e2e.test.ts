@@ -14,8 +14,6 @@ import {
   makeIncorrect,
   req,
 } from "./test-helpers";
-import { MongoClient } from "mongodb";
-import { runDb } from "../src/db/mongodb/mongodb";
 import { HttpStatuses } from "../src/types/http-statuses";
 import mongoose from "mongoose";
 
