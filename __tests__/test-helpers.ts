@@ -10,6 +10,7 @@ import {
   PostViewModel,
 } from "../src/types/posts-types";
 import { HttpStatuses } from "../src/types/http-statuses";
+import { ApiCallsRepository } from "../src/db/mongodb/repositories/api-calls-repository/apiCalls-repository";
 
 export const req = agent(app);
 
@@ -143,6 +144,10 @@ export const createPostInDbHelper = async () => {
 };
 
 export const getTokenPair = async (user?: UserDtoType) => {
+  jest
+    .spyOn(ApiCallsRepository.prototype, "getAllCallsCount")
+    .mockResolvedValue(1);
+
   if (!user) {
     user = createUserDto({});
     await createNewUserInDb(user);

@@ -203,11 +203,14 @@ describe("/blogs", () => {
         name: "new_blog_name",
       });
 
-      await req
-        .put(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId.slice(0, -1) + "a"}`)
+      const res = await req
+        .put(APP_CONFIG.MAIN_PATHS.BLOGS + `/${blogId.slice(0, -2) + "ab"}`)
         .set(basicAuth)
-        .send(newBlogDto)
-        .expect(HttpStatuses.NotFound);
+        .send(newBlogDto);
+
+      console.log(res.body);
+
+      expect(res.status).toBe(HttpStatuses.NotFound);
     });
 
     it("should not update the blog with incorrect id", async () => {

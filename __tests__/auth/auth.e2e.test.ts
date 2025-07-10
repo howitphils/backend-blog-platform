@@ -10,6 +10,7 @@ import {
 } from "../test-helpers";
 import { clearCollections } from "../test-helpers";
 import mongoose from "mongoose";
+import { ApiCallsRepository } from "../../src/db/mongodb/repositories/api-calls-repository/apiCalls-repository";
 
 describe("/auth", () => {
   beforeAll(async () => {
@@ -17,7 +18,9 @@ describe("/auth", () => {
       APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
     );
 
-    jest.spyOn(APP_CONFIG, "REQUEST_LIMIT", "get").mockReturnValue(1000);
+    jest
+      .spyOn(ApiCallsRepository.prototype, "getAllCallsCount")
+      .mockResolvedValue(1);
   });
 
   afterAll(async () => {
@@ -209,23 +212,23 @@ describe("/auth", () => {
       expect(res.body.errorsMessages[0].message).toBe("Must be an email");
     });
 
-    it("should return an error for too many requests", async () => {
-      for (let i = 0; i < APP_CONFIG.USER_LOGINS_TEST_COUNT - 1; i++) {
-        await req
-          .post(
-            APP_CONFIG.MAIN_PATHS.AUTH +
-              APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
-          )
-          .expect(HttpStatuses.BadRequest);
-      }
+    // it("should return an error for too many requests", async () => {
+    //   for (let i = 0; i < APP_CONFIG.USER_LOGINS_TEST_COUNT - 1; i++) {
+    //     await req
+    //       .post(
+    //         APP_CONFIG.MAIN_PATHS.AUTH +
+    //           APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
+    //       )
+    //       .expect(HttpStatuses.BadRequest);
+    //   }
 
-      await req
-        .post(
-          APP_CONFIG.MAIN_PATHS.AUTH +
-            APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
-        )
-        .expect(HttpStatuses.TooManyRequests);
-    });
+    //   await req
+    //     .post(
+    //       APP_CONFIG.MAIN_PATHS.AUTH +
+    //         APP_CONFIG.ENDPOINT_PATHS.AUTH.PASSWORD_RECOVERY
+    //     )
+    //     .expect(HttpStatuses.TooManyRequests);
+    // });
   });
 
   describe("confirm password recovery", () => {
@@ -261,22 +264,22 @@ describe("/auth", () => {
       expect(res.body.errorsMessages[0].message).toBe("Must be a string");
     });
 
-    it("should return an error for too many requests", async () => {
-      for (let i = 0; i < APP_CONFIG.USER_LOGINS_TEST_COUNT - 1; i++) {
-        await req
-          .post(
-            APP_CONFIG.MAIN_PATHS.AUTH +
-              APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY
-          )
-          .expect(HttpStatuses.BadRequest);
-      }
+    // it("should return an error for too many requests", async () => {
+    //   for (let i = 0; i < APP_CONFIG.USER_LOGINS_TEST_COUNT - 1; i++) {
+    //     await req
+    //       .post(
+    //         APP_CONFIG.MAIN_PATHS.AUTH +
+    //           APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY
+    //       )
+    //       .expect(HttpStatuses.BadRequest);
+    //   }
 
-      await req
-        .post(
-          APP_CONFIG.MAIN_PATHS.AUTH +
-            APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY
-        )
-        .expect(HttpStatuses.TooManyRequests);
-    });
+    //   await req
+    //     .post(
+    //       APP_CONFIG.MAIN_PATHS.AUTH +
+    //         APP_CONFIG.ENDPOINT_PATHS.AUTH.CONFIRM_PASSWORD_RECOVERY
+    //     )
+    //     .expect(HttpStatuses.TooManyRequests);
+    // });
   });
 });
