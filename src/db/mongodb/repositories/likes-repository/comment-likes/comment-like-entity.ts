@@ -24,7 +24,7 @@ const CommentLikesSchema = new mongoose.Schema<CommentLike>({
   status: {
     type: String,
     required: true,
-    enum: Object.values(CommentLikeStatus),
+    enum: Object.values(CommentLikeStatus), // для валидации значения статуса
   },
   commentId: {
     type: String,
@@ -42,7 +42,7 @@ const CommentLikesSchema = new mongoose.Schema<CommentLike>({
 
 type CommentLikesModel = mongoose.Model<CommentLike>;
 
-export type CommentLikesDbDocument = mongoose.HydratedDocument<CommentLike>;
+export type CommentLikeDbDocument = mongoose.HydratedDocument<CommentLike>;
 
 export const CommentLikesModel = mongoose.model<CommentLike, CommentLikesModel>(
   "CommentLikes",

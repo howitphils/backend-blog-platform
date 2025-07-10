@@ -25,12 +25,33 @@ export class Post {
 }
 
 const PostsSchema = new mongoose.Schema<Post>({
-  title: { type: String },
-  blogId: { type: String },
-  blogName: { type: String },
-  content: { type: String },
-  createdAt: { type: String },
-  shortDescription: { type: String },
+  title: {
+    type: String,
+    required: true,
+    maxlength: 100,
+  },
+  shortDescription: {
+    type: String,
+    required: true,
+    maxlength: 100,
+  },
+  content: {
+    type: String,
+    required: true,
+    maxlength: 1000,
+  },
+  blogId: {
+    type: String,
+    required: true,
+  },
+  blogName: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: String,
+    required: true,
+  },
 });
 
 type PostModel = mongoose.Model<Post>;

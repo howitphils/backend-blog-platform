@@ -20,7 +20,11 @@ export class Comment {
 }
 
 const CommentsSchema = new mongoose.Schema<Comment>({
-  content: { type: String, required: true },
+  content: {
+    type: String,
+    required: true,
+    maxlength: 300,
+  },
   commentatorInfo: {
     userId: { type: String, required: true },
     userLogin: { type: String, required: true },

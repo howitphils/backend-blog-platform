@@ -4,7 +4,6 @@ import {
 } from "../../../../types/blogs-types";
 import { WithId } from "mongodb";
 import { BlogDbType } from "../../../../types/blogs-types";
-// import { blogsCollection } from "../../mongodb";
 import { PaginationType } from "../../../../types/common-types";
 import { BlogsModel } from "./blogs-entity";
 

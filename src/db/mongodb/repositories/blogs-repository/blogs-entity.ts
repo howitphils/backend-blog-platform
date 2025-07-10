@@ -18,11 +18,26 @@ export class Blog {
 }
 
 const BlogsSchema = new mongoose.Schema<BlogDbType>({
-  name: { type: String, required: true },
-  description: { type: String },
-  websiteUrl: { type: String },
-  createdAt: { type: String },
-  isMembership: { type: Boolean },
+  name: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  websiteUrl: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: String,
+    required: true,
+  },
+  isMembership: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 type BlogModel = mongoose.Model<BlogDbType>;
