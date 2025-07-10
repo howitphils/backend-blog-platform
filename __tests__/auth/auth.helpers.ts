@@ -1,13 +1,11 @@
 import { container } from "./../../src/composition-root";
 import { WithId } from "mongodb";
-import {
-  sessionsCollection,
-  usersCollection,
-} from "../../src/db/mongodb/mongodb";
 import { UserDbType } from "../../src/types/users-types";
 import { SessionDbType, SessionTestType } from "../../src/types/sessions-types";
 import { DateFnsService } from "../../src/adapters/dateFnsService";
 import { UuidService } from "../../src/adapters/uuIdService";
+import { UserModel } from "../../src/db/mongodb/repositories/users-repository/user-entitty";
+import { SessionsModel } from "../../src/db/mongodb/repositories/sessions-repository/session-entity";
 
 const dateFnsService = container.get(DateFnsService);
 const uuIdService = container.get(UuidService);
@@ -82,9 +80,11 @@ export const testSeeder = {
       },
     };
 
-    const res = await usersCollection.insertOne({ ...newUser });
+    const dbUser = new UserModel(newUser);
+    await dbUser.save();
+
     return {
-      _id: res.insertedId,
+      _id: dbUser._id,
       ...newUser,
     };
   },
@@ -101,8 +101,10 @@ export const testSeeder = {
       device_name: device_name ?? "testDevice",
     };
 
-    await sessionsCollection.insertOne({ ...newSession });
+    const dbSession = new SessionsModel(newSession);
 
-    return newSession;
+    await dbSession.save();
+
+    return { id: dbSession.id, ...newSession };
   },
 };

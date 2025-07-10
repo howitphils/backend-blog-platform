@@ -210,7 +210,7 @@ export class AuthService {
     await this.usersRepository.save(user);
   }
 
-  async confirmRegistration(confirmationCode: string): Promise<void> {
+  async confirmRegistration(confirmationCode: string): Promise<boolean> {
     const targetUser = await this.usersRepository.getUserByConfirmationCode(
       confirmationCode
     );
@@ -251,6 +251,8 @@ export class AuthService {
     targetUser.emailConfirmation.isConfirmed = true;
 
     await this.usersRepository.save(targetUser);
+
+    return targetUser.emailConfirmation.isConfirmed;
   }
 
   async resendConfirmationCode(email: string) {

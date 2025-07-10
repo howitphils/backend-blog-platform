@@ -1,7 +1,6 @@
 import { clearCollections, createUserDto, req } from "../test-helpers";
 
 import { ErrorWithStatusCode } from "../../src/middlewares/error-handler";
-import { usersCollection } from "../../src/db/mongodb/mongodb";
 import { APP_CONFIG } from "../../src/settings";
 import { HttpStatuses } from "../../src/types/http-statuses";
 import { testSeeder } from "./auth.helpers";
@@ -12,12 +11,15 @@ import { container } from "../../src/composition-root";
 import { UuidService } from "../../src/adapters/uuIdService";
 import { DateFnsService } from "../../src/adapters/dateFnsService";
 import mongoose from "mongoose";
+import { UserModel } from "../../src/db/mongodb/repositories/users-repository/user-entitty";
 
 describe("/auth", () => {
   beforeAll(async () => {
     await mongoose.connect(
       APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
     );
+
+    NodeMailerService.prototype.sendEmail = jest.fn().mockResolvedValue(true);
   });
 
   afterAll(async () => {
@@ -38,7 +40,7 @@ describe("/auth", () => {
 
       await registerUserUseCase(userDto);
 
-      const usersCount = await usersCollection.countDocuments();
+      const usersCount = await UserModel.countDocuments();
 
       expect(NodeMailerService.prototype.sendEmail).toHaveBeenCalledTimes(1);
       expect(usersCount).toBe(1);
@@ -57,7 +59,7 @@ describe("/auth", () => {
         expect(error.statusCode).toBe(HttpStatuses.BadRequest);
       }
 
-      const usersCount = await usersCollection.countDocuments();
+      const usersCount = await UserModel.countDocuments();
 
       expect(NodeMailerService.prototype.sendEmail).toHaveBeenCalledTimes(1);
       expect(usersCount).toBe(1);
@@ -71,6 +73,7 @@ describe("/auth", () => {
 
     const authService = container.get(AuthService);
     const uuIdService = container.get(UuidService);
+    const dateFnsService = container.get(DateFnsService);
 
     const confirmEmailUseCase =
       authService.confirmRegistration.bind(authService);
@@ -88,7 +91,10 @@ describe("/auth", () => {
     });
 
     it("should not confirm the email with expired code and throw an error", async () => {
-      const { email, login, pass } = testSeeder.createUserDto({});
+      const { email, login, pass } = testSeeder.createUserDto({
+        email: "user2@gmail",
+        login: "user2",
+      });
       const confirmationCode = uuIdService.createRandomCode();
 
       await testSeeder.insertUser({
@@ -96,7 +102,7 @@ describe("/auth", () => {
         login,
         pass,
         confirmationCode,
-        expirationDate: new Date(),
+        expirationDate: dateFnsService.rollBackBySeconds(10),
         isConfirmed: true,
       });
 
@@ -112,7 +118,10 @@ describe("/auth", () => {
     });
 
     it("should not confirm already confirmed email and throw an error", async () => {
-      const { email, login, pass } = testSeeder.createUserDto({});
+      const { email, login, pass } = testSeeder.createUserDto({
+        email: "user3",
+        login: "user3",
+      });
       const confirmationCode = uuIdService.createRandomCode();
 
       await testSeeder.insertUser({
@@ -135,7 +144,10 @@ describe("/auth", () => {
     });
 
     it("should confirm the email", async () => {
-      const { email, login, pass } = testSeeder.createUserDto({});
+      const { email, login, pass } = testSeeder.createUserDto({
+        email: "user4",
+        login: "user4",
+      });
       const confirmationCode = uuIdService.createRandomCode();
 
       await testSeeder.insertUser({
@@ -145,7 +157,7 @@ describe("/auth", () => {
         confirmationCode,
       });
 
-      expect(await confirmEmailUseCase(confirmationCode)).toBeTruthy();
+      expect(await confirmEmailUseCase(confirmationCode)).toBeTruthy;
     });
   });
 
@@ -242,7 +254,7 @@ describe("/auth", () => {
 
       await codeResendingUseCase(email);
 
-      const updatedUser = await usersCollection.findOne({
+      const updatedUser = await UserModel.findOne({
         "accountData.email": { $regex: email, $options: "i" },
       });
 
@@ -332,7 +344,7 @@ describe("/auth", () => {
         .send({ newPassword: "new_password", recoveryCode: "correct_code" })
         .expect(HttpStatuses.NoContent);
 
-      const updatedUser = (await usersCollection.findOne({
+      const updatedUser = (await UserModel.findOne({
         "accountData.email": email,
       })) as UserDbType;
 

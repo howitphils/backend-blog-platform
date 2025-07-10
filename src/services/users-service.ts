@@ -13,6 +13,7 @@ import {
 } from "../db/mongodb/repositories/users-repository/user-entitty";
 import { DateFnsService } from "../adapters/dateFnsService";
 import { UuidService } from "../adapters/uuIdService";
+import { createErrorsObject } from "../routers/controllers/utils";
 
 @injectable()
 export class UsersService {
@@ -36,21 +37,21 @@ export class UsersService {
   ): Promise<string> {
     const { login, email, password } = userDto;
 
-    // const existingUser = await this.usersRepository.getUserByCredentials(
-    //   login,
-    //   email
-    // );
+    const existingUser = await this.usersRepository.getUserByCredentials(
+      login,
+      email
+    );
 
-    // if (existingUser) {
-    //   const field =
-    //     existingUser.accountData.email === email ? "email" : "login";
+    if (existingUser) {
+      const field =
+        existingUser.accountData.email === email ? "email" : "login";
 
-    //   throw new ErrorWithStatusCode(
-    //     APP_CONFIG.ERROR_MESSAGES.USER_ALREADY_EXISTS,
-    //     HttpStatuses.BadRequest,
-    //     createErrorsObject(field, `User with this ${field} already exists`)
-    //   );
-    // }
+      throw new ErrorWithStatusCode(
+        APP_CONFIG.ERROR_MESSAGES.USER_ALREADY_EXISTS,
+        HttpStatuses.BadRequest,
+        createErrorsObject(field, `User with this ${field} already exists`)
+      );
+    }
 
     const passHash = await this.bcryptService.createHash(password);
 
