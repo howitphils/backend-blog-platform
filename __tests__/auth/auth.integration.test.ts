@@ -150,14 +150,18 @@ describe("/auth", () => {
       });
       const confirmationCode = uuIdService.createRandomCode();
 
-      await testSeeder.insertUser({
+      const user = await testSeeder.insertUser({
         email,
         login,
         pass,
         confirmationCode,
       });
 
-      expect(await confirmEmailUseCase(confirmationCode)).toBeTruthy;
+      await confirmEmailUseCase(confirmationCode);
+
+      const updatedUser = (await UserModel.findById(user._id)) as UserDbType;
+
+      expect(updatedUser.emailConfirmation.isConfirmed).toBe(true);
     });
   });
 
@@ -209,7 +213,10 @@ describe("/auth", () => {
     });
 
     it("should throw an error if user is already confirmed", async () => {
-      const { email, login, pass } = testSeeder.createUserDto({});
+      const { email, login, pass } = testSeeder.createUserDto({
+        login: "user2",
+        email: "user2",
+      });
       const confirmationCode = "test";
 
       await testSeeder.insertUser({
@@ -236,6 +243,7 @@ describe("/auth", () => {
     it("should update user's confirmationCode and expiration date and send an email with confirmationCode", async () => {
       const { email, login, pass } = testSeeder.createUserDto({
         email: "someemail@gmail.com",
+        login: "user3",
       });
 
       const uuIdService = container.get(UuidService);
@@ -244,7 +252,7 @@ describe("/auth", () => {
       const startCode = uuIdService.createRandomCode();
       const startExpirationDate = dateFnsService.addToCurrentDate();
 
-      await testSeeder.insertUser({
+      const dbUser = await testSeeder.insertUser({
         email,
         login,
         pass,
@@ -254,16 +262,15 @@ describe("/auth", () => {
 
       await codeResendingUseCase(email);
 
-      const updatedUser = await UserModel.findOne({
-        "accountData.email": { $regex: email, $options: "i" },
-      });
+      const updatedUser = (await UserModel.findById(dbUser._id)) as UserDbType;
 
-      expect(updatedUser?.emailConfirmation.confirmationCode).not.toBe(
+      expect(updatedUser.emailConfirmation.confirmationCode).not.toBe(
         startCode
       );
-      expect(updatedUser?.emailConfirmation.expirationDate).not.toBe(
+      expect(updatedUser.emailConfirmation.expirationDate).not.toBe(
         startExpirationDate
       );
+
       expect(NodeMailerService.prototype.sendEmail).toHaveBeenCalledTimes(2);
     });
   });

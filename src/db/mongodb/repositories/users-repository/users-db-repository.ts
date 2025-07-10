@@ -14,12 +14,13 @@ export class UsersRepository {
   async getUserByLoginOrEmail(
     loginOrEmail: string
   ): Promise<UserDbDocument | null> {
-    return UserModel.findOne({
+    const user = await UserModel.findOne({
       $or: [
         { "accountData.email": { $regex: loginOrEmail, $options: "i" } },
         { "accountData.login": { $regex: loginOrEmail, $options: "i" } },
       ],
     });
+    return user;
   }
 
   // Отдельный метод для проверки на существование пользователя с таким email/login
