@@ -36,7 +36,7 @@ describe("/auth", () => {
     const registerUserUseCase = authService.registerUser.bind(authService);
 
     it("should accept user's data and send an email", async () => {
-      const userDto = createUserDto({});
+      const userDto = createUserDto({ login: "user1", email: "user1" });
 
       await registerUserUseCase(userDto);
 
@@ -47,7 +47,7 @@ describe("/auth", () => {
     });
 
     it("should not register a user twice with an error", async () => {
-      const userDto = createUserDto({});
+      const userDto = createUserDto({ login: "user1", email: "user1" });
 
       try {
         await registerUserUseCase(userDto);

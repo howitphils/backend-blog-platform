@@ -1,13 +1,13 @@
 import { WithId } from "mongodb";
-import { sessionsCollection } from "../../mongodb";
 import {
   SessionDbType,
   SessionViewModel,
 } from "../../../../types/sessions-types";
+import { SessionsModel } from "./session-entity";
 
 export class SessionsQueryRepository {
   async getAllUsersSessions(userId: string): Promise<SessionViewModel[]> {
-    const sessions = await sessionsCollection.find({ userId }).toArray();
+    const sessions = await SessionsModel.find({ userId });
 
     return sessions.map(this._mapFromDbToViewModel);
   }

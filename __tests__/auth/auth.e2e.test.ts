@@ -16,6 +16,8 @@ describe("/auth", () => {
     await mongoose.connect(
       APP_CONFIG.MONGO_URL + "/" + APP_CONFIG.TEST_DB_NAME
     );
+
+    jest.spyOn(APP_CONFIG, "REQUEST_LIMIT", "get").mockReturnValue(1000);
   });
 
   afterAll(async () => {

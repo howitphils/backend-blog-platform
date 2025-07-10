@@ -38,7 +38,7 @@ export const errorHandler = (
       .json({ message: "Incorrect input data" });
   }
 
-  console.log(JSON.stringify(err));
+  console.log(err);
   res.status(HttpStatuses.ServerError).json({ message: "Unexpected error" });
 
   return;
