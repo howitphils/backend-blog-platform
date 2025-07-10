@@ -25,7 +25,14 @@ export class Session {
   }
 }
 
-const SessionsSchema = new mongoose.Schema<Session>({});
+const SessionsSchema = new mongoose.Schema<Session>({
+  device_name: { type: String, required: true },
+  deviceId: { type: String, required: true },
+  exp: { type: Number, required: true },
+  iat: { type: Number, required: true },
+  ip: { type: String, required: true },
+  userId: { type: String, required: true },
+});
 
 type SessionsModel = mongoose.Model<Session>;
 

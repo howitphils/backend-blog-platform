@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
 import { ApiCallType } from "../../../../types/apiCalls";
 
-const ApiCallsSchema = new mongoose.Schema<ApiCallType>({});
+const ApiCallsSchema = new mongoose.Schema<ApiCallType>({
+  date: { type: Date, required: true },
+  ip: { type: String, required: true },
+  url: { type: String, required: true },
+});
 
 type ApiCallsModel = mongoose.Model<ApiCallType>;
 
