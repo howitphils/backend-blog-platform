@@ -1,5 +1,6 @@
 import {
   CommentDbType,
+  CommentLikeDto,
   CreateCommentDto,
   DeleteCommentDto,
   UpdateCommentDto,
@@ -13,6 +14,13 @@ import {
   Comment,
   CommentsModel,
 } from "../db/mongodb/repositories/comments-repository/comments-entity";
+import {
+  CommentLike,
+  CommentLikesModel,
+  CommentLikeStatus,
+} from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+import { ErrorWithStatusCode } from "../middlewares/error-handler";
+import { HttpStatuses } from "../types/http-statuses";
 
 @injectable()
 export class CommentsService {
@@ -127,6 +135,52 @@ export class CommentsService {
       extensions: [],
       data: true,
     };
+  }
+
+  async updateLikeStatus(dto: CommentLikeDto) {
+    //TODO: вынести в middleware валидацию cтатуса лайка
+    if (!Object.values(CommentLikeStatus).includes(dto.likeStatus)) {
+      throw new ErrorWithStatusCode(
+        "Invalid like status",
+        HttpStatuses.BadRequest
+      );
+    }
+
+    const targetComment = await this.commentsRepository.getCommentById(
+      dto.commentId
+    );
+
+    if (!targetComment) {
+      throw new ErrorWithStatusCode("Comment not found", HttpStatuses.NotFound);
+    }
+
+    const targetLike = await CommentLikesModel.findOne({
+      userId: dto.userId,
+      commentId: dto.commentId,
+    });
+
+    if (!targetLike) {
+      const newLike = new CommentLike(
+        dto.userId,
+        dto.commentId,
+        dto.likeStatus
+      );
+
+      const dbLike = new CommentLikesModel(newLike);
+
+      await dbLike.save();
+
+      return;
+    }
+
+    if (dto.likeStatus === CommentLikeStatus.None) {
+      // если статус лайка None, удаляем его
+      await targetLike.deleteOne();
+    } else if (dto.likeStatus !== targetLike.status) {
+      // если статус лайка отличается от текущего, обновляем его
+      targetLike.status = dto.likeStatus;
+      await targetLike.save();
+    }
   }
 
   async deleteComment(

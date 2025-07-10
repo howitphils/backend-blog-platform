@@ -1,3 +1,5 @@
+import { CommentLikeStatus } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+
 export type CommentInputModel = {
   content: string;
 };
@@ -50,4 +52,10 @@ export type UpdateCommentDto = {
 export type DeleteCommentDto = {
   userId: string;
   commentId: string;
+};
+
+export type CommentLikeDto = {
+  userId: string;
+  commentId: string;
+  likeStatus: CommentLikeStatus;
 };

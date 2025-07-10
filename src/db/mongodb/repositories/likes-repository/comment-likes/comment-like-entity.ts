@@ -24,7 +24,7 @@ const CommentLikesSchema = new mongoose.Schema<CommentLike>({
   status: {
     type: String,
     required: true,
-    enum: Object.values(CommentLikeStatus), // для валидации значения статуса
+    enum: Object.values(CommentLikeStatus), // для валидации значения статуса - ожидается именно массив значений
   },
   commentId: {
     type: String,
