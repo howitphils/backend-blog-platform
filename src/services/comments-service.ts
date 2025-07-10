@@ -159,6 +159,7 @@ export class CommentsService {
       commentId: dto.commentId,
     });
 
+    // Нужно ли добавлять проверку входящего статуса лайка на не None?
     if (!targetLike) {
       const newLike = new CommentLike(
         dto.userId,

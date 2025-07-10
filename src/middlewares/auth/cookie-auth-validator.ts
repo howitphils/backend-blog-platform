@@ -3,6 +3,7 @@ import { APP_CONFIG } from "../../settings";
 import { HttpStatuses } from "../../types/http-statuses";
 import { container } from "../../composition-root";
 import { JwtService } from "../../adapters/jwtService";
+import { ErrorWithStatusCode } from "../error-handler";
 
 const jwtService = container.get(JwtService);
 
@@ -14,19 +15,19 @@ export const refreshTokenValidator = (
   const refreshToken = req.cookies[APP_CONFIG.REFRESH_TOKEN_COOKIE_NAME];
 
   if (!refreshToken) {
-    console.log("refresh token does not exist");
-
-    res.sendStatus(HttpStatuses.Unauthorized);
-    return;
+    throw new ErrorWithStatusCode(
+      "Refresh token is missing",
+      HttpStatuses.Unauthorized
+    );
   }
 
   const verified = jwtService.verifyRefreshToken(refreshToken);
 
   if (!verified) {
-    console.log("refresh token is not verified");
-
-    res.sendStatus(HttpStatuses.Unauthorized);
-    return;
+    throw new ErrorWithStatusCode(
+      "Refresh token is not valid",
+      HttpStatuses.Unauthorized
+    );
   }
 
   //TODO достать из токена девайсИд, время выпуска и закинуть в реквест

@@ -3,19 +3,20 @@ import { HttpStatuses } from "../../types/http-statuses";
 import { ResultStatus } from "../../types/resultObject-types";
 import { container } from "../../composition-root";
 import { AuthService } from "../../services/auth-service";
+import { ErrorWithStatusCode } from "../error-handler";
 
 const authService = container.get(AuthService);
 
 export const jwtAuthGuard = (
-  req: Request<{}>,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
   if (!req.headers.authorization) {
-    console.log("no headers");
-
-    res.sendStatus(HttpStatuses.Unauthorized);
-    return;
+    throw new ErrorWithStatusCode(
+      "Authorization header is missing",
+      HttpStatuses.Unauthorized
+    );
   }
 
   const verificationResult = authService.checkAccessToken(
@@ -23,10 +24,13 @@ export const jwtAuthGuard = (
   );
 
   if (verificationResult.status !== ResultStatus.Success) {
-    res.sendStatus(HttpStatuses.Unauthorized);
-  } else {
-    req.user = { id: verificationResult.data as string };
+    throw new ErrorWithStatusCode(
+      verificationResult.errorMessage || "Invalid access token",
+      HttpStatuses.Unauthorized
+    );
   }
+
+  req.user = { id: verificationResult.data as string };
 
   next();
 };

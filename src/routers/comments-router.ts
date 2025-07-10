@@ -30,7 +30,7 @@ commentsRouter.put(
 );
 
 commentsRouter.put(
-  "/:id",
+  "/:id/like-status",
   jwtAuthGuard,
   checkUserInRequest,
   validateParamsId,

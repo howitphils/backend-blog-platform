@@ -313,8 +313,6 @@ export class AuthService {
     const verifiedUser = this.jwtService.verifyAccessToken(accessToken);
 
     if (!verifiedUser) {
-      console.log("not verified");
-
       const resultObject: ResultObject = {
         status: ResultStatus.Unauthorized,
         errorMessage: "Token is not verified",
