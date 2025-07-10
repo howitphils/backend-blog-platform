@@ -71,5 +71,7 @@ export const APP_CONFIG = {
     RECOVERY_CODE: "recoveryCode",
     CONFIRMATION_CODE: "confirmationCode",
     EMAIL: "email",
+    LIKE_STATUS: "likeStatus",
+    CONTENT: "content",
   },
 };
