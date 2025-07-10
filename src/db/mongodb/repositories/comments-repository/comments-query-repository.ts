@@ -3,6 +3,10 @@ import {
   CommentViewModel,
 } from "../../../../types/comments-types";
 import { PaginationType } from "../../../../types/common-types";
+import {
+  CommentLikesModel,
+  CommentLikeStatus,
+} from "../likes-repository/comment-likes/comment-like-entity";
 import { CommentDbDocument, CommentsModel } from "./comments-entity";
 
 export class CommentsQueryRepository {
@@ -31,16 +35,43 @@ export class CommentsQueryRepository {
     };
   }
 
-  async getCommentById(id: string): Promise<CommentViewModel | null> {
-    const targetComment = await CommentsModel.findById(id);
+  async getCommentById(
+    commentId: string,
+    userId: string
+  ): Promise<CommentViewModel | null> {
+    const targetComment = await CommentsModel.findById(commentId);
 
     if (!targetComment) return null;
 
-    return this._mapFromDbToViewModel(targetComment);
+    const likesCount = await CommentLikesModel.countDocuments({
+      status: CommentLikeStatus.Like,
+      commentId,
+    });
+    const dislikesCount = await CommentLikesModel.countDocuments({
+      status: CommentLikeStatus.Dislike,
+      commentId,
+    });
+
+    const myStatus = await CommentLikesModel.findOne({
+      commentId,
+      userId,
+    });
+
+    return this._mapFromDbToViewModel(
+      targetComment,
+      likesCount,
+      dislikesCount,
+      myStatus?.status || CommentLikeStatus.None
+    );
   }
 
   // Преобразование комментария из формата бд в формат, который ожидает клиент
-  _mapFromDbToViewModel(comment: CommentDbDocument): CommentViewModel {
+  _mapFromDbToViewModel(
+    comment: CommentDbDocument,
+    likesCount: number,
+    dislikesCount: number,
+    myStatus: CommentLikeStatus
+  ): CommentViewModel {
     const { id, content, createdAt } = comment;
     const { userId, userLogin } = comment.commentatorInfo;
 
@@ -49,6 +80,11 @@ export class CommentsQueryRepository {
       content,
       createdAt,
       commentatorInfo: { userId, userLogin },
+      likesInfo: {
+        likesCount: likesCount,
+        dislikesCount: dislikesCount,
+        myStatus,
+      },
     };
   }
 }

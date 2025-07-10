@@ -9,11 +9,18 @@ export type CommentatorInfo = {
   userLogin: string;
 };
 
+export type LikesInfo = {
+  likesCount: number;
+  dislikesCount: number;
+  myStatus: CommentLikeStatus;
+};
+
 export type CommentViewModel = {
   id: string;
   content: string;
-  commentatorInfo: CommentatorInfo;
   createdAt: string;
+  commentatorInfo: CommentatorInfo;
+  likesInfo: LikesInfo;
 };
 
 export type CommentDbType = {

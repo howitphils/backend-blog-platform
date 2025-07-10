@@ -138,14 +138,6 @@ export class CommentsService {
   }
 
   async updateLikeStatus(dto: CommentLikeDto) {
-    //TODO: вынести в middleware валидацию cтатуса лайка
-    if (!Object.values(CommentLikeStatus).includes(dto.likeStatus)) {
-      throw new ErrorWithStatusCode(
-        "Invalid like status",
-        HttpStatuses.BadRequest
-      );
-    }
-
     const targetComment = await this.commentsRepository.getCommentById(
       dto.commentId
     );
@@ -180,6 +172,7 @@ export class CommentsService {
     } else if (dto.likeStatus !== targetLike.status) {
       // если статус лайка отличается от текущего, обновляем его
       targetLike.status = dto.likeStatus;
+
       await targetLike.save();
     }
   }

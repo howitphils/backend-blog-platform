@@ -15,6 +15,7 @@ import { convertToHttpCode } from "./utils";
 import { CommentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
 import { CommentsService } from "../../services/comments-service";
 import { inject, injectable } from "inversify";
+import { ErrorWithStatusCode } from "../../middlewares/error-handler";
 
 @injectable()
 export class CommentsController {
@@ -31,12 +32,14 @@ export class CommentsController {
     res: Response<CommentViewModel>
   ) {
     const targetComment = await this.commentsQueryRepository.getCommentById(
-      req.params.id
+      req.params.id,
+      req.user.id
     );
+
     if (!targetComment) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
+      throw new ErrorWithStatusCode("Comment not found", HttpStatuses.NotFound);
     }
+
     res.status(HttpStatuses.Success).json(targetComment);
   }
 

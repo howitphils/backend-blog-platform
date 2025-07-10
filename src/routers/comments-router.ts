@@ -15,6 +15,8 @@ export const commentsRouter = Router();
 
 commentsRouter.get(
   "/:id",
+  jwtAuthGuard,
+  checkUserInRequest,
   validateParamsId,
   commentsController.getCommentById.bind(commentsController)
 );
