@@ -4,7 +4,7 @@ import { HttpStatuses } from "../types/http-statuses";
 
 // Валидация параметра id в запросе на наличие валидного ObjectId
 export const validateParamsId = (
-  req: Request<{ id: string | ObjectId }>,
+  req: Request<{ id: string }>,
   res: Response,
   next: NextFunction
 ) => {

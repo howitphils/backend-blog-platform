@@ -1,6 +1,7 @@
 import { HttpStatuses } from "../../src/types/http-statuses";
 import { APP_CONFIG } from "../../src/settings";
 import {
+  clearCollections,
   createNewUserInDb,
   createUserDto,
   delay,
@@ -19,6 +20,8 @@ describe("/devices", () => {
   });
 
   afterAll(async () => {
+    await clearCollections();
+
     await mongoose.disconnect();
     console.log("Connection closed");
   });

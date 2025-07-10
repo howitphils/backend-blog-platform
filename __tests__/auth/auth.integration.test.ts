@@ -25,7 +25,10 @@ describe("/auth", () => {
   afterAll(async () => {
     await mongoose.disconnect();
     console.log("Connection closed");
+
+    jest.clearAllMocks();
   });
+
   describe("registration", () => {
     afterAll(async () => {
       await clearCollections();

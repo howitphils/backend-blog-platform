@@ -54,6 +54,10 @@ export type DeleteCommentDto = {
   commentId: string;
 };
 
+export type UpdateCommentLikeInputModel = {
+  likeStatus: CommentLikeStatus;
+};
+
 export type CommentLikeDto = {
   userId: string;
   commentId: string;

@@ -7,7 +7,7 @@ import { userBodyValidators } from "../middlewares/body-validations/users-body-v
 import { resendEmailBodyValidators } from "../middlewares/body-validations/resend-email-body-validations";
 import { confirmationCodeBodyValidators } from "../middlewares/body-validations/confirm-code-body-validations";
 import { refreshTokenValidator } from "../middlewares/auth/cookie-auth-validator";
-import { apiCallsGuard } from "../middlewares/apiCallsGuard";
+import { apiCallsGuard } from "../middlewares/api-calls-guard";
 import { confrimPasswordRecoveryValidators } from "../middlewares/body-validations/confirm-recover-password-body-validators";
 import { APP_CONFIG } from "../settings";
 import { container } from "../composition-root";

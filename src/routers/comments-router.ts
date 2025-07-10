@@ -6,6 +6,7 @@ import { commentsBodyValidators } from "../middlewares/body-validations/comments
 import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 import { validateParamsId } from "../middlewares/validate-paramsId";
 import { CommentsController } from "./controllers/comments-controller";
+import { checkUserInRequest } from "../middlewares/check-req-user";
 
 const commentsController = container.get(CommentsController);
 
@@ -20,6 +21,7 @@ commentsRouter.get(
 commentsRouter.put(
   "/:id",
   jwtAuthGuard,
+  checkUserInRequest,
   validateParamsId,
   commentsBodyValidators,
   bodyValidationResult,
@@ -29,6 +31,7 @@ commentsRouter.put(
 commentsRouter.delete(
   "/:id",
   jwtAuthGuard,
+  checkUserInRequest,
   validateParamsId,
   commentsController.deleteComment.bind(commentsController)
 );

@@ -1,16 +1,13 @@
-import {
-  RequestWithParamsAndBodyAndUserId,
-  RequestWithParamsAndUserId,
-} from "./../../types/requests-types";
 import { Response } from "express";
-import { UserId } from "../../types/users-types";
 import {
   CommentInputModel,
   CommentViewModel,
-  DeleteCommentDto,
-  UpdateCommentDto,
+  UpdateCommentLikeInputModel,
 } from "../../types/comments-types";
-import { RequestWithParams } from "../../types/requests-types";
+import {
+  RequestWithParams,
+  RequestWithParamsAndBody,
+} from "../../types/requests-types";
 import { ParamsId } from "../../types/common-types";
 import { ResultStatus } from "../../types/resultObject-types";
 import { HttpStatuses } from "../../types/http-statuses";
@@ -44,26 +41,14 @@ export class CommentsController {
   }
 
   async updateComment(
-    req: RequestWithParamsAndBodyAndUserId<ParamsId, CommentInputModel, UserId>,
+    req: RequestWithParamsAndBody<ParamsId, CommentInputModel>,
     res: Response
   ) {
-    const userId = req.user?.id;
-    if (!userId) {
-      throw new Error("User id does not exist in comments req");
-    }
-
-    const commentId = req.params.id;
-    const commentBody = req.body;
-
-    const updateCommentDto: UpdateCommentDto = {
-      userId,
-      commentId,
-      commentBody,
-    };
-
-    const updateResult = await this.commentsService.updateComment(
-      updateCommentDto
-    );
+    const updateResult = await this.commentsService.updateComment({
+      commentBody: req.body,
+      userId: req.user.id,
+      commentId: req.params.id,
+    });
 
     if (updateResult.status !== ResultStatus.Success) {
       res
@@ -75,26 +60,11 @@ export class CommentsController {
     res.sendStatus(HttpStatuses.NoContent);
   }
 
-  async deleteComment(
-    req: RequestWithParamsAndUserId<ParamsId, UserId>,
-    res: Response
-  ) {
-    const commentId = req.params.id;
-    const userId = req.user?.id;
-
-    if (!userId) {
-      res.sendStatus(HttpStatuses.ServerError);
-      return;
-    }
-
-    const deleteCommentDto: DeleteCommentDto = {
-      userId,
-      commentId,
-    };
-
-    const deleteResult = await this.commentsService.deleteComment(
-      deleteCommentDto
-    );
+  async deleteComment(req: RequestWithParams<ParamsId>, res: Response) {
+    const deleteResult = await this.commentsService.deleteComment({
+      commentId: req.params.id,
+      userId: req.user.id,
+    });
 
     if (deleteResult.status !== ResultStatus.Success) {
       res
@@ -102,6 +72,19 @@ export class CommentsController {
         .json(deleteResult.extensions);
       return;
     }
+
+    res.sendStatus(HttpStatuses.NoContent);
+  }
+
+  async updateLikeStatus(
+    req: RequestWithParamsAndBody<ParamsId, UpdateCommentLikeInputModel>,
+    res: Response
+  ) {
+    await this.commentsService.updateLikeStatus({
+      userId: req.user.id,
+      commentId: req.params.id,
+      likeStatus: req.body.likeStatus,
+    });
 
     res.sendStatus(HttpStatuses.NoContent);
   }
