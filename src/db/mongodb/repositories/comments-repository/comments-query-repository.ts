@@ -7,7 +7,7 @@ import {
   CommentLikesModel,
   CommentLikeStatus,
 } from "../likes-repository/comment-likes/comment-like-entity";
-import { CommentDbDocument, CommentsModel } from "./comments-entity";
+import { CommentsModel } from "./comments-entity";
 
 export class CommentsQueryRepository {
   // Получение всех комментариев с учетом query параметров
@@ -24,6 +24,14 @@ export class CommentsQueryRepository {
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
 
+    const commentsIds = comments.map((comment) => comment.id);
+
+    // Получаем лайки для всех комментариев юзера
+    const likes = await CommentLikesModel.find({
+      commentId: { $in: commentsIds },
+      userId,
+    });
+
     // Получаем число всех комментов конкретного поста
     const totalCount = await CommentsModel.countDocuments({ postId });
 
@@ -32,9 +40,21 @@ export class CommentsQueryRepository {
       pagesCount: Math.ceil(totalCount / pageSize),
       pageSize: pageSize,
       totalCount,
-      items: comments.map((comment) =>
-        this._mapFromDbToViewModel(comment, userId)
-      ),
+      items: comments.map((comment) => {
+        return {
+          commentatorInfo: comment.commentatorInfo,
+          content: comment.content,
+          createdAt: comment.createdAt,
+          id: comment.id,
+          likesInfo: {
+            likesCount: comment.likesCount,
+            dislikesCount: comment.dislikesCount,
+            myStatus:
+              likes.find((like) => like.commentId === comment.id)?.status ||
+              CommentLikeStatus.None,
+          },
+        };
+      }),
     };
   }
 
@@ -46,7 +66,7 @@ export class CommentsQueryRepository {
 
     if (!targetComment) return null;
 
-    const usersLike = await CommentLikesModel.findOne({ commentId, userId });
+    const userLike = await CommentLikesModel.findOne({ commentId, userId });
 
     return {
       content: targetComment.content,
@@ -59,7 +79,7 @@ export class CommentsQueryRepository {
       likesInfo: {
         likesCount: targetComment.likesCount,
         dislikesCount: targetComment.dislikesCount,
-        myStatus: usersLike?.status || CommentLikeStatus.None,
+        myStatus: userLike?.status || CommentLikeStatus.None,
       },
     };
 
@@ -67,36 +87,36 @@ export class CommentsQueryRepository {
   }
 
   // Преобразование комментария из формата бд в формат, который ожидает клиент
-  async _mapFromDbToViewModel(
-    comment: CommentDbDocument,
-    userId: string
-  ): CommentViewModel {
-    const { id, content, createdAt, commentatorInfo } = comment;
+  // async _mapFromDbToViewModel(
+  //   comment: CommentDbDocument,
+  //   userId: string
+  // ): CommentViewModel {
+  //   const { id, content, createdAt, commentatorInfo } = comment;
 
-    const likesCount = await CommentLikesModel.countDocuments({
-      status: CommentLikeStatus.Like,
-      id,
-    });
-    const dislikesCount = await CommentLikesModel.countDocuments({
-      status: CommentLikeStatus.Dislike,
-      id,
-    });
+  //   const likesCount = await CommentLikesModel.countDocuments({
+  //     status: CommentLikeStatus.Like,
+  //     id,
+  //   });
+  //   const dislikesCount = await CommentLikesModel.countDocuments({
+  //     status: CommentLikeStatus.Dislike,
+  //     id,
+  //   });
 
-    const targetLike = await CommentLikesModel.findOne({
-      id,
-      userId,
-    });
+  //   const targetLike = await CommentLikesModel.findOne({
+  //     id,
+  //     userId,
+  //   });
 
-    return {
-      id,
-      content,
-      createdAt,
-      commentatorInfo: commentatorInfo,
-      likesInfo: {
-        likesCount: likesCount,
-        dislikesCount: dislikesCount,
-        myStatus: targetLike?.status || CommentLikeStatus.None,
-      },
-    };
-  }
+  //   return {
+  //     id,
+  //     content,
+  //     createdAt,
+  //     commentatorInfo: commentatorInfo,
+  //     likesInfo: {
+  //       likesCount: likesCount,
+  //       dislikesCount: dislikesCount,
+  //       myStatus: targetLike?.status || CommentLikeStatus.None,
+  //     },
+  //   };
+  // }
 }

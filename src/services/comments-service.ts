@@ -176,14 +176,21 @@ export class CommentsService {
         } else if (targetLike.status === CommentLikeStatus.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
           targetComment.dislikesCount -= 1;
+
+          if (targetComment.dislikesCount < 0) {
+            targetComment.dislikesCount = 0; // Защита от отрицательного количества дизлайков
+          }
         }
-        await this.commentsRepository.save(targetComment);
       }
 
       if (dto.likeStatus === CommentLikeStatus.Like) {
         if (targetLike.status === CommentLikeStatus.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
           targetComment.dislikesCount -= 1;
+
+          if (targetComment.dislikesCount < 0) {
+            targetComment.dislikesCount = 0; // Защита от отрицательного количества дизлайков
+          }
         }
         // Если текущий статус лайка - None, то просто добавляем лайк
         targetComment.likesCount += 1;
@@ -193,10 +200,16 @@ export class CommentsService {
         if (targetLike.status === CommentLikeStatus.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
           targetComment.likesCount -= 1;
+
+          if (targetComment.likesCount < 0) {
+            targetComment.likesCount = 0; // Защита от отрицательного количества лайков
+          }
         }
         // Если текущий статус лайка - None, то просто добавляем дизлайк
         targetComment.dislikesCount += 1;
       }
+
+      await this.commentsRepository.save(targetComment);
 
       // если статус лайка отличается от текущего, обновляем его
       targetLike.status = dto.likeStatus;
