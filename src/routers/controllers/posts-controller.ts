@@ -13,7 +13,6 @@ import {
   CommentInputModel,
   CommentsRequestQueryType,
   CommentViewModel,
-  CreateCommentDto,
 } from "../../types/comments-types";
 import {
   RequestWithBody,
@@ -65,11 +64,11 @@ export class PostsController {
     await this.postsService.getPostById(req.params.id);
 
     const mapedQueryParams = mapCommentsQueryParams(req.query);
-    const convertedPostId = req.params.id.toString();
 
     const comments = await this.commentsQueryRepository.getAllCommentsForPost(
       mapedQueryParams,
-      convertedPostId
+      req.params.id,
+      req.user.id
     );
 
     res.status(HttpStatuses.Success).json(comments);
@@ -95,24 +94,11 @@ export class PostsController {
     req: RequestWithParamsAndBody<ParamsId, CommentInputModel>,
     res: Response<CommentViewModel | ExtensionType[]>
   ) {
-    const userId = req.user.id;
-
-    if (!userId) {
-      throw new Error("User is not found in create comment req");
-    }
-
-    const postId = req.params.id;
-    const commentBody = req.body;
-
-    const createCommentDto: CreateCommentDto = {
-      userId,
-      postId,
-      commentBody,
-    };
-
-    const createResult = await this.commentsService.createNewComment(
-      createCommentDto
-    );
+    const createResult = await this.commentsService.createNewComment({
+      userId: req.user.id,
+      postId: req.params.id,
+      commentBody: req.body,
+    });
 
     if (createResult.status !== "Success") {
       res
@@ -122,7 +108,8 @@ export class PostsController {
     }
 
     const newComment = await this.commentsQueryRepository.getCommentById(
-      createResult.data as string
+      createResult.data as string,
+      req.user.id
     );
 
     if (!newComment) {

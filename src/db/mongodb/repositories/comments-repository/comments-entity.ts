@@ -2,9 +2,11 @@ import mongoose from "mongoose";
 
 export class Comment {
   content: string;
-  commentatorInfo: { userId: string; userLogin: string };
   createdAt: string;
   postId: string;
+  commentatorInfo: { userId: string; userLogin: string };
+  dislikesCount: number;
+  likesCount: number;
 
   constructor(
     content: string,
@@ -13,9 +15,11 @@ export class Comment {
     postId: string
   ) {
     this.content = content;
-    this.commentatorInfo = { userId, userLogin };
     this.postId = postId;
     this.createdAt = new Date().toISOString();
+    this.commentatorInfo = { userId, userLogin };
+    this.dislikesCount = 0;
+    this.likesCount = 0;
   }
 }
 
@@ -25,12 +29,14 @@ const CommentsSchema = new mongoose.Schema<Comment>({
     required: true,
     maxlength: 300,
   },
+  createdAt: { type: String, required: true },
+  postId: { type: String, required: true },
   commentatorInfo: {
     userId: { type: String, required: true },
     userLogin: { type: String, required: true },
   },
-  createdAt: { type: String, required: true },
-  postId: { type: String, required: true },
+  dislikesCount: { type: Number, default: 0 },
+  likesCount: { type: Number, default: 0 },
 });
 
 type CommentsModel = mongoose.Model<Comment>;
