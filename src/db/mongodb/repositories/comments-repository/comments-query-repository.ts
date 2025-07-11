@@ -46,7 +46,22 @@ export class CommentsQueryRepository {
 
     if (!targetComment) return null;
 
-    return {};
+    const usersLike = await CommentLikesModel.findOne({ commentId, userId });
+
+    return {
+      content: targetComment.content,
+      createdAt: targetComment.createdAt,
+      id: targetComment.id,
+      commentatorInfo: {
+        userId: targetComment.commentatorInfo.userId,
+        userLogin: targetComment.commentatorInfo.userLogin,
+      },
+      likesInfo: {
+        likesCount: targetComment.likesCount,
+        dislikesCount: targetComment.dislikesCount,
+        myStatus: usersLike?.status || CommentLikeStatus.None,
+      },
+    };
 
     // return this._mapFromDbToViewModel(targetComment, userId);
   }
