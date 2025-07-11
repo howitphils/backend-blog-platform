@@ -166,10 +166,38 @@ export class CommentsService {
       return;
     }
 
-    if (dto.likeStatus === CommentLikeStatus.None) {
-      // если статус лайка None, удаляем его
-      await targetLike.deleteOne();
-    } else if (dto.likeStatus !== targetLike.status) {
+    // Если статус лайка не равен статусу лайка в запросе, то обновляем счетчики лайков и дизлайков
+    if (dto.likeStatus !== targetLike.status) {
+      // Если статус лайка в запросе - None, то убираем лайк или дизлайк
+      if (dto.likeStatus === CommentLikeStatus.None) {
+        if (targetLike.status === CommentLikeStatus.Like) {
+          // Если текущий статус лайка - лайк, то убираем лайк
+          targetComment.likesCount -= 1;
+        } else if (targetLike.status === CommentLikeStatus.Dislike) {
+          // Если текущий статус лайка - дизлайк, то убираем дизлайк
+          targetComment.dislikesCount -= 1;
+        }
+        await this.commentsRepository.save(targetComment);
+      }
+
+      if (dto.likeStatus === CommentLikeStatus.Like) {
+        if (targetLike.status === CommentLikeStatus.Dislike) {
+          // Если текущий статус лайка - дизлайк, то убираем дизлайк
+          targetComment.dislikesCount -= 1;
+        }
+        // Если текущий статус лайка - None, то просто добавляем лайк
+        targetComment.likesCount += 1;
+      }
+
+      if (dto.likeStatus === CommentLikeStatus.Dislike) {
+        if (targetLike.status === CommentLikeStatus.Like) {
+          // Если текущий статус лайка - лайк, то убираем лайк
+          targetComment.likesCount -= 1;
+        }
+        // Если текущий статус лайка - None, то просто добавляем дизлайк
+        targetComment.dislikesCount += 1;
+      }
+
       // если статус лайка отличается от текущего, обновляем его
       targetLike.status = dto.likeStatus;
 
