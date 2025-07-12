@@ -11,6 +11,7 @@ import {
 } from "../src/types/posts-types";
 import { HttpStatuses } from "../src/types/http-statuses";
 import { ApiCallsRepository } from "../src/db/mongodb/repositories/api-calls-repository/apiCalls-repository";
+import { CommentViewModel } from "../src/types/comments-types";
 
 export const req = agent(app);
 
@@ -179,7 +180,12 @@ export const clearCollections = async () => {
     .expect(HttpStatuses.NoContent);
 };
 
-export const createCommentInDb = async () => {
+export const createCommentInDb = async (): Promise<{
+  comment: CommentViewModel;
+  token: string;
+  user: UserViewModel;
+  postId: string;
+}> => {
   const userDto = createUserDto({
     login: "random",
     email: "randomemail@email.com",
@@ -198,7 +204,7 @@ export const createCommentInDb = async () => {
     .send(contentDto)
     .expect(HttpStatuses.Created);
 
-  return { comment: res.body, token, user: dbUser };
+  return { comment: res.body, token, user: dbUser, postId: dbPost.id };
 };
 
 export const makeIncorrect = (id: string) => {

@@ -3,6 +3,7 @@ import {
   clearCollections,
   createCommentInDb,
   createContentDto,
+  defaultPagination,
   getTokenPair,
   jwtAuth,
   makeIncorrect,
@@ -55,9 +56,9 @@ describe("/comments", () => {
         },
         createdAt: expect.any(String),
         likesInfo: {
-          likesCount: commentInfo.comment.likesCount,
-          dislikesCount: commentInfo.comment.dislikesCount,
-          myStatus: commentInfo.comment.myStatus || "None",
+          likesCount: commentInfo.comment.likesInfo.likesCount,
+          dislikesCount: commentInfo.comment.likesInfo.dislikesCount,
+          myStatus: commentInfo.comment.likesInfo.myStatus || "None",
         },
       });
     });
@@ -74,6 +75,45 @@ describe("/comments", () => {
         .get(APP_CONFIG.MAIN_PATHS.COMMENTS + "/" + makeIncorrect(commentId))
         .set(jwtAuth(token))
         .expect(HttpStatuses.NotFound);
+    });
+  });
+
+  describe("get comments for a post", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    it("should return all comments for a post", async () => {
+      const commentInfo = await createCommentInDb();
+
+      const res = await req
+        .get(
+          APP_CONFIG.MAIN_PATHS.POSTS + `/${commentInfo.postId}` + "/comments"
+        )
+        .set(jwtAuth(commentInfo.token))
+        .expect(HttpStatuses.Success);
+
+      expect(res.body).toEqual({
+        ...defaultPagination,
+        pagesCount: 1,
+        totalCount: 1,
+        items: [
+          {
+            id: commentInfo.comment.id,
+            content: commentInfo.comment.content,
+            commentatorInfo: {
+              userId: commentInfo.user.id,
+              userLogin: commentInfo.user.login,
+            },
+            createdAt: expect.any(String),
+            likesInfo: {
+              likesCount: commentInfo.comment.likesInfo.likesCount,
+              dislikesCount: commentInfo.comment.likesInfo.dislikesCount,
+              myStatus: commentInfo.comment.likesInfo.myStatus,
+            },
+          },
+        ],
+      });
     });
   });
 
@@ -102,6 +142,7 @@ describe("/comments", () => {
 
       const res = await req
         .get(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
+        .set(jwtAuth(token))
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
@@ -112,6 +153,11 @@ describe("/comments", () => {
           userLogin: commentInfo.user.login,
         },
         createdAt: expect.any(String),
+        likesInfo: {
+          likesCount: commentInfo.comment.likesInfo.likesCount,
+          dislikesCount: commentInfo.comment.likesInfo.dislikesCount,
+          myStatus: commentInfo.comment.likesInfo.myStatus || "None",
+        },
       });
     });
 

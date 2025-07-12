@@ -113,8 +113,7 @@ export class PostsController {
     );
 
     if (!newComment) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
+      throw new Error("Comment not found after creation");
     }
 
     res.status(HttpStatuses.Created).json(newComment);
