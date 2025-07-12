@@ -280,4 +280,107 @@ describe("/comments", () => {
         .expect(HttpStatuses.NotFound);
     });
   });
+
+  describe("update comment's like status", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    let commentId = "";
+    let token = "";
+
+    it("should update comment status with like", async () => {
+      const commentInfo = await createCommentInDb();
+
+      commentId = commentInfo.comment.id;
+      token = commentInfo.token;
+
+      const res = await req
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}/like-status`)
+        .set(jwtAuth(token))
+        .send({ likeStatus: "Like" })
+        .expect(HttpStatuses.NoContent);
+
+      expect(res.body).toEqual({});
+
+      const commentRes = await req
+        .get(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
+        .set(jwtAuth(token))
+        .expect(HttpStatuses.Success);
+
+      expect(commentRes.body.likesInfo.myStatus).toBe("Like");
+      expect(commentRes.body.likesInfo.likesCount).toBe(1);
+      expect(commentRes.body.likesInfo.dislikesCount).toBe(0);
+    });
+
+    it("should update comment like status with dislike", async () => {
+      const res = await req
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}/like-status`)
+        .set(jwtAuth(token))
+        .send({ likeStatus: "Dislike" })
+        .expect(HttpStatuses.NoContent);
+
+      expect(res.body).toEqual({});
+
+      const commentRes = await req
+        .get(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
+        .set(jwtAuth(token))
+        .expect(HttpStatuses.Success);
+
+      expect(commentRes.body.likesInfo.myStatus).toBe("Dislike");
+      expect(commentRes.body.likesInfo.likesCount).toBe(0);
+      expect(commentRes.body.likesInfo.dislikesCount).toBe(1);
+    });
+
+    it("should not update comment like status with the same status in request", async () => {
+      await req
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}/like-status`)
+        .set(jwtAuth(token))
+        .send({ likeStatus: "Dislike" })
+        .expect(HttpStatuses.NoContent);
+
+      const commentRes = await req
+        .get(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
+        .set(jwtAuth(token))
+        .expect(HttpStatuses.Success);
+
+      expect(commentRes.body.likesInfo.myStatus).toBe("Dislike");
+      expect(commentRes.body.likesInfo.likesCount).toBe(0);
+      expect(commentRes.body.likesInfo.dislikesCount).toBe(1);
+    });
+
+    it("should return an error if like status is incorrect", async () => {
+      await req
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}/like-status`)
+        .set(jwtAuth(token))
+        .send({ likeStatus: "Incorrect" })
+        .expect(HttpStatuses.BadRequest);
+    });
+
+    it("should not update comment like status for unauthorized user", async () => {
+      await req
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}/like-status`)
+        .send({ likeStatus: "Like" })
+        .expect(HttpStatuses.Unauthorized);
+    });
+
+    it("should not update comment like status if comment does not exist", async () => {
+      await req
+        .put(
+          APP_CONFIG.MAIN_PATHS.COMMENTS +
+            `/${makeIncorrect(commentId)}/like-status`
+        )
+        .set(jwtAuth(token))
+        .send({ likeStatus: "Like" })
+        .expect(HttpStatuses.NotFound);
+    });
+
+    it("should not update comment like status by incorrect id", async () => {
+      await req
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + "/22/like-status")
+        .set(jwtAuth(token))
+        .send({ likeStatus: "Like" })
+        .expect(HttpStatuses.BadRequest);
+    });
+  });
 });

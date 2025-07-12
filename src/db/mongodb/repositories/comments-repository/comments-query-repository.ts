@@ -37,7 +37,7 @@ export class CommentsQueryRepository {
 
     const likesObj = likes.reduce(
       (acc: { [key: string]: CommentLikeStatus }, like) => {
-        acc[like.commentId] = like.status || CommentLikeStatus.None;
+        acc[like.commentId] = like.status;
         return acc;
       },
       {}
