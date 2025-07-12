@@ -32,15 +32,18 @@ describe("/comments", () => {
 
     let commentId = "";
     let user = {} as UserViewModel;
+    let token = "";
 
     it("should return a comment by id", async () => {
       const commentInfo = await createCommentInDb();
 
       commentId = commentInfo.comment.id;
       user = commentInfo.user;
+      token = commentInfo.token;
 
       const res = await req
         .get(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
+        .set(jwtAuth(commentInfo.token))
         .expect(HttpStatuses.Success);
 
       expect(res.body).toEqual({
@@ -51,18 +54,25 @@ describe("/comments", () => {
           userLogin: user.login,
         },
         createdAt: expect.any(String),
+        likesInfo: {
+          likesCount: commentInfo.comment.likesCount,
+          dislikesCount: commentInfo.comment.dislikesCount,
+          myStatus: commentInfo.comment.myStatus || "None",
+        },
       });
     });
 
     it("should not return a comment by incorrect id", async () => {
       await req
         .get(APP_CONFIG.MAIN_PATHS.COMMENTS + "/22")
+        .set(jwtAuth(token))
         .expect(HttpStatuses.BadRequest);
     });
 
     it("should not return a not existing comment", async () => {
       await req
         .get(APP_CONFIG.MAIN_PATHS.COMMENTS + "/" + makeIncorrect(commentId))
+        .set(jwtAuth(token))
         .expect(HttpStatuses.NotFound);
     });
   });

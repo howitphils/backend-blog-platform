@@ -163,8 +163,18 @@ export class CommentsService {
 
       await dbLike.save();
 
+      if (dto.likeStatus === CommentLikeStatus.Like) {
+        targetComment.likesCount += 1;
+      } else if (dto.likeStatus === CommentLikeStatus.Dislike) {
+        targetComment.likesCount += 1;
+      }
+
+      this.commentsRepository.save(targetComment);
+
       return;
     }
+
+    // TODO: FIX
 
     // Если статус лайка не равен статусу лайка в запросе, то обновляем счетчики лайков и дизлайков
     if (dto.likeStatus !== targetLike.status) {
@@ -176,10 +186,6 @@ export class CommentsService {
         } else if (targetLike.status === CommentLikeStatus.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
           targetComment.dislikesCount -= 1;
-
-          if (targetComment.dislikesCount < 0) {
-            targetComment.dislikesCount = 0; // Защита от отрицательного количества дизлайков
-          }
         }
       }
 
@@ -187,10 +193,6 @@ export class CommentsService {
         if (targetLike.status === CommentLikeStatus.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
           targetComment.dislikesCount -= 1;
-
-          if (targetComment.dislikesCount < 0) {
-            targetComment.dislikesCount = 0; // Защита от отрицательного количества дизлайков
-          }
         }
         // Если текущий статус лайка - None, то просто добавляем лайк
         targetComment.likesCount += 1;
@@ -200,13 +202,15 @@ export class CommentsService {
         if (targetLike.status === CommentLikeStatus.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
           targetComment.likesCount -= 1;
-
-          if (targetComment.likesCount < 0) {
-            targetComment.likesCount = 0; // Защита от отрицательного количества лайков
-          }
         }
         // Если текущий статус лайка - None, то просто добавляем дизлайк
         targetComment.dislikesCount += 1;
+      }
+
+      if (targetComment.likesCount < 0) {
+        targetComment.likesCount = 0;
+      } else if (targetComment.dislikesCount < 0) {
+        targetComment.dislikesCount = 0;
       }
 
       await this.commentsRepository.save(targetComment);

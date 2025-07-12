@@ -24,16 +24,24 @@ export class CommentsQueryRepository {
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
 
+    // Получаем число всех комментов конкретного поста
+    const totalCount = await CommentsModel.countDocuments({ postId });
+
     const commentsIds = comments.map((comment) => comment.id);
 
     // Получаем лайки для всех комментариев юзера
     const likes = await CommentLikesModel.find({
       commentId: { $in: commentsIds },
       userId,
-    });
+    }).lean();
 
-    // Получаем число всех комментов конкретного поста
-    const totalCount = await CommentsModel.countDocuments({ postId });
+    const likesObj = likes.reduce(
+      (acc: { [key: string]: CommentLikeStatus }, like) => {
+        acc[like.commentId] = like.status || CommentLikeStatus.None;
+        return acc;
+      },
+      {}
+    );
 
     return {
       page: pageNumber,
@@ -49,9 +57,7 @@ export class CommentsQueryRepository {
           likesInfo: {
             likesCount: comment.likesCount,
             dislikesCount: comment.dislikesCount,
-            myStatus:
-              likes.find((like) => like.commentId === comment.id)?.status ||
-              CommentLikeStatus.None,
+            myStatus: likesObj[comment.id],
           },
         };
       }),
