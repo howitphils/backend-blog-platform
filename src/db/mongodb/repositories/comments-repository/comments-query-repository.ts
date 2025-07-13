@@ -9,12 +9,16 @@ import {
 } from "../likes-repository/comment-likes/comment-like-entity";
 import { CommentsModel } from "./comments-entity";
 
+type LikeObjType = {
+  [key: string]: CommentLikeStatus;
+};
+
 export class CommentsQueryRepository {
   // Получение всех комментариев с учетом query параметров
   async getAllCommentsForPost(
     filters: CommentsMapedQueryType,
     postId: string,
-    userId: string
+    userId?: string
   ): Promise<PaginationType<CommentViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = filters;
 
@@ -27,21 +31,22 @@ export class CommentsQueryRepository {
     // Получаем число всех комментов конкретного поста
     const totalCount = await CommentsModel.countDocuments({ postId });
 
-    const commentsIds = comments.map((comment) => comment.id);
+    let likesObj: LikeObjType;
 
-    // Получаем лайки для всех комментариев юзера
-    const likes = await CommentLikesModel.find({
-      commentId: { $in: commentsIds },
-      userId,
-    }).lean();
+    if (userId) {
+      const commentsIds = comments.map((comment) => comment.id);
 
-    const likesObj = likes.reduce(
-      (acc: { [key: string]: CommentLikeStatus }, like) => {
+      // Получаем лайки для всех комментариев юзера
+      const likes = await CommentLikesModel.find({
+        commentId: { $in: commentsIds },
+        userId,
+      }).lean();
+
+      likesObj = likes.reduce((acc: LikeObjType, like) => {
         acc[like.commentId] = like.status;
         return acc;
-      },
-      {}
-    );
+      }, {});
+    }
 
     return {
       page: pageNumber,
@@ -57,7 +62,11 @@ export class CommentsQueryRepository {
           likesInfo: {
             likesCount: comment.likesCount,
             dislikesCount: comment.dislikesCount,
-            myStatus: likesObj[comment.id] || CommentLikeStatus.None,
+            myStatus: !userId
+              ? CommentLikeStatus.None
+              : likesObj[comment.id]
+              ? likesObj[comment.id]
+              : CommentLikeStatus.None,
           },
         };
       }),
@@ -66,7 +75,7 @@ export class CommentsQueryRepository {
 
   async getCommentById(
     commentId: string,
-    userId: string
+    userId?: string
   ): Promise<CommentViewModel | null> {
     const targetComment = await CommentsModel.findById(commentId);
 

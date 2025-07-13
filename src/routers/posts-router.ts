@@ -8,7 +8,7 @@ import { jwtAuthGuard } from "../middlewares/auth/jwt-auth-validator";
 import { commentsBodyValidators } from "../middlewares/body-validations/comments-body-validators";
 import { container } from "../composition-root";
 import { PostsController } from "./controllers/posts-controller";
-import { checkUserInRequest } from "../middlewares/check-req-user";
+import { jwtAuthOptional } from "../middlewares/jwt-optional-auth";
 
 const postsController = container.get(PostsController);
 
@@ -27,8 +27,7 @@ postsRouter.get(
 // Получение комментариев по айди поста
 postsRouter.get(
   "/:id/comments",
-  jwtAuthGuard,
-  checkUserInRequest,
+  jwtAuthOptional,
   validateParamsId,
   postsController.getComments.bind(postsController)
 );

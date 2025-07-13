@@ -174,8 +174,6 @@ export class CommentsService {
       return;
     }
 
-    // TODO: FIX
-
     // Если статус лайка не равен статусу лайка в запросе, то обновляем счетчики лайков и дизлайков
     if (dto.likeStatus !== targetLike.status) {
       // Если статус лайка в запросе - None, то убираем лайк или дизлайк
