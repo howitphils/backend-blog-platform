@@ -1,6 +1,7 @@
 import { APP_CONFIG } from "../src/settings";
 import {
   clearCollections,
+  CommentInfoType,
   createCommentInDb,
   createContentDto,
   defaultPagination,
@@ -13,6 +14,7 @@ import {
 import { HttpStatuses } from "../src/types/http-statuses";
 import { UserViewModel } from "../src/types/users-types";
 import mongoose from "mongoose";
+// import { CommentLikeStatus } from "../src/db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 
 describe("/comments", () => {
   beforeAll(async () => {
@@ -83,8 +85,10 @@ describe("/comments", () => {
       await clearCollections();
     });
 
+    let commentInfo: CommentInfoType;
+
     it("should return all comments for a post", async () => {
-      const commentInfo = await createCommentInDb();
+      commentInfo = await createCommentInDb();
 
       const res = await req
         .get(
@@ -115,6 +119,36 @@ describe("/comments", () => {
         ],
       });
     });
+
+    // it("should return all comments for unauthorized user", async () => {
+    //   const res = await req
+    //     .get(
+    //       APP_CONFIG.MAIN_PATHS.POSTS + `/${commentInfo.postId}` + "/comments"
+    //     )
+    //     .expect(HttpStatuses.Success);
+
+    //   expect(res.body).toEqual({
+    //     ...defaultPagination,
+    //     pagesCount: 1,
+    //     totalCount: 1,
+    //     items: [
+    //       {
+    //         id: commentInfo.comment.id,
+    //         content: commentInfo.comment.content,
+    //         commentatorInfo: {
+    //           userId: commentInfo.user.id,
+    //           userLogin: commentInfo.user.login,
+    //         },
+    //         createdAt: expect.any(String),
+    //         likesInfo: {
+    //           likesCount: commentInfo.comment.likesInfo.likesCount,
+    //           dislikesCount: commentInfo.comment.likesInfo.dislikesCount,
+    //           myStatus: CommentLikeStatus.None,
+    //         },
+    //       },
+    //     ],
+    //   });
+    // });
   });
 
   describe("update the comment", () => {

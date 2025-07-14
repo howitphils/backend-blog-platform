@@ -180,16 +180,19 @@ export const clearCollections = async () => {
     .expect(HttpStatuses.NoContent);
 };
 
-export const createCommentInDb = async (): Promise<{
+export type CommentInfoType = {
   comment: CommentViewModel;
   token: string;
   user: UserViewModel;
   postId: string;
-}> => {
+};
+
+export const createCommentInDb = async (): Promise<CommentInfoType> => {
   const userDto = createUserDto({
     login: "random",
     email: "randomemail@email.com",
   });
+
   const dbUser = await createNewUserInDb(userDto);
 
   const dbPost = await createPostInDbHelper();

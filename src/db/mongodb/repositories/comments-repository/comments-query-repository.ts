@@ -18,7 +18,7 @@ export class CommentsQueryRepository {
   async getAllCommentsForPost(
     filters: CommentsMapedQueryType,
     postId: string,
-    userId?: string
+    userId: string | undefined
   ): Promise<PaginationType<CommentViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = filters;
 
