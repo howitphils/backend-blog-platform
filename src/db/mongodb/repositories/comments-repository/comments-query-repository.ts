@@ -2,10 +2,10 @@ import {
   CommentsMapedQueryType,
   CommentViewModel,
 } from "../../../../types/comments-types";
-import { PaginationType } from "../../../../types/common-types";
+import { LikeStatuses, PaginationType } from "../../../../types/common-types";
 import {
+  CommentLikeDbDocument,
   CommentLikesModel,
-  LikeStatuses,
 } from "../likes-repository/comment-likes/comment-like-entity";
 import { CommentsModel } from "./comments-entity";
 
@@ -62,9 +62,7 @@ export class CommentsQueryRepository {
           likesInfo: {
             likesCount: comment.likesCount,
             dislikesCount: comment.dislikesCount,
-            myStatus: !userId
-              ? LikeStatuses.None
-              : likesObj[comment.id]
+            myStatus: likesObj[comment.id]
               ? likesObj[comment.id]
               : LikeStatuses.None,
           },
@@ -75,13 +73,17 @@ export class CommentsQueryRepository {
 
   async getCommentById(
     commentId: string,
-    userId?: string
+    userId: string
   ): Promise<CommentViewModel | null> {
     const targetComment = await CommentsModel.findById(commentId);
 
     if (!targetComment) return null;
 
-    const userLike = await CommentLikesModel.findOne({ commentId, userId });
+    let userLike: CommentLikeDbDocument | null = null;
+
+    if (userId !== "") {
+      userLike = await CommentLikesModel.findOne({ commentId, userId });
+    }
 
     return {
       content: targetComment.content,
@@ -94,7 +96,7 @@ export class CommentsQueryRepository {
       likesInfo: {
         likesCount: targetComment.likesCount,
         dislikesCount: targetComment.dislikesCount,
-        myStatus: userLike?.status || LikeStatuses.None,
+        myStatus: userLike ? userLike.status : LikeStatuses.None,
       },
     };
 

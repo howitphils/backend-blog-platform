@@ -1,10 +1,5 @@
 import mongoose from "mongoose";
-
-export enum LikeStatuses {
-  Like = "Like",
-  Dislike = "Dislike",
-  None = "None",
-}
+import { LikeStatuses } from "../../../../../types/common-types";
 
 export class CommentLike {
   status: LikeStatuses;

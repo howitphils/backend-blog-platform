@@ -17,11 +17,11 @@ import {
 import {
   CommentLike,
   CommentLikesModel,
-  LikeStatuses,
 } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { CommentLikesRepository } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-repository";
+import { LikeStatuses } from "../types/common-types";
 
 @injectable()
 export class CommentsService {

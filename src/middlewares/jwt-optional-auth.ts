@@ -2,8 +2,6 @@ import { Response, NextFunction, Request } from "express";
 import { container } from "../composition-root";
 import { AuthService } from "../services/auth-service";
 import { ResultStatus } from "../types/resultObject-types";
-import { ErrorWithStatusCode } from "./error-handler";
-import { HttpStatuses } from "../types/http-statuses";
 
 const authService = container.get(AuthService);
 
@@ -23,14 +21,15 @@ export const jwtAuthOptional = (
     req.headers.authorization
   );
 
-  if (verificationResult.status !== ResultStatus.Success) {
-    throw new ErrorWithStatusCode(
-      verificationResult.errorMessage || "Invalid access token",
-      HttpStatuses.Unauthorized
-    );
+  if (verificationResult.status === ResultStatus.Success) {
+    req.user = { id: verificationResult.data as string };
+
+    next();
+
+    return;
   }
 
-  req.user = { id: verificationResult.data as string };
+  req.user = { id: "" };
 
   next();
 };

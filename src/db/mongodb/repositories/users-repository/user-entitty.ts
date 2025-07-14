@@ -1,6 +1,6 @@
+import { randomUUID } from "crypto";
+import { add } from "date-fns";
 import mongoose from "mongoose";
-import { UuidService } from "../../../../adapters/uuIdService";
-import { DateFnsService } from "../../../../adapters/dateFnsService";
 
 export class User {
   accountData: {
@@ -23,8 +23,6 @@ export class User {
     email: string,
     login: string,
     passHash: string,
-    uuIdService: UuidService,
-    dateFnsService: DateFnsService,
     isAdmin?: boolean
   ) {
     this.accountData = {
@@ -34,13 +32,17 @@ export class User {
       createdAt: new Date().toISOString(),
     };
     this.emailConfirmation = {
-      confirmationCode: uuIdService.createRandomCode(),
-      expirationDate: dateFnsService.addToCurrentDate(),
+      confirmationCode: randomUUID(),
+      expirationDate: add(new Date(), {
+        days: 2,
+      }),
       isConfirmed: isAdmin ? true : false,
     };
     this.passwordRecovery = {
-      recoveryCode: uuIdService.createRandomCode(),
-      expirationDate: dateFnsService.addToCurrentDate(),
+      recoveryCode: randomUUID(),
+      expirationDate: add(new Date(), {
+        days: 2,
+      }),
     };
   }
 }

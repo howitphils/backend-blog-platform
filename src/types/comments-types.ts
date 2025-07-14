@@ -1,4 +1,4 @@
-import { LikeStatuses } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+import { LikeStatuses } from "./common-types";
 
 export type CommentInputModel = {
   content: string;

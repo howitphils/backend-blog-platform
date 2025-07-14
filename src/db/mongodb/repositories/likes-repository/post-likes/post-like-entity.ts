@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { LikeStatuses } from "../comment-likes/comment-like-entity";
+import { LikeStatuses } from "../../../../../types/common-types";
 
 export class PostLike {
   status: LikeStatuses;

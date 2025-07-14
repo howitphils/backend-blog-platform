@@ -11,8 +11,6 @@ import {
   UserDbDocument,
   UserModel,
 } from "../db/mongodb/repositories/users-repository/user-entitty";
-import { DateFnsService } from "../adapters/dateFnsService";
-import { UuidService } from "../adapters/uuIdService";
 import { createErrorsObject } from "../routers/controllers/utils";
 
 @injectable()
@@ -22,13 +20,7 @@ export class UsersService {
     private usersRepository: UsersRepository,
 
     @inject(BcryptService)
-    private bcryptService: BcryptService,
-
-    @inject(DateFnsService)
-    private dateFnsService: DateFnsService,
-
-    @inject(UuidService)
-    private uuIdService: UuidService
+    private bcryptService: BcryptService
   ) {}
 
   async createNewUser(
@@ -55,35 +47,7 @@ export class UsersService {
 
     const passHash = await this.bcryptService.createHash(password);
 
-    // const confirmationCode = this.uuIdService.createRandomCode();
-    // const recoveryCode = this.uuIdService.createRandomCode();
-
-    const newUser: User = new User(
-      email,
-      login,
-      passHash,
-      this.uuIdService,
-      this.dateFnsService,
-      isAdmin
-    );
-
-    // const newUser: UserDbType = {
-    //   accountData: {
-    //     email: user.email,
-    //     login: user.login,
-    //     passHash,
-    //     createdAt: new Date().toISOString(),
-    //   },
-    //   emailConfirmation: {
-    //     confirmationCode,
-    //     expirationDate: this.dateFnsService.addToCurrentDate(),
-    //     isConfirmed: isAdmin ? true : false,
-    //   },
-    //   passwordRecovery: {
-    //     recoveryCode,
-    //     expirationDate: this.dateFnsService.addToCurrentDate(),
-    //   },
-    // };
+    const newUser: User = new User(email, login, passHash, isAdmin);
 
     const newDbUser = new UserModel(newUser);
 

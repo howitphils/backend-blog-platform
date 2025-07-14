@@ -18,11 +18,16 @@ const postsController = container.get(PostsController);
 export const postsRouter = Router();
 
 // Получение постов
-postsRouter.get("/", postsController.getPosts.bind(postsController));
+postsRouter.get(
+  "/",
+  jwtAuthOptional,
+  postsController.getPosts.bind(postsController)
+);
 
 // Получение поста по айди
 postsRouter.get(
   "/:id",
+  jwtAuthOptional,
   validateParamsId,
   postsController.getPostById.bind(postsController)
 );
