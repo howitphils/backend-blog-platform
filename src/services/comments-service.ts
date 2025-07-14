@@ -21,6 +21,7 @@ import {
 } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
+import { CommentLikesRepository } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-repository";
 
 @injectable()
 export class CommentsService {
@@ -32,7 +33,10 @@ export class CommentsService {
     private commentsRepository: CommentsRepository,
 
     @inject(UsersService)
-    private usersService: UsersService
+    private usersService: UsersService,
+
+    @inject(CommentLikesRepository)
+    private commentLikesRepository: CommentLikesRepository
   ) {}
 
   async createNewComment(
@@ -146,12 +150,12 @@ export class CommentsService {
       throw new ErrorWithStatusCode("Comment not found", HttpStatuses.NotFound);
     }
 
-    const targetLike = await CommentLikesModel.findOne({
-      userId: dto.userId,
-      commentId: dto.commentId,
-    });
+    const targetLike =
+      await this.commentLikesRepository.getLikeByUserIdAndCommentId({
+        userId: dto.userId,
+        commentId: dto.commentId,
+      });
 
-    // Нужно ли добавлять проверку входящего статуса лайка на не None?
     if (!targetLike) {
       const newLike = new CommentLike(
         dto.userId,
@@ -161,7 +165,7 @@ export class CommentsService {
 
       const dbLike = new CommentLikesModel(newLike);
 
-      await dbLike.save();
+      await this.commentLikesRepository.save(dbLike);
 
       if (dto.likeStatus === LikeStatuses.Like) {
         targetComment.likesCount += 1;
@@ -216,7 +220,7 @@ export class CommentsService {
       // если статус лайка отличается от текущего, обновляем его
       targetLike.status = dto.likeStatus;
 
-      await targetLike.save();
+      await this.commentLikesRepository.save(targetLike);
     }
   }
 

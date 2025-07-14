@@ -14,4 +14,14 @@ export class CommentLikesRepository {
   async getLikeById(id: string): Promise<CommentLikeDbDocument | null> {
     return CommentLikesModel.findById(id);
   }
+
+  async getLikeByUserIdAndCommentId({
+    userId,
+    commentId,
+  }: {
+    userId: string;
+    commentId: string;
+  }): Promise<CommentLikeDbDocument | null> {
+    return CommentLikesModel.findOne({ userId, commentId });
+  }
 }

@@ -13,6 +13,12 @@ import {
   PostsModel,
 } from "../db/mongodb/repositories/posts-repository/post-entity";
 import { APP_CONFIG } from "../settings";
+import { PostLikesRepository } from "../db/mongodb/repositories/likes-repository/post-likes/post-like-repository";
+import {
+  PostLike,
+  PostLikesModel,
+} from "../db/mongodb/repositories/likes-repository/post-likes/post-like-entity";
+import { LikeStatuses } from "../types/common-types";
 
 @injectable()
 export class PostsService {
@@ -21,7 +27,10 @@ export class PostsService {
     private postsRepository: PostsRepository,
 
     @inject(BlogsService)
-    private blogsService: BlogsService
+    private blogsService: BlogsService,
+
+    @inject(PostLikesRepository)
+    private postLikesRepository: PostLikesRepository
   ) {}
 
   async createNewPost(post: PostInputModel): Promise<string> {
@@ -92,21 +101,82 @@ export class PostsService {
   }
 
   async updatePostLikeStatus(dto: UpdatePostLikeStatusDtoType) {
-    const { postId, userId, likeStatus } = dto;
+    const targetPost = await this.postsRepository.getPostById(dto.postId);
 
-    const post = await this.postsRepository.getPostById(postId);
-
-    if (!post) {
+    if (!targetPost) {
       throw new ErrorWithStatusCode(
         APP_CONFIG.ERROR_MESSAGES.POST_NOT_FOUND,
         HttpStatuses.NotFound
       );
     }
 
-    // Update the like status logic here
-    // This is a placeholder for the actual implementation
-    // You would typically update the likes in the database
+    const targetLike =
+      await this.postLikesRepository.getPostLikeByUserIdAndPostId({
+        userId: dto.userId,
+        postId: dto.postId,
+      });
 
-    return; // Return void or appropriate response
+    if (!targetLike) {
+      const newLike = new PostLike(dto.userId, dto.postId, dto.likeStatus);
+
+      const dbLike = new PostLikesModel(newLike);
+
+      await this.postLikesRepository.save(dbLike);
+
+      if (dto.likeStatus === "Like") {
+        targetPost.likesCount += 1;
+      } else if (dto.likeStatus === "Dislike") {
+        targetPost.dislikesCount += 1;
+      }
+
+      await this.postsRepository.save(targetPost);
+
+      return;
+    }
+
+    // Если статус лайка не равен статусу лайка в запросе, то обновляем счетчики лайков и дизлайков
+    if (dto.likeStatus !== targetLike.status) {
+      // Если статус лайка в запросе - None, то убираем лайк или дизлайк
+      if (dto.likeStatus === LikeStatuses.None) {
+        if (targetLike.status === LikeStatuses.Like) {
+          // Если текущий статус лайка - лайк, то убираем лайк
+          targetPost.likesCount -= 1;
+        } else if (targetLike.status === LikeStatuses.Dislike) {
+          // Если текущий статус лайка - дизлайк, то убираем дизлайк
+          targetPost.dislikesCount -= 1;
+        }
+      }
+
+      if (dto.likeStatus === LikeStatuses.Like) {
+        if (targetLike.status === LikeStatuses.Dislike) {
+          // Если текущий статус лайка - дизлайк, то убираем дизлайк
+          targetPost.dislikesCount -= 1;
+        }
+        // Если текущий статус лайка - None, то просто добавляем лайк
+        targetPost.likesCount += 1;
+      }
+
+      if (dto.likeStatus === LikeStatuses.Dislike) {
+        if (targetLike.status === LikeStatuses.Like) {
+          // Если текущий статус лайка - лайк, то убираем лайк
+          targetPost.likesCount -= 1;
+        }
+        // Если текущий статус лайка - None, то просто добавляем дизлайк
+        targetPost.dislikesCount += 1;
+      }
+
+      if (targetPost.likesCount < 0) {
+        targetPost.likesCount = 0;
+      } else if (targetPost.dislikesCount < 0) {
+        targetPost.dislikesCount = 0;
+      }
+
+      await this.postsRepository.save(targetPost);
+
+      // если статус лайка отличается от текущего, обновляем его
+      targetLike.status = dto.likeStatus;
+
+      await this.postLikesRepository.save(targetLike);
+    }
   }
 }

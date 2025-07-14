@@ -11,4 +11,14 @@ export class PostLikesRepository {
   async getLikeById(id: string): Promise<PostLikeDbDocument | null> {
     return PostLikesModel.findById(id);
   }
+
+  async getPostLikeByUserIdAndPostId({
+    userId,
+    postId,
+  }: {
+    userId: string;
+    postId: string;
+  }): Promise<PostLikeDbDocument | null> {
+    return PostLikesModel.findOne({ userId, postId });
+  }
 }
