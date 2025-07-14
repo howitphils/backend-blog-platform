@@ -1,4 +1,4 @@
-import { LikeStatuses } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+import { LikeStatuses } from "./common-types";
 
 export type PostInputModel = {
   title: string; // max 30
@@ -7,7 +7,7 @@ export type PostInputModel = {
   blogId: string; // valid
 };
 
-type NewestLikeType = {
+export type NewestLikeType = {
   addedAt: string;
   userId: string;
   login: string;

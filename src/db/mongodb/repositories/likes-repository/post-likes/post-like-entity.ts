@@ -5,12 +5,19 @@ export class PostLike {
   status: LikeStatuses;
   postId: string;
   userId: string;
+  userLogin: string;
   createdAt: string;
 
-  constructor(userId: string, postId: string, status: LikeStatuses) {
+  constructor(
+    userId: string,
+    postId: string,
+    status: LikeStatuses,
+    userLogin: string
+  ) {
     this.userId = userId;
     this.postId = postId;
     this.status = status;
+    this.userLogin = userLogin;
     this.createdAt = new Date().toISOString();
   }
 }

@@ -19,6 +19,7 @@ import {
   PostLikesModel,
 } from "../db/mongodb/repositories/likes-repository/post-likes/post-like-entity";
 import { LikeStatuses } from "../types/common-types";
+import { UsersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 
 @injectable()
 export class PostsService {
@@ -30,7 +31,10 @@ export class PostsService {
     private blogsService: BlogsService,
 
     @inject(PostLikesRepository)
-    private postLikesRepository: PostLikesRepository
+    private postLikesRepository: PostLikesRepository,
+
+    @inject(UsersRepository)
+    private userRepository: UsersRepository
   ) {}
 
   async createNewPost(post: PostInputModel): Promise<string> {
@@ -117,7 +121,18 @@ export class PostsService {
       });
 
     if (!targetLike) {
-      const newLike = new PostLike(dto.userId, dto.postId, dto.likeStatus);
+      const currentUser = await this.userRepository.getUserById(dto.userId);
+
+      if (!currentUser) {
+        throw new Error("User not found in update post like");
+      }
+
+      const newLike = new PostLike(
+        dto.userId,
+        dto.postId,
+        dto.likeStatus,
+        currentUser.accountData.login
+      );
 
       const dbLike = new PostLikesModel(newLike);
 
@@ -125,6 +140,10 @@ export class PostsService {
 
       if (dto.likeStatus === "Like") {
         targetPost.likesCount += 1;
+
+        targetPost.newestLikes = await this.postLikesRepository.getNewestLikes(
+          targetPost.id
+        );
       } else if (dto.likeStatus === "Dislike") {
         targetPost.dislikesCount += 1;
       }
@@ -141,6 +160,9 @@ export class PostsService {
         if (targetLike.status === LikeStatuses.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
           targetPost.likesCount -= 1;
+
+          targetPost.newestLikes =
+            await this.postLikesRepository.getNewestLikes(targetPost.id);
         } else if (targetLike.status === LikeStatuses.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
           targetPost.dislikesCount -= 1;
@@ -154,12 +176,19 @@ export class PostsService {
         }
         // Если текущий статус лайка - None, то просто добавляем лайк
         targetPost.likesCount += 1;
+
+        targetPost.newestLikes = await this.postLikesRepository.getNewestLikes(
+          targetPost.id
+        );
       }
 
       if (dto.likeStatus === LikeStatuses.Dislike) {
         if (targetLike.status === LikeStatuses.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
           targetPost.likesCount -= 1;
+
+          targetPost.newestLikes =
+            await this.postLikesRepository.getNewestLikes(targetPost.id);
         }
         // Если текущий статус лайка - None, то просто добавляем дизлайк
         targetPost.dislikesCount += 1;

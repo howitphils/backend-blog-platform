@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { PostLikeDbDocument } from "../likes-repository/post-likes/post-like-entity";
 
 export class Post {
   title: string; // max 30
@@ -9,6 +10,7 @@ export class Post {
   createdAt: string;
   likesCount: number;
   dislikesCount: number;
+  newestLikes: PostLikeDbDocument[];
 
   constructor(
     title: string,
@@ -25,6 +27,7 @@ export class Post {
     this.createdAt = new Date().toISOString();
     this.likesCount = 0;
     this.dislikesCount = 0;
+    this.newestLikes = [];
   }
 }
 

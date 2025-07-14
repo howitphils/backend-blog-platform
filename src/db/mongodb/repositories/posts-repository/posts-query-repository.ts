@@ -5,7 +5,6 @@ import {
 import { LikeStatuses, PaginationType } from "../../../../types/common-types";
 import { PostsModel } from "./post-entity";
 import { PostLikesModel } from "../likes-repository/post-likes/post-like-entity";
-import { UserModel } from "../users-repository/user-entitty";
 
 export class PostsQueryRepository {
   // Получение всех постов с учетом query параметров
@@ -70,39 +69,18 @@ export class PostsQueryRepository {
     }
 
     // Получаем лайк для поста конкретного юзера
-    const postLike = await PostLikesModel.findOne({
-      postId: post.id,
-      userId,
-    });
-
-    // Получаем 3 последних лайка для поста
-    const newestDbLikes = await PostLikesModel.find({
-      postId: post.id,
-      status: LikeStatuses.Like,
-    })
-      .sort({ createdAt: -1 })
-      .limit(3)
-      .lean();
-
-    // Преобразуем массив лайков в массив userId для получения логинов
-    const mappedDbLikes = newestDbLikes.map((like) => like.userId);
-
-    // Получаем пользователей по userId
-    const users = await UserModel.find({
-      id: { $in: mappedDbLikes },
-    });
-
-    // Преобразуем массив пользователей в объект, где ключ - это userId, а значение - логин
-    const usersLogins = users.reduce((acc: { [key: string]: string }, curr) => {
-      acc[curr.id] = curr.accountData.login;
-      return acc;
-    }, {});
+    const postLike = userId
+      ? await PostLikesModel.findOne({
+          postId: post.id,
+          userId,
+        })
+      : {};
 
     // Преобразуем последние лайки в формат, который ожидает клиент
-    const newestLikes = newestDbLikes.map((like) => ({
+    const mapedNewestLikes = post.newestLikes.map((like) => ({
       addedAt: like.createdAt,
       userId: like.userId,
-      login: usersLogins[like.userId],
+      login: like.userLogin,
     }));
 
     // Если пост найден, преобразуем его в формат, который ожидает клиент
@@ -118,7 +96,7 @@ export class PostsQueryRepository {
         likesCount: post.likesCount,
         dislikesCount: post.dislikesCount,
         myStatus: postLike?.status || LikeStatuses.None,
-        newestLikes,
+        newestLikes: mapedNewestLikes,
       },
     };
   }

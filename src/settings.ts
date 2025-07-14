@@ -74,4 +74,5 @@ export const APP_CONFIG = {
     LIKE_STATUS: "likeStatus",
     CONTENT: "content",
   },
+  NEWEST_LIKES_LIMIT: 3,
 };

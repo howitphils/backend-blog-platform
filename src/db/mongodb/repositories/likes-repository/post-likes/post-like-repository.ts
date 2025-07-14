@@ -1,5 +1,7 @@
 import { injectable } from "inversify";
 import { PostLikeDbDocument, PostLikesModel } from "./post-like-entity";
+import { LikeStatuses } from "../../../../../types/common-types";
+import { APP_CONFIG } from "../../../../../settings";
 
 @injectable()
 export class PostLikesRepository {
@@ -20,5 +22,17 @@ export class PostLikesRepository {
     postId: string;
   }): Promise<PostLikeDbDocument | null> {
     return PostLikesModel.findOne({ userId, postId });
+  }
+
+  async getNewestLikes(
+    postId: string,
+    limit: number = APP_CONFIG.NEWEST_LIKES_LIMIT
+  ) {
+    return PostLikesModel.find({
+      postId,
+      status: LikeStatuses.Like,
+    })
+      .sort({ createdAt: -1 })
+      .limit(limit);
   }
 }
