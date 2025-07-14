@@ -37,8 +37,8 @@ export class PostsService {
     private userRepository: UsersRepository
   ) {}
 
-  async createNewPost(post: PostInputModel): Promise<string> {
-    const targetBlog = await this.blogsService.getBlogById(post.blogId);
+  async createNewPost(dto: PostInputModel): Promise<string> {
+    const targetBlog = await this.blogsService.getBlogById(dto.blogId);
 
     if (!targetBlog) {
       throw new ErrorWithStatusCode(
@@ -47,7 +47,7 @@ export class PostsService {
       );
     }
 
-    const { blogId, content, shortDescription, title } = post;
+    const { blogId, content, shortDescription, title } = dto;
 
     const newPost: Post = new Post(
       title,
@@ -58,6 +58,8 @@ export class PostsService {
     );
 
     const dbPost = new PostsModel(newPost);
+
+    dbPost.newestLikes = [];
 
     return this.postsRepository.save(dbPost);
   }

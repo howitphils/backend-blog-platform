@@ -40,6 +40,10 @@ const PostLikesSchema = new mongoose.Schema<PostLike>({
     type: String,
     required: true,
   },
+  userLogin: {
+    type: String,
+    required: true,
+  },
 });
 
 type PostLikesModel = mongoose.Model<PostLike>;

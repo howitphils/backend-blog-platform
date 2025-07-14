@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { PostLikeDbDocument } from "../likes-repository/post-likes/post-like-entity";
+import { NewestLikeType } from "../../../../types/posts-types";
 
 export class Post {
   title: string; // max 30
@@ -31,6 +32,21 @@ export class Post {
   }
 }
 
+const NewestLikeSchema = new mongoose.Schema<NewestLikeType>({
+  addedAt: {
+    type: String,
+    required: true,
+  },
+  login: {
+    type: String,
+    required: true,
+  },
+  userId: {
+    type: String,
+    required: true,
+  },
+});
+
 const PostsSchema = new mongoose.Schema<Post>({
   title: {
     type: String,
@@ -59,6 +75,15 @@ const PostsSchema = new mongoose.Schema<Post>({
     type: String,
     required: true,
   },
+  dislikesCount: {
+    type: Number,
+    required: true,
+  },
+  likesCount: {
+    type: Number,
+    required: true,
+  },
+  newestLikes: { type: [NewestLikeSchema] },
 });
 
 type PostModel = mongoose.Model<Post>;

@@ -28,6 +28,8 @@ import { PostsController } from "./routers/controllers/posts-controller";
 import { SessionsController } from "./routers/controllers/sessions-controller";
 import { UsersController } from "./routers/controllers/users-controller";
 import { Container } from "inversify";
+import { CommentLikesRepository } from "./db/mongodb/repositories/likes-repository/comment-likes/comment-like-repository";
+import { PostLikesRepository } from "./db/mongodb/repositories/likes-repository/post-likes/post-like-repository";
 
 // Dependency Injection
 
@@ -129,6 +131,8 @@ container.bind(BlogsRepository).to(BlogsRepository);
 container.bind(PostsRepository).to(PostsRepository);
 container.bind(CommentsRepository).to(CommentsRepository);
 container.bind(ApiCallsRepository).to(ApiCallsRepository);
+container.bind(CommentLikesRepository).to(CommentLikesRepository);
+container.bind(PostLikesRepository).to(PostLikesRepository);
 
 // Query Repositories
 container.bind(UsersQueryRepository).to(UsersQueryRepository);

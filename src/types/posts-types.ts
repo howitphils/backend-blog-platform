@@ -1,3 +1,4 @@
+import { PostLikeDbDocument } from "../db/mongodb/repositories/likes-repository/post-likes/post-like-entity";
 import { LikeStatuses } from "./common-types";
 
 export type PostInputModel = {
@@ -36,6 +37,9 @@ export type PostDbType = {
   blogId: string; // valid
   blogName: string;
   createdAt: string;
+  likesCount: number;
+  dislikesCount: number;
+  newestLikes: PostLikeDbDocument[];
 };
 
 export type PostsRequestQueryType = {

@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { BlogDbType } from "../../../../types/blogs-types";
 
 export class Blog {
   name: string;
@@ -17,7 +16,7 @@ export class Blog {
   }
 }
 
-const BlogsSchema = new mongoose.Schema<BlogDbType>({
+const BlogsSchema = new mongoose.Schema<Blog>({
   name: {
     type: String,
     required: true,
@@ -40,11 +39,8 @@ const BlogsSchema = new mongoose.Schema<BlogDbType>({
   },
 });
 
-type BlogModel = mongoose.Model<BlogDbType>;
+type BlogModel = mongoose.Model<Blog>;
 
-export type BlogDbDocument = mongoose.HydratedDocument<BlogDbType>;
+export type BlogDbDocument = mongoose.HydratedDocument<Blog>;
 
-export const BlogsModel = mongoose.model<BlogDbType, BlogModel>(
-  "Blog",
-  BlogsSchema
-);
+export const BlogsModel = mongoose.model<Blog, BlogModel>("Blog", BlogsSchema);

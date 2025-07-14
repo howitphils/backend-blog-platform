@@ -14,8 +14,8 @@ import {
 
 import { HttpStatuses } from "../src/types/http-statuses";
 import mongoose from "mongoose";
-import { LikeStatuses } from "../src/db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 import { testSeeder } from "./auth/auth.helpers";
+import { LikeStatuses } from "../src/types/common-types";
 
 describe("/comments", () => {
   beforeAll(async () => {

@@ -11,6 +11,7 @@ import {
   req,
 } from "./test-helpers";
 import mongoose from "mongoose";
+import { LikeStatuses } from "../src/types/common-types";
 
 describe("/blogs", () => {
   beforeAll(async () => {
@@ -297,6 +298,12 @@ describe("/blogs", () => {
         blogId: blogDb.id,
         blogName: expect.any(String),
         createdAt: expect.any(String),
+        extendedLikesInfo: {
+          dislikesCount: 0,
+          likesCount: 0,
+          myStatus: LikeStatuses.None,
+          newestLikes: [],
+        },
       });
 
       await req
