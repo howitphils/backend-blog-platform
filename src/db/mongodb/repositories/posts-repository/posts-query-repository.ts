@@ -1,15 +1,24 @@
 import {
+  NewestLikeType,
   PostsMapedQueryType,
   PostViewModel,
 } from "../../../../types/posts-types";
-import { LikeStatuses, PaginationType } from "../../../../types/common-types";
+import {
+  LikesStatusesObjType,
+  LikeStatuses,
+  PaginationType,
+} from "../../../../types/common-types";
 import { PostsModel } from "./post-entity";
-import { PostLikesModel } from "../likes-repository/post-likes/post-like-entity";
+import {
+  PostLikeDbDocument,
+  PostLikesModel,
+} from "../likes-repository/post-likes/post-like-entity";
 
 export class PostsQueryRepository {
   // Получение всех постов с учетом query параметров
   async getAllPosts(
-    filters: PostsMapedQueryType
+    filters: PostsMapedQueryType,
+    userId: string
   ): Promise<PaginationType<PostViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = filters;
 
@@ -17,18 +26,53 @@ export class PostsQueryRepository {
     const posts = await PostsModel.find({})
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
-      .limit(pageSize)
-      .lean();
+      .limit(pageSize);
 
     // Получаем число всех постов
     const totalCount = await PostsModel.countDocuments();
+
+    let likesStatusesObj: LikesStatusesObjType;
+
+    if (userId) {
+      const postsIds = posts.map((post) => post.id);
+
+      // Получаем лайки юзера для найденных постов
+      const likes = await PostLikesModel.find({
+        postId: { $in: postsIds },
+        userId,
+      }).lean();
+
+      // Преобразуем в объект формата postId - likeStatus для более быстрого считывания
+      likesStatusesObj = likes.reduce((acc: LikesStatusesObjType, like) => {
+        acc[like.postId] = like.status;
+        return acc;
+      }, {});
+    }
 
     return {
       page: pageNumber,
       pagesCount: Math.ceil(totalCount / pageSize),
       pageSize: pageSize,
       totalCount,
-      items: posts.map(this._mapFromDbToViewModel),
+      items: posts.map((post) => {
+        return {
+          id: post.id,
+          blogId: post.blogId,
+          blogName: post.blogName,
+          content: post.content,
+          createdAt: post.createdAt,
+          shortDescription: post.shortDescription,
+          title: post.title,
+          extendedLikesInfo: {
+            dislikesCount: post.dislikesCount,
+            likesCount: post.likesCount,
+            myStatus: likesStatusesObj[post.id]
+              ? likesStatusesObj[post.id]
+              : LikeStatuses.None,
+            newestLikes: post.newestLikes.map(this._mapDbNewestLikeToView),
+          },
+        };
+      }),
     };
   }
 
@@ -68,22 +112,19 @@ export class PostsQueryRepository {
       return null;
     }
 
+    let postLike: PostLikeDbDocument | null = null;
+
     // Получаем лайк для поста конкретного юзера
-    const postLike = userId
-      ? await PostLikesModel.findOne({
-          postId: post.id,
-          userId,
-        })
-      : {};
+    if (userId) {
+      postLike = await PostLikesModel.findOne({
+        postId: post.id,
+        userId,
+      });
+    }
 
     // Преобразуем последние лайки в формат, который ожидает клиент
-    const mapedNewestLikes = post.newestLikes.map((like) => ({
-      addedAt: like.createdAt,
-      userId: like.userId,
-      login: like.userLogin,
-    }));
+    const mapedNewestLikes = post.newestLikes.map(this._mapDbNewestLikeToView);
 
-    // Если пост найден, преобразуем его в формат, который ожидает клиент
     return {
       id: post._id.toString(),
       blogId: post.blogId,
@@ -95,22 +136,17 @@ export class PostsQueryRepository {
       extendedLikesInfo: {
         likesCount: post.likesCount,
         dislikesCount: post.dislikesCount,
-        myStatus: postLike?.status || LikeStatuses.None,
+        myStatus: postLike ? postLike.status : LikeStatuses.None,
         newestLikes: mapedNewestLikes,
       },
     };
   }
 
-  // Преобразование поста из формата базы данных в формат, который ожидает клиент
-  _mapFromDbToViewModel(post: WithId<PostDbType>): PostViewModel {
+  _mapDbNewestLikeToView(dbLike: PostLikeDbDocument): NewestLikeType {
     return {
-      id: post._id.toString(),
-      blogId: post.blogId,
-      blogName: post.blogName,
-      content: post.content,
-      createdAt: post.createdAt,
-      shortDescription: post.shortDescription,
-      title: post.title,
+      addedAt: dbLike.createdAt,
+      login: dbLike.userLogin,
+      userId: dbLike.userId,
     };
   }
 }

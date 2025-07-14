@@ -2,16 +2,16 @@ import {
   CommentsMapedQueryType,
   CommentViewModel,
 } from "../../../../types/comments-types";
-import { LikeStatuses, PaginationType } from "../../../../types/common-types";
+import {
+  LikesStatusesObjType,
+  LikeStatuses,
+  PaginationType,
+} from "../../../../types/common-types";
 import {
   CommentLikeDbDocument,
   CommentLikesModel,
 } from "../likes-repository/comment-likes/comment-like-entity";
 import { CommentsModel } from "./comments-entity";
-
-type LikeObjType = {
-  [key: string]: LikeStatuses;
-};
 
 export class CommentsQueryRepository {
   // Получение всех комментариев с учетом query параметров
@@ -31,7 +31,7 @@ export class CommentsQueryRepository {
     // Получаем число всех комментов конкретного поста
     const totalCount = await CommentsModel.countDocuments({ postId });
 
-    let likesObj: LikeObjType;
+    let likesObj: LikesStatusesObjType;
 
     if (userId) {
       const commentsIds = comments.map((comment) => comment.id);
@@ -42,7 +42,7 @@ export class CommentsQueryRepository {
         userId,
       }).lean();
 
-      likesObj = likes.reduce((acc: LikeObjType, like) => {
+      likesObj = likes.reduce((acc: LikesStatusesObjType, like) => {
         acc[like.commentId] = like.status;
         return acc;
       }, {});

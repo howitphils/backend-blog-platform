@@ -15,3 +15,7 @@ export type PaginationType<T> = {
 export type ParamsId = {
   id: string;
 };
+
+export type LikesStatusesObjType = {
+  [key: string]: LikeStatuses;
+};
