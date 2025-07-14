@@ -13,6 +13,8 @@ export const jwtAuthOptional = (
   next: NextFunction
 ) => {
   if (!req.headers.authorization) {
+    req.user = { id: "" }; // No user authenticated
+
     next();
     return;
   }

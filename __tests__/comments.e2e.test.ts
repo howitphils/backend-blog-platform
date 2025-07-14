@@ -12,9 +12,8 @@ import {
 } from "./test-helpers";
 
 import { HttpStatuses } from "../src/types/http-statuses";
-import { UserViewModel } from "../src/types/users-types";
 import mongoose from "mongoose";
-// import { CommentLikeStatus } from "../src/db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+import { CommentLikeStatus } from "../src/db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 
 describe("/comments", () => {
   beforeAll(async () => {
@@ -33,16 +32,12 @@ describe("/comments", () => {
       await clearCollections();
     });
 
-    let commentId = "";
-    let user = {} as UserViewModel;
-    let token = "";
+    let commentInfo: CommentInfoType;
 
     it("should return a comment by id", async () => {
-      const commentInfo = await createCommentInDb();
+      commentInfo = await createCommentInDb();
 
-      commentId = commentInfo.comment.id;
-      user = commentInfo.user;
-      token = commentInfo.token;
+      const commentId = commentInfo.comment.id;
 
       const res = await req
         .get(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}`)
@@ -53,8 +48,8 @@ describe("/comments", () => {
         id: commentId,
         content: commentInfo.comment.content,
         commentatorInfo: {
-          userId: user.id,
-          userLogin: user.login,
+          userId: commentInfo.user.id,
+          userLogin: commentInfo.user.login,
         },
         createdAt: expect.any(String),
         likesInfo: {
@@ -65,17 +60,41 @@ describe("/comments", () => {
       });
     });
 
+    it("should return a comment by id for unauthorized user", async () => {
+      const res = await req
+        .get(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentInfo.comment.id}`)
+        .expect(HttpStatuses.Success);
+
+      expect(res.body).toEqual({
+        id: commentInfo.comment.id,
+        content: commentInfo.comment.content,
+        commentatorInfo: {
+          userId: commentInfo.user.id,
+          userLogin: commentInfo.user.login,
+        },
+        createdAt: expect.any(String),
+        likesInfo: {
+          likesCount: commentInfo.comment.likesInfo.likesCount,
+          dislikesCount: commentInfo.comment.likesInfo.dislikesCount,
+          myStatus: CommentLikeStatus.None,
+        },
+      });
+    });
     it("should not return a comment by incorrect id", async () => {
       await req
         .get(APP_CONFIG.MAIN_PATHS.COMMENTS + "/22")
-        .set(jwtAuth(token))
+        .set(jwtAuth(commentInfo.token))
         .expect(HttpStatuses.BadRequest);
     });
 
     it("should not return a not existing comment", async () => {
       await req
-        .get(APP_CONFIG.MAIN_PATHS.COMMENTS + "/" + makeIncorrect(commentId))
-        .set(jwtAuth(token))
+        .get(
+          APP_CONFIG.MAIN_PATHS.COMMENTS +
+            "/" +
+            makeIncorrect(commentInfo.comment.id)
+        )
+        .set(jwtAuth(commentInfo.token))
         .expect(HttpStatuses.NotFound);
     });
   });
@@ -120,35 +139,35 @@ describe("/comments", () => {
       });
     });
 
-    // it("should return all comments for unauthorized user", async () => {
-    //   const res = await req
-    //     .get(
-    //       APP_CONFIG.MAIN_PATHS.POSTS + `/${commentInfo.postId}` + "/comments"
-    //     )
-    //     .expect(HttpStatuses.Success);
+    it("should return all comments for unauthorized user", async () => {
+      const res = await req
+        .get(
+          APP_CONFIG.MAIN_PATHS.POSTS + `/${commentInfo.postId}` + "/comments"
+        )
+        .expect(HttpStatuses.Success);
 
-    //   expect(res.body).toEqual({
-    //     ...defaultPagination,
-    //     pagesCount: 1,
-    //     totalCount: 1,
-    //     items: [
-    //       {
-    //         id: commentInfo.comment.id,
-    //         content: commentInfo.comment.content,
-    //         commentatorInfo: {
-    //           userId: commentInfo.user.id,
-    //           userLogin: commentInfo.user.login,
-    //         },
-    //         createdAt: expect.any(String),
-    //         likesInfo: {
-    //           likesCount: commentInfo.comment.likesInfo.likesCount,
-    //           dislikesCount: commentInfo.comment.likesInfo.dislikesCount,
-    //           myStatus: CommentLikeStatus.None,
-    //         },
-    //       },
-    //     ],
-    //   });
-    // });
+      expect(res.body).toEqual({
+        ...defaultPagination,
+        pagesCount: 1,
+        totalCount: 1,
+        items: [
+          {
+            id: commentInfo.comment.id,
+            content: commentInfo.comment.content,
+            commentatorInfo: {
+              userId: commentInfo.user.id,
+              userLogin: commentInfo.user.login,
+            },
+            createdAt: expect.any(String),
+            likesInfo: {
+              likesCount: commentInfo.comment.likesInfo.likesCount,
+              dislikesCount: commentInfo.comment.likesInfo.dislikesCount,
+              myStatus: CommentLikeStatus.None,
+            },
+          },
+        ],
+      });
+    });
   });
 
   describe("update the comment", () => {

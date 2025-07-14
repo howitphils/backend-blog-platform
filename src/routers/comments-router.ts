@@ -8,7 +8,7 @@ import { validateParamsId } from "../middlewares/validate-paramsId";
 import { CommentsController } from "./controllers/comments-controller";
 import { checkUserInRequest } from "../middlewares/check-req-user";
 import { likeStatusBodyValidator } from "../middlewares/body-validations/like-status-body-validator";
-// import { jwtAuthOptional } from "../middlewares/jwt-optional-auth";
+import { jwtAuthOptional } from "../middlewares/jwt-optional-auth";
 
 const commentsController = container.get(CommentsController);
 
@@ -16,9 +16,7 @@ export const commentsRouter = Router();
 
 commentsRouter.get(
   "/:id",
-  // jwtAuthOptional,
-  jwtAuthGuard,
-  checkUserInRequest,
+  jwtAuthOptional,
   validateParamsId,
   commentsController.getCommentById.bind(commentsController)
 );
