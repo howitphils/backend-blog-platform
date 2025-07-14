@@ -1,8 +1,16 @@
+import { LikeStatuses } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+
 export type PostInputModel = {
   title: string; // max 30
   shortDescription: string; // max 100
   content: string; // max 1000
   blogId: string; // valid
+};
+
+type NewestLikeType = {
+  addedAt: string;
+  userId: string;
+  login: string;
 };
 
 export type PostViewModel = {
@@ -13,6 +21,12 @@ export type PostViewModel = {
   blogId: string; // valid
   blogName: string;
   createdAt: string;
+  extendedLikesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: LikeStatuses;
+    newestLikes: NewestLikeType[];
+  };
 };
 
 export type PostDbType = {

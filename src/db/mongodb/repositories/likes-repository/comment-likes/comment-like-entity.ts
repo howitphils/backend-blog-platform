@@ -1,18 +1,18 @@
 import mongoose from "mongoose";
 
-export enum CommentLikeStatus {
+export enum LikeStatuses {
   Like = "Like",
   Dislike = "Dislike",
   None = "None",
 }
 
 export class CommentLike {
-  status: CommentLikeStatus;
+  status: LikeStatuses;
   commentId: string;
   userId: string;
   createdAt: string;
 
-  constructor(userId: string, commentId: string, status: CommentLikeStatus) {
+  constructor(userId: string, commentId: string, status: LikeStatuses) {
     this.userId = userId;
     this.commentId = commentId;
     this.status = status;
@@ -24,7 +24,7 @@ const CommentLikesSchema = new mongoose.Schema<CommentLike>({
   status: {
     type: String,
     required: true,
-    enum: Object.values(CommentLikeStatus), // для валидации значения статуса - ожидается именно массив значений
+    enum: Object.values(LikeStatuses), // для валидации значения статуса - ожидается именно массив значений
   },
   commentId: {
     type: String,

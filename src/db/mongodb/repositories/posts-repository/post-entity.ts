@@ -7,6 +7,8 @@ export class Post {
   blogId: string; // valid
   blogName: string;
   createdAt: string;
+  likesCount: number;
+  dislikesCount: number;
 
   constructor(
     title: string,
@@ -21,6 +23,8 @@ export class Post {
     this.blogId = blogId;
     this.blogName = blogName;
     this.createdAt = new Date().toISOString();
+    this.likesCount = 0;
+    this.dislikesCount = 0;
   }
 }
 

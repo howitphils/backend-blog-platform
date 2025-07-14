@@ -1,4 +1,4 @@
-import { CommentLikeStatus } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+import { LikeStatuses } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 
 export type CommentInputModel = {
   content: string;
@@ -12,7 +12,7 @@ export type CommentatorInfo = {
 export type LikesInfo = {
   likesCount: number;
   dislikesCount: number;
-  myStatus: CommentLikeStatus;
+  myStatus: LikeStatuses;
 };
 
 export type CommentViewModel = {
@@ -62,13 +62,13 @@ export type DeleteCommentDto = {
 };
 
 export type UpdateCommentLikeInputModel = {
-  likeStatus: CommentLikeStatus;
+  likeStatus: LikeStatuses;
 };
 
 export type CommentLikeDto = {
   userId: string;
   commentId: string;
-  likeStatus: CommentLikeStatus;
+  likeStatus: LikeStatuses;
 };
 
 export type CommentTestType = {

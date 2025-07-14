@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatuses } from "../../types/http-statuses";
 import { createErrorsObject } from "../../routers/controllers/utils";
-import { CommentLikeStatus } from "../../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+import { LikeStatuses } from "../../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 import { APP_CONFIG } from "../../settings";
 
 export const likeStatusBodyValidator = (
@@ -35,9 +35,7 @@ export const likeStatusBodyValidator = (
     return;
   }
 
-  if (
-    !Object.values(CommentLikeStatus).includes(likeStatus as CommentLikeStatus)
-  ) {
+  if (!Object.values(LikeStatuses).includes(likeStatus as LikeStatuses)) {
     res
       .status(HttpStatuses.BadRequest)
       .json(

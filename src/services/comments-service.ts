@@ -17,7 +17,7 @@ import {
 import {
   CommentLike,
   CommentLikesModel,
-  CommentLikeStatus,
+  LikeStatuses,
 } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
@@ -163,9 +163,9 @@ export class CommentsService {
 
       await dbLike.save();
 
-      if (dto.likeStatus === CommentLikeStatus.Like) {
+      if (dto.likeStatus === LikeStatuses.Like) {
         targetComment.likesCount += 1;
-      } else if (dto.likeStatus === CommentLikeStatus.Dislike) {
+      } else if (dto.likeStatus === LikeStatuses.Dislike) {
         targetComment.dislikesCount += 1;
       }
 
@@ -177,18 +177,18 @@ export class CommentsService {
     // Если статус лайка не равен статусу лайка в запросе, то обновляем счетчики лайков и дизлайков
     if (dto.likeStatus !== targetLike.status) {
       // Если статус лайка в запросе - None, то убираем лайк или дизлайк
-      if (dto.likeStatus === CommentLikeStatus.None) {
-        if (targetLike.status === CommentLikeStatus.Like) {
+      if (dto.likeStatus === LikeStatuses.None) {
+        if (targetLike.status === LikeStatuses.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
           targetComment.likesCount -= 1;
-        } else if (targetLike.status === CommentLikeStatus.Dislike) {
+        } else if (targetLike.status === LikeStatuses.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
           targetComment.dislikesCount -= 1;
         }
       }
 
-      if (dto.likeStatus === CommentLikeStatus.Like) {
-        if (targetLike.status === CommentLikeStatus.Dislike) {
+      if (dto.likeStatus === LikeStatuses.Like) {
+        if (targetLike.status === LikeStatuses.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
           targetComment.dislikesCount -= 1;
         }
@@ -196,8 +196,8 @@ export class CommentsService {
         targetComment.likesCount += 1;
       }
 
-      if (dto.likeStatus === CommentLikeStatus.Dislike) {
-        if (targetLike.status === CommentLikeStatus.Like) {
+      if (dto.likeStatus === LikeStatuses.Dislike) {
+        if (targetLike.status === LikeStatuses.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
           targetComment.likesCount -= 1;
         }

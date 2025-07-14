@@ -5,12 +5,12 @@ import {
 import { PaginationType } from "../../../../types/common-types";
 import {
   CommentLikesModel,
-  CommentLikeStatus,
+  LikeStatuses,
 } from "../likes-repository/comment-likes/comment-like-entity";
 import { CommentsModel } from "./comments-entity";
 
 type LikeObjType = {
-  [key: string]: CommentLikeStatus;
+  [key: string]: LikeStatuses;
 };
 
 export class CommentsQueryRepository {
@@ -63,10 +63,10 @@ export class CommentsQueryRepository {
             likesCount: comment.likesCount,
             dislikesCount: comment.dislikesCount,
             myStatus: !userId
-              ? CommentLikeStatus.None
+              ? LikeStatuses.None
               : likesObj[comment.id]
               ? likesObj[comment.id]
-              : CommentLikeStatus.None,
+              : LikeStatuses.None,
           },
         };
       }),
@@ -94,7 +94,7 @@ export class CommentsQueryRepository {
       likesInfo: {
         likesCount: targetComment.likesCount,
         dislikesCount: targetComment.dislikesCount,
-        myStatus: userLike?.status || CommentLikeStatus.None,
+        myStatus: userLike?.status || LikeStatuses.None,
       },
     };
 

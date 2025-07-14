@@ -14,7 +14,7 @@ import {
 
 import { HttpStatuses } from "../src/types/http-statuses";
 import mongoose from "mongoose";
-import { CommentLikeStatus } from "../src/db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+import { LikeStatuses } from "../src/db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 import { testSeeder } from "./auth/auth.helpers";
 
 describe("/comments", () => {
@@ -78,7 +78,7 @@ describe("/comments", () => {
         likesInfo: {
           likesCount: commentInfo.comment.likesInfo.likesCount,
           dislikesCount: commentInfo.comment.likesInfo.dislikesCount,
-          myStatus: CommentLikeStatus.None,
+          myStatus: LikeStatuses.None,
         },
       });
     });
@@ -164,7 +164,7 @@ describe("/comments", () => {
             likesInfo: {
               likesCount: commentInfo.comment.likesInfo.likesCount,
               dislikesCount: commentInfo.comment.likesInfo.dislikesCount,
-              myStatus: CommentLikeStatus.None,
+              myStatus: LikeStatuses.None,
             },
           },
         ],
