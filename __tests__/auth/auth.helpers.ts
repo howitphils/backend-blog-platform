@@ -6,6 +6,11 @@ import { DateFnsService } from "../../src/adapters/dateFnsService";
 import { UuidService } from "../../src/adapters/uuIdService";
 import { UserModel } from "../../src/db/mongodb/repositories/users-repository/user-entitty";
 import { SessionsModel } from "../../src/db/mongodb/repositories/sessions-repository/session-entity";
+import {
+  Comment,
+  CommentsModel,
+} from "../../src/db/mongodb/repositories/comments-repository/comments-entity";
+import { CommentTestType } from "../../src/types/comments-types";
 
 const dateFnsService = container.get(DateFnsService);
 const uuIdService = container.get(UuidService);
@@ -39,14 +44,28 @@ export const testSeeder = {
   },
 
   // createUserDtos(count: number) {
-  //   const users = [];
+  //   const users: UserInputModel[] = [];
 
   //   for (let i = 0; i <= count; i++) {
   //     users.push({
   //       login: "test" + i,
   //       email: `test${i}@gmail.com`,
-  //       pass: "12345678",
+  //       password: "12345678",
   //     });
+  //   }
+  //   return users;
+  // },
+
+  // async insertUsers(count: number) {
+  //   const users: WithId<UserDbType>[] = [];
+  //   const userDtos = testSeeder.createUserDtos(count);
+  //   for (const userDto of userDtos) {
+  //     const newUser = await testSeeder.insertUser({
+  //       login: userDto.login,
+  //       email: userDto.email,
+  //       pass: userDto.password,
+  //     });
+  //     users.push(newUser);
   //   }
   //   return users;
   // },
@@ -106,5 +125,27 @@ export const testSeeder = {
     await dbSession.save();
 
     return { id: dbSession.id, ...newSession };
+  },
+
+  async insertComment(comment: CommentTestType) {
+    const { postId, content, commentatorInfo } = comment;
+
+    const newComment: Comment = {
+      postId: postId || "testPostId",
+      content: content || "Test comment content",
+      createdAt: new Date().toISOString(),
+      commentatorInfo: commentatorInfo || {
+        userId: "testUserId",
+        userLogin: "testUserLogin",
+      },
+      likesCount: 0,
+      dislikesCount: 0,
+    };
+
+    const dbComment = new CommentsModel(newComment);
+
+    await dbComment.save();
+
+    return { id: dbComment.id, ...newComment };
   },
 };

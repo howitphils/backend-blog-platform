@@ -195,11 +195,11 @@ export const createCommentInDb = async (): Promise<CommentInfoType> => {
 
   const dbUser = await createNewUserInDb(userDto);
 
+  const token = (await getTokenPair(userDto)).accessToken;
+
   const dbPost = await createPostInDbHelper();
 
   const contentDto = createContentDto({});
-
-  const token = (await getTokenPair(userDto)).accessToken;
 
   const res = await req
     .post(APP_CONFIG.MAIN_PATHS.POSTS + `/${dbPost.id}` + "/comments")
@@ -220,4 +220,24 @@ export const delay = (ms: number): Promise<void> => {
       res();
     }, ms);
   });
+};
+
+export const getUsersTokens = async (count: number) => {
+  const tokens: string[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const userDto = createUserDto({
+      email: `useremail${i + 1}@email.com`,
+      login: `userlogin${i + 1}`,
+      password: `password${i + 1}`,
+    });
+
+    await createNewUserInDb(userDto);
+
+    const token = (await getTokenPair(userDto)).accessToken;
+
+    tokens.push(token);
+  }
+
+  return tokens;
 };

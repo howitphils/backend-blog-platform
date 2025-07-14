@@ -70,3 +70,9 @@ export type CommentLikeDto = {
   commentId: string;
   likeStatus: CommentLikeStatus;
 };
+
+export type CommentTestType = {
+  postId?: string;
+  content?: string;
+  commentatorInfo?: CommentatorInfo;
+};

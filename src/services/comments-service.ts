@@ -166,7 +166,7 @@ export class CommentsService {
       if (dto.likeStatus === CommentLikeStatus.Like) {
         targetComment.likesCount += 1;
       } else if (dto.likeStatus === CommentLikeStatus.Dislike) {
-        targetComment.likesCount += 1;
+        targetComment.dislikesCount += 1;
       }
 
       this.commentsRepository.save(targetComment);

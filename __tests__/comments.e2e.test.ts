@@ -6,6 +6,7 @@ import {
   createContentDto,
   defaultPagination,
   getTokenPair,
+  getUsersTokens,
   jwtAuth,
   makeIncorrect,
   req,
@@ -14,6 +15,7 @@ import {
 import { HttpStatuses } from "../src/types/http-statuses";
 import mongoose from "mongoose";
 import { CommentLikeStatus } from "../src/db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+import { testSeeder } from "./auth/auth.helpers";
 
 describe("/comments", () => {
   beforeAll(async () => {
@@ -385,7 +387,7 @@ describe("/comments", () => {
       expect(commentRes.body.likesInfo.dislikesCount).toBe(1);
     });
 
-    it("should not update comment like status with the same status in request", async () => {
+    it("should not update comment like status with the same status", async () => {
       await req
         .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${commentId}/like-status`)
         .set(jwtAuth(token))
@@ -434,6 +436,40 @@ describe("/comments", () => {
         .set(jwtAuth(token))
         .send({ likeStatus: "Like" })
         .expect(HttpStatuses.BadRequest);
+    });
+
+    it("should update comment's dislike/like counter properly", async () => {
+      const comment = await testSeeder.insertComment({});
+
+      const tokens = await getUsersTokens(3);
+
+      await req
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${comment.id}/like-status`)
+        .set(jwtAuth(tokens[0]))
+        .send({ likeStatus: "Dislike" })
+        .expect(HttpStatuses.NoContent);
+
+      await req
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${comment.id}/like-status`)
+        .set(jwtAuth(tokens[1]))
+        .send({ likeStatus: "Dislike" })
+        .expect(HttpStatuses.NoContent);
+
+      await req
+        .put(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${comment.id}/like-status`)
+        .set(jwtAuth(tokens[2]))
+        .send({ likeStatus: "Like" })
+        .expect(HttpStatuses.NoContent);
+
+      // Check the final status
+      const res = await req
+        .get(APP_CONFIG.MAIN_PATHS.COMMENTS + `/${comment.id}`)
+        .set(jwtAuth(tokens[0]))
+        .expect(HttpStatuses.Success);
+
+      expect(res.body.likesInfo.myStatus).toBe("Dislike");
+      expect(res.body.likesInfo.likesCount).toBe(1);
+      expect(res.body.likesInfo.dislikesCount).toBe(2);
     });
   });
 });
