@@ -45,7 +45,7 @@ export class PostsQueryRepository {
         userId,
       }).lean();
 
-      // Преобразуем в объект формата postId - likeStatus для более быстрого считывания
+      // Преобразуем в объект формата postId: likeStatus для более быстрого считывания
       likesStatusesObj = likes.reduce((acc: LikesStatusesObjType, like) => {
         acc[like.postId] = like.status;
         return acc;
@@ -69,9 +69,7 @@ export class PostsQueryRepository {
           extendedLikesInfo: {
             dislikesCount: post.dislikesCount,
             likesCount: post.likesCount,
-            myStatus: likesStatusesObj[post.id]
-              ? likesStatusesObj[post.id]
-              : LikeStatuses.None,
+            myStatus: likesStatusesObj[post.id] || LikeStatuses.None,
             newestLikes: post.newestLikes.map(this._mapDbNewestLikeToView),
           },
         };
