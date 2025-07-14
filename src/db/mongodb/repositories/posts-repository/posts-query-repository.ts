@@ -79,6 +79,7 @@ export class PostsQueryRepository {
   // Получение постов конкретного блога
   async getAllPostsByBlogId(
     blogId: string,
+    userId: string,
     filters: PostsMapedQueryType
   ): Promise<PaginationType<PostViewModel>> {
     const { pageNumber, pageSize, sortBy, sortDirection } = filters;
@@ -94,6 +95,50 @@ export class PostsQueryRepository {
     const totalCount = await PostsModel.countDocuments({
       blogId,
     });
+
+    let likesStatusesObj: LikesStatusesObjType;
+
+    if (userId) {
+      const postsIds = posts.map((post) => post.id);
+
+      // Получаем лайки юзера для найденных постов
+      const likes = await PostLikesModel.find({
+        postId: { $in: postsIds },
+        userId,
+      }).lean();
+
+      // Преобразуем в объект формата postId - likeStatus для более быстрого считывания
+      likesStatusesObj = likes.reduce((acc: LikesStatusesObjType, like) => {
+        acc[like.postId] = like.status;
+        return acc;
+      }, {});
+    }
+
+    return {
+      page: pageNumber,
+      pagesCount: Math.ceil(totalCount / pageSize),
+      pageSize: pageSize,
+      totalCount,
+      items: posts.map((post) => {
+        return {
+          id: post.id,
+          blogId: post.blogId,
+          blogName: post.blogName,
+          content: post.content,
+          createdAt: post.createdAt,
+          shortDescription: post.shortDescription,
+          title: post.title,
+          extendedLikesInfo: {
+            dislikesCount: post.dislikesCount,
+            likesCount: post.likesCount,
+            myStatus: likesStatusesObj[post.id]
+              ? likesStatusesObj[post.id]
+              : LikeStatuses.None,
+            newestLikes: post.newestLikes.map(this._mapDbNewestLikeToView),
+          },
+        };
+      }),
+    };
 
     return {
       page: pageNumber,

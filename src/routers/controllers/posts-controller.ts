@@ -57,7 +57,10 @@ export class PostsController {
   ) {
     const mapedQueryParams = mapPostsQueryParams(req.query);
 
-    const posts = await this.postsQueryRepository.getAllPosts(mapedQueryParams);
+    const posts = await this.postsQueryRepository.getAllPosts(
+      mapedQueryParams,
+      req.user.id
+    );
 
     res.status(HttpStatuses.Success).json(posts);
   }
@@ -85,7 +88,10 @@ export class PostsController {
   ) {
     const createdId = await this.postsService.createNewPost(req.body);
 
-    const newPost = await this.postsQueryRepository.getPostById(createdId);
+    const newPost = await this.postsQueryRepository.getPostById(
+      createdId,
+      req.user.id
+    );
 
     if (!newPost) {
       res.sendStatus(HttpStatuses.NotFound);
@@ -129,7 +135,8 @@ export class PostsController {
     res: Response<PostViewModel>
   ) {
     const targetPost = await this.postsQueryRepository.getPostById(
-      req.params.id
+      req.params.id,
+      req.user.id
     );
 
     if (!targetPost) {

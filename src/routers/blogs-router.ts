@@ -7,6 +7,7 @@ import { validateParamsId } from "../middlewares/validate-paramsId";
 import { postsBodyValidator } from "../middlewares/body-validations/posts-body-validators";
 import { container } from "../composition-root";
 import { BlogsController } from "./controllers/blogs-controller";
+import { jwtAuthOptional } from "../middlewares/jwt-optional-auth";
 
 const blogsController = container.get(BlogsController);
 
@@ -25,6 +26,7 @@ blogsRouter.get(
 // Получение постов по айди блога
 blogsRouter.get(
   "/:id/posts",
+  jwtAuthOptional,
   validateParamsId,
   blogsController.getPostsByBlogId.bind(blogsController)
 );
