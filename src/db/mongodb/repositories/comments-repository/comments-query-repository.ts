@@ -31,7 +31,7 @@ export class CommentsQueryRepository {
     // Получаем число всех комментов конкретного поста
     const totalCount = await CommentsModel.countDocuments({ postId });
 
-    let likesObj: LikesStatusesObjType;
+    let likesObj: LikesStatusesObjType = {};
 
     if (userId) {
       const commentsIds = comments.map((comment) => comment.id);

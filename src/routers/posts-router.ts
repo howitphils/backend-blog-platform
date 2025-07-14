@@ -54,6 +54,7 @@ postsRouter.post(
 postsRouter.post(
   "/",
   authGuard,
+  jwtAuthOptional,
   postsBodyValidator,
   bodyValidationResult,
   postsController.createPost.bind(postsController)

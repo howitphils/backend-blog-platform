@@ -34,7 +34,7 @@ export class PostsQueryRepository {
     // Получаем число всех постов
     const totalCount = await PostsModel.countDocuments();
 
-    let likesStatusesObj: LikesStatusesObjType;
+    let likesStatusesObj: LikesStatusesObjType = {};
 
     if (userId) {
       const postsIds = posts.map((post) => post.id);
