@@ -1,4 +1,7 @@
-import { PostInputModel } from "../types/posts-types";
+import {
+  PostInputModel,
+  UpdatePostLikeStatusDtoType,
+} from "../types/posts-types";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { PostsRepository } from "../db/mongodb/repositories/posts-repository/posts-db-repository";
@@ -86,5 +89,24 @@ export class PostsService {
     }
 
     await post.deleteOne();
+  }
+
+  async updatePostLikeStatus(dto: UpdatePostLikeStatusDtoType) {
+    const { postId, userId, likeStatus } = dto;
+
+    const post = await this.postsRepository.getPostById(postId);
+
+    if (!post) {
+      throw new ErrorWithStatusCode(
+        APP_CONFIG.ERROR_MESSAGES.POST_NOT_FOUND,
+        HttpStatuses.NotFound
+      );
+    }
+
+    // Update the like status logic here
+    // This is a placeholder for the actual implementation
+    // You would typically update the likes in the database
+
+    return; // Return void or appropriate response
   }
 }

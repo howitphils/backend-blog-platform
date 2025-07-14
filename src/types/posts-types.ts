@@ -70,3 +70,9 @@ export type PostDtoType = {
   content?: string;
   blogId: string;
 };
+
+export type UpdatePostLikeStatusDtoType = {
+  postId: string;
+  userId: string;
+  likeStatus: LikeStatuses;
+};

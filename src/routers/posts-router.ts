@@ -9,6 +9,8 @@ import { commentsBodyValidators } from "../middlewares/body-validations/comments
 import { container } from "../composition-root";
 import { PostsController } from "./controllers/posts-controller";
 import { jwtAuthOptional } from "../middlewares/jwt-optional-auth";
+import { checkUserInRequest } from "../middlewares/check-req-user";
+import { likeStatusBodyValidator } from "../middlewares/body-validations/like-status-body-validator";
 // import { checkUserInRequest } from "../middlewares/check-req-user";
 
 const postsController = container.get(PostsController);
@@ -68,4 +70,13 @@ postsRouter.delete(
   authGuard,
   validateParamsId,
   postsController.deletePost.bind(postsController)
+);
+
+postsRouter.put(
+  "/:id/like-status",
+  jwtAuthGuard,
+  checkUserInRequest,
+  likeStatusBodyValidator,
+  validateParamsId,
+  postsController.updateLikeStatus.bind(postsController)
 );

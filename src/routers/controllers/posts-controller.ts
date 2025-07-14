@@ -21,7 +21,11 @@ import {
   RequestWithParamsAndQuery,
   RequestWithQuery,
 } from "../../types/requests-types";
-import { PaginationType, ParamsId } from "../../types/common-types";
+import {
+  LikeStatuses,
+  PaginationType,
+  ParamsId,
+} from "../../types/common-types";
 import { HttpStatuses } from "../../types/http-statuses";
 import { ExtensionType } from "../../types/resultObject-types";
 import { PostsQueryRepository } from "../../db/mongodb/repositories/posts-repository/posts-query-repository";
@@ -29,6 +33,7 @@ import { PostsService } from "../../services/posts-service";
 import { CommentsQueryRepository } from "../../db/mongodb/repositories/comments-repository/comments-query-repository";
 import { CommentsService } from "../../services/comments-service";
 import { inject, injectable } from "inversify";
+import { ErrorWithStatusCode } from "../../middlewares/error-handler";
 
 @injectable()
 export class PostsController {
@@ -128,8 +133,7 @@ export class PostsController {
     );
 
     if (!targetPost) {
-      res.sendStatus(HttpStatuses.NotFound);
-      return;
+      throw new ErrorWithStatusCode("Post not found", HttpStatuses.NotFound);
     }
 
     res.status(HttpStatuses.Success).json(targetPost);
@@ -145,6 +149,19 @@ export class PostsController {
 
   async deletePost(req: RequestWithParams<ParamsId>, res: Response) {
     await this.postsService.deletePost(req.params.id);
+    res.sendStatus(HttpStatuses.NoContent);
+  }
+
+  async updateLikeStatus(
+    req: RequestWithParamsAndBody<ParamsId, { likeStatus: LikeStatuses }>,
+    res: Response
+  ) {
+    await this.postsService.updatePostLikeStatus({
+      postId: req.params.id,
+      userId: req.user.id,
+      likeStatus: req.body.likeStatus,
+    });
+
     res.sendStatus(HttpStatuses.NoContent);
   }
 }

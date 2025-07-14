@@ -1,3 +1,9 @@
+export enum LikeStatuses {
+  Like = "Like",
+  Dislike = "Dislike",
+  None = "None",
+}
+
 export type PaginationType<T> = {
   pagesCount: number;
   page: number;
