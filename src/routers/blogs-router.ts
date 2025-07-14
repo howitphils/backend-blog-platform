@@ -35,6 +35,7 @@ blogsRouter.get(
 blogsRouter.post(
   "/:id/posts",
   authGuard,
+  jwtAuthOptional,
   validateParamsId,
   postsBodyValidator,
   bodyValidationResult,

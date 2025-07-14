@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { HttpStatuses } from "../../types/http-statuses";
 import { createErrorsObject } from "../../routers/controllers/utils";
-import { LikeStatuses } from "../../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 import { APP_CONFIG } from "../../settings";
+import { LikeStatuses } from "../../types/common-types";
 
 export const likeStatusBodyValidator = (
   req: Request,

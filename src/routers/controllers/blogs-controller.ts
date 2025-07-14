@@ -61,11 +61,11 @@ export class BlogsController {
     await this.blogsService.getBlogById(req.params.id);
 
     const mapedQueryParams = mapPostsQueryParams(req.query);
-    const convertedId = req.params.id.toString();
 
-    const posts = await this.postsQueryRepository.getAllPostsByBlogId(
-      convertedId,
-      mapedQueryParams
+    const posts = await this.postsQueryRepository.getAllPosts(
+      mapedQueryParams,
+      req.user.id,
+      req.params.id
     );
 
     res.status(HttpStatuses.Success).json(posts);
@@ -100,7 +100,10 @@ export class BlogsController {
 
     const newPostId = await this.postsService.createNewPost(postInputDto);
 
-    const newPost = await this.postsQueryRepository.getPostById(newPostId);
+    const newPost = await this.postsQueryRepository.getPostById(
+      newPostId,
+      req.user.id
+    );
 
     if (!newPost) {
       res.sendStatus(HttpStatuses.NotFound);
