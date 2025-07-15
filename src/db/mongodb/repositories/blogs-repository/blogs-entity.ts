@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { BlogDbType, BlogInputModel } from "../../../../types/blogs-types";
+import { BlogInputModel } from "../../../../types/blogs-types";
 
 export class BlogEntity {
   name: string;
@@ -23,7 +23,7 @@ export class BlogEntity {
     return newDbBlog;
   }
 
-  updateBlog(dto: BlogInputModel): BlogDbType {
+  updateBlog(dto: BlogInputModel): BlogEntity {
     this.name = dto.name;
     this.description = dto.description;
     this.websiteUrl = dto.websiteUrl;
@@ -33,16 +33,16 @@ export class BlogEntity {
 }
 
 interface BlogMethods {
-  updateBlog(dto: BlogInputModel): BlogDbType;
+  updateBlog(dto: BlogInputModel): BlogEntity;
 }
 
 interface BlogStatics {
   createNewBlog(dto: BlogInputModel): BlogDbDocument;
 }
 
-type BlogsModel = mongoose.Model<BlogDbType, {}, BlogMethods> & BlogStatics;
+type BlogsModel = mongoose.Model<BlogEntity, {}, BlogMethods> & BlogStatics;
 
-const BlogsSchema = new mongoose.Schema<BlogDbType, BlogsModel, BlogMethods>({
+const BlogsSchema = new mongoose.Schema<BlogEntity, BlogsModel, BlogMethods>({
   name: {
     type: String,
     required: true,
@@ -65,11 +65,12 @@ const BlogsSchema = new mongoose.Schema<BlogDbType, BlogsModel, BlogMethods>({
   },
 });
 
-export type BlogDbDocument = mongoose.HydratedDocument<BlogDbType, BlogMethods>;
+export type BlogDbDocument = mongoose.HydratedDocument<BlogEntity, BlogMethods>;
 
+// Заменяет собой присвоение значений BlogsSchema.statics и BlogsSchema.methods и берет их автоматически из класса (не нужно описывать методы вручную)
 BlogsSchema.loadClass(BlogEntity);
 
-export const BlogsModel = mongoose.model<BlogDbType, BlogsModel>(
+export const BlogsModel = mongoose.model<BlogEntity, BlogsModel>(
   "Blog",
   BlogsSchema
 );

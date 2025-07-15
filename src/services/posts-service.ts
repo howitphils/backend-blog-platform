@@ -8,9 +8,8 @@ import { PostsRepository } from "../db/mongodb/repositories/posts-repository/pos
 import { BlogsService } from "./blogs-service";
 import { inject, injectable } from "inversify";
 import {
-  Post,
+  PostEntity,
   PostDbDocument,
-  PostsModel,
 } from "../db/mongodb/repositories/posts-repository/post-entity";
 import { APP_CONFIG } from "../settings";
 import { PostLikesRepository } from "../db/mongodb/repositories/likes-repository/post-likes/post-like-repository";
@@ -49,17 +48,13 @@ export class PostsService {
 
     const { blogId, content, shortDescription, title } = dto;
 
-    const newPost: Post = new Post(
-      title,
-      shortDescription,
-      content,
+    const dbPost = PostEntity.createPost({
       blogId,
-      targetBlog.name
-    );
-
-    const dbPost = new PostsModel(newPost);
-
-    dbPost.newestLikes = [];
+      blogName: targetBlog.name,
+      content,
+      shortDescription,
+      title,
+    });
 
     return this.postsRepository.save(dbPost);
   }
@@ -86,9 +81,7 @@ export class PostsService {
       );
     }
 
-    post.title = updatedPost.title;
-    post.content = updatedPost.content;
-    post.shortDescription = updatedPost.shortDescription;
+    post.updatePost(updatedPost);
 
     await this.postsRepository.save(post);
   }

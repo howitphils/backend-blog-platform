@@ -80,3 +80,11 @@ export type UpdatePostLikeStatusDtoType = {
   userId: string;
   likeStatus: LikeStatuses;
 };
+
+export type CreatePostDto = {
+  title: string;
+  shortDescription: string;
+  content: string;
+  blogId: string;
+  blogName: string;
+};

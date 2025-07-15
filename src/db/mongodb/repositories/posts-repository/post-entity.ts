@@ -1,8 +1,12 @@
 import mongoose from "mongoose";
 import { PostLikeDbDocument } from "../likes-repository/post-likes/post-like-entity";
-import { NewestLikeType } from "../../../../types/posts-types";
+import {
+  CreatePostDto,
+  NewestLikeType,
+  PostInputModel,
+} from "../../../../types/posts-types";
 
-export class Post {
+export class PostEntity {
   title: string; // max 30
   shortDescription: string; // max 100
   content: string; // max 1000
@@ -13,7 +17,7 @@ export class Post {
   dislikesCount: number;
   newestLikes: PostLikeDbDocument[];
 
-  constructor(
+  private constructor(
     title: string,
     shortDescription: string,
     content: string,
@@ -29,6 +33,28 @@ export class Post {
     this.likesCount = 0;
     this.dislikesCount = 0;
     this.newestLikes = [];
+  }
+
+  static createPost(dto: CreatePostDto) {
+    const newPost = new PostEntity(
+      dto.title,
+      dto.shortDescription,
+      dto.content,
+      dto.blogId,
+      dto.blogName
+    );
+
+    const newDbPost = new PostsModel(newPost);
+
+    return newDbPost;
+  }
+
+  updatePost(dto: PostInputModel): PostEntity {
+    this.title = dto.title;
+    this.content = dto.content;
+    this.shortDescription = dto.shortDescription;
+
+    return this;
   }
 }
 
@@ -47,7 +73,7 @@ const NewestLikeSchema = new mongoose.Schema<NewestLikeType>({
   },
 });
 
-const PostsSchema = new mongoose.Schema<Post>({
+const PostsSchema = new mongoose.Schema<PostEntity, PostsModel>({
   title: {
     type: String,
     required: true,
@@ -86,8 +112,21 @@ const PostsSchema = new mongoose.Schema<Post>({
   newestLikes: { type: [NewestLikeSchema] },
 });
 
-type PostModel = mongoose.Model<Post>;
+interface PostMethods {
+  updatePost(dto: PostInputModel): PostEntity;
+}
 
-export type PostDbDocument = mongoose.HydratedDocument<Post>;
+interface PostStatics {
+  createNewBlog(dto: CreatePostDto): PostDbDocument;
+}
 
-export const PostsModel = mongoose.model<Post, PostModel>("Post", PostsSchema);
+type PostsModel = mongoose.Model<PostEntity, {}, PostMethods> & PostStatics;
+
+export type PostDbDocument = mongoose.HydratedDocument<PostEntity, PostMethods>;
+
+PostsSchema.loadClass(PostEntity);
+
+export const PostsModel = mongoose.model<PostEntity, PostsModel>(
+  "Post",
+  PostsSchema
+);
