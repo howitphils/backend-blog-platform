@@ -16,6 +16,7 @@ import {
 } from "./test-helpers";
 import { HttpStatuses } from "../src/types/http-statuses";
 import mongoose from "mongoose";
+import { LikeStatuses } from "../src/types/common-types";
 
 describe("/posts", () => {
   beforeAll(async () => {
@@ -91,6 +92,11 @@ describe("/posts", () => {
           userLogin: dbUser.login,
         },
         createdAt: expect.any(String),
+        likesInfo: {
+          dislikesCount: 0,
+          likesCount: 0,
+          myStatus: LikeStatuses.None,
+        },
       });
     });
 
@@ -161,6 +167,12 @@ describe("/posts", () => {
         blogId: blogDb.id,
         blogName: blogDb.name,
         createdAt: expect.any(String),
+        extendedLikesInfo: {
+          dislikesCount: 0,
+          likesCount: 0,
+          myStatus: LikeStatuses.None,
+          newestLikes: [],
+        },
       });
 
       const postsRes = await req
@@ -218,6 +230,12 @@ describe("/posts", () => {
         blogId: postDb.blogId,
         blogName: postDb.blogName,
         createdAt: expect.any(String),
+        extendedLikesInfo: {
+          dislikesCount: 0,
+          likesCount: 0,
+          myStatus: LikeStatuses.None,
+          newestLikes: [],
+        },
       });
     });
 
@@ -272,6 +290,12 @@ describe("/posts", () => {
         blogId: postDb.blogId,
         blogName: postDb.blogName,
         createdAt: expect.any(String),
+        extendedLikesInfo: {
+          dislikesCount: 0,
+          likesCount: 0,
+          myStatus: LikeStatuses.None,
+          newestLikes: [],
+        },
       });
     });
 

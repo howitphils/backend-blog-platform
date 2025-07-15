@@ -209,8 +209,6 @@ describe("/blogs", () => {
         .set(basicAuth)
         .send(newBlogDto);
 
-      console.log(res.body);
-
       expect(res.status).toBe(HttpStatuses.NotFound);
     });
 

@@ -5,7 +5,7 @@ import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { BlogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
 import { inject, injectable } from "inversify";
-import { BlogsModel } from "../db/mongodb/repositories/blogs-repository/blogs-entity";
+import { BlogEntity } from "../db/mongodb/repositories/blogs-repository/blogs-entity";
 
 @injectable()
 export class BlogsService {
@@ -14,16 +14,13 @@ export class BlogsService {
   ) {}
 
   async createNewBlog(blog: BlogInputModel): Promise<string> {
-    // const { description, name, websiteUrl } = blog;
+    const newBlog = BlogEntity.createNewBlog({
+      description: blog.description,
+      name: blog.name,
+      websiteUrl: blog.websiteUrl,
+    });
 
-    // const newBlog: BlogDbType = new Blog(name, description, websiteUrl);
-
-    const dbBlog = new BlogsModel(blog);
-
-    dbBlog.createdAt = new Date().toISOString();
-    dbBlog.isMembership = false;
-
-    return this.blogsRepository.save(dbBlog);
+    return this.blogsRepository.save(newBlog);
   }
 
   async getBlogById(id: string): Promise<WithId<BlogDbType>> {
@@ -49,9 +46,7 @@ export class BlogsService {
       );
     }
 
-    targetBlog.name = updatedBlog.name;
-    targetBlog.description = updatedBlog.description;
-    targetBlog.websiteUrl = updatedBlog.websiteUrl;
+    targetBlog.updateBlog(updatedBlog);
 
     await this.blogsRepository.save(targetBlog);
   }
