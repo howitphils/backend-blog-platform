@@ -405,4 +405,43 @@ describe("/posts", () => {
         .expect(HttpStatuses.NotFound);
     });
   });
+
+  describe("update post's like status", () => {
+    afterAll(async () => {
+      await clearCollections();
+    });
+
+    it("should update post's like status", async () => {
+      const userDto = createUserDto({});
+      const dbUser = await createNewUserInDb(userDto);
+      const postDb = await createPostInDbHelper();
+      const token = (await getTokenPair(userDto)).accessToken;
+
+      const res = await req
+        .put(APP_CONFIG.MAIN_PATHS.POSTS + `/${postDb.id}/like-status`)
+        .set(jwtAuth(token))
+        .send({ likeStatus: LikeStatuses.Like });
+
+      console.log(res.body);
+      expect(res.status).toBe(HttpStatuses.NoContent);
+
+      const updatedPostRes = await req
+        .get(APP_CONFIG.MAIN_PATHS.POSTS + `/${postDb.id}`)
+        .set(jwtAuth(token))
+        .expect(HttpStatuses.Success);
+
+      expect(updatedPostRes.body.extendedLikesInfo).toEqual({
+        dislikesCount: 0,
+        likesCount: 1,
+        myStatus: LikeStatuses.Like,
+        newestLikes: [
+          {
+            createdAt: expect.any(String),
+            userId: dbUser.id,
+            userLogin: dbUser.login,
+          },
+        ],
+      });
+    });
+  });
 });

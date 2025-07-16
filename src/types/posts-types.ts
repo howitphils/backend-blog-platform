@@ -9,9 +9,9 @@ export type PostInputModel = {
 };
 
 export type NewestLikeType = {
-  addedAt: string;
+  createdAt: string;
   userId: string;
-  login: string;
+  userLogin: string;
 };
 
 export type PostViewModel = {

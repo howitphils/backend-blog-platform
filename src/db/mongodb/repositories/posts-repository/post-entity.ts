@@ -59,11 +59,11 @@ export class PostEntity {
 }
 
 const NewestLikeSchema = new mongoose.Schema<NewestLikeType>({
-  addedAt: {
+  createdAt: {
     type: String,
     required: true,
   },
-  login: {
+  userLogin: {
     type: String,
     required: true,
   },
