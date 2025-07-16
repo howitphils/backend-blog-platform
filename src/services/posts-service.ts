@@ -155,9 +155,6 @@ export class PostsService {
         if (targetLike.status === LikeStatuses.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
           targetPost.likesCount -= 1;
-
-          targetPost.newestLikes =
-            await this.postLikesRepository.getNewestLikes(targetPost.id);
         } else if (targetLike.status === LikeStatuses.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
           targetPost.dislikesCount -= 1;
@@ -171,19 +168,12 @@ export class PostsService {
         }
         // Если текущий статус лайка - None, то просто добавляем лайк
         targetPost.likesCount += 1;
-
-        targetPost.newestLikes = await this.postLikesRepository.getNewestLikes(
-          targetPost.id
-        );
       }
 
       if (dto.likeStatus === LikeStatuses.Dislike) {
         if (targetLike.status === LikeStatuses.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
           targetPost.likesCount -= 1;
-
-          targetPost.newestLikes =
-            await this.postLikesRepository.getNewestLikes(targetPost.id);
         }
         // Если текущий статус лайка - None, то просто добавляем дизлайк
         targetPost.dislikesCount += 1;
@@ -194,6 +184,10 @@ export class PostsService {
       } else if (targetPost.dislikesCount < 0) {
         targetPost.dislikesCount = 0;
       }
+
+      targetPost.newestLikes = await this.postLikesRepository.getNewestLikes(
+        targetPost.id
+      );
 
       await this.postsRepository.save(targetPost);
 
