@@ -412,7 +412,10 @@ describe("/posts", () => {
     });
 
     it("should update post's like status", async () => {
-      const userDto = createUserDto({});
+      const userDto = createUserDto({
+        email: "user1@gmail.com",
+        login: "user1login",
+      });
       const dbUser = await createNewUserInDb(userDto);
       const postDb = await createPostInDbHelper();
       const token = (await getTokenPair(userDto)).accessToken;
@@ -436,12 +439,68 @@ describe("/posts", () => {
         myStatus: LikeStatuses.Like,
         newestLikes: [
           {
-            createdAt: expect.any(String),
+            addedAt: expect.any(String),
             userId: dbUser.id,
-            userLogin: dbUser.login,
+            login: dbUser.login,
           },
         ],
       });
     });
+
+    it("should return empty newestLikes array when like status is changed", async () => {
+      const userDto = createUserDto({});
+      await createNewUserInDb(userDto);
+      const postDb = await createPostInDbHelper();
+      const token = (await getTokenPair(userDto)).accessToken;
+
+      await req
+        .put(APP_CONFIG.MAIN_PATHS.POSTS + `/${postDb.id}/like-status`)
+        .set(jwtAuth(token))
+        .send({ likeStatus: LikeStatuses.Like })
+        .expect(HttpStatuses.NoContent);
+
+      await req
+        .put(APP_CONFIG.MAIN_PATHS.POSTS + `/${postDb.id}/like-status`)
+        .set(jwtAuth(token))
+        .send({ likeStatus: LikeStatuses.Dislike })
+        .expect(HttpStatuses.NoContent);
+
+      // await req
+      //   .put(APP_CONFIG.MAIN_PATHS.POSTS + `/${postDb.id}/like-status`)
+      //   .set(jwtAuth(token))
+      //   .send({ likeStatus: LikeStatuses.None })
+      //   .expect(HttpStatuses.NoContent);
+
+      const postLikeRes = await req
+        .get(APP_CONFIG.MAIN_PATHS.POSTS + `/${postDb.id}`)
+        .set(jwtAuth(token))
+        .expect(HttpStatuses.Success);
+
+      expect(postLikeRes.body).toEqual({
+        id: postDb.id,
+        title: postDb.title,
+        shortDescription: postDb.shortDescription,
+        content: postDb.content,
+        blogId: postDb.blogId,
+        blogName: postDb.blogName,
+        createdAt: expect.any(String),
+        extendedLikesInfo: {
+          dislikesCount: 1,
+          likesCount: 0,
+          myStatus: LikeStatuses.Dislike,
+          newestLikes: [],
+        },
+      });
+    });
+
+    // TODO:
+    // create 6 posts then
+    // like post 1 by user 1, user 2;
+    //   like post 2 by user 2, user 3;
+    //   dislike post 3 by user 1;
+    //   like post 4 by user 1, user 4, user 2, user 3;
+    //   like post 5 by user 2, dislike by user 3;
+    //   like post 6 by user 1, dislike by user 2.
+    //   Get the posts by user 1 after all likes
   });
 });

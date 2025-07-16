@@ -184,17 +184,16 @@ export class PostsService {
       } else if (targetPost.dislikesCount < 0) {
         targetPost.dislikesCount = 0;
       }
+      // Обновляем статус лайка
+      targetLike.status = dto.likeStatus;
+
+      await this.postLikesRepository.save(targetLike);
 
       targetPost.newestLikes = await this.postLikesRepository.getNewestLikes(
         targetPost.id
       );
 
       await this.postsRepository.save(targetPost);
-
-      // если статус лайка отличается от текущего, обновляем его
-      targetLike.status = dto.likeStatus;
-
-      await this.postLikesRepository.save(targetLike);
     }
   }
 }

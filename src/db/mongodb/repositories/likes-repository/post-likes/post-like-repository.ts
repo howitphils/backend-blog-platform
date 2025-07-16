@@ -28,11 +28,12 @@ export class PostLikesRepository {
     postId: string,
     limit: number = APP_CONFIG.NEWEST_LIKES_LIMIT
   ) {
-    return PostLikesModel.find({
+    const likes = await PostLikesModel.find({
       postId,
       status: LikeStatuses.Like,
     })
       .sort({ addedAt: -1 })
       .limit(limit);
+    return likes;
   }
 }
