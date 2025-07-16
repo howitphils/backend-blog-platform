@@ -32,7 +32,7 @@ export class PostsQueryRepository {
       .limit(pageSize);
 
     // Получаем число всех постов
-    const totalCount = await PostsModel.countDocuments();
+    const totalCount = await PostsModel.countDocuments(filter);
 
     let likesStatusesObj: LikesStatusesObjType = {};
 
