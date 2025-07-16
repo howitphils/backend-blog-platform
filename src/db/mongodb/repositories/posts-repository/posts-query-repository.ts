@@ -116,11 +116,10 @@ export class PostsQueryRepository {
   }
 
   _mapDbNewestLikeToView(dbLike: PostLikeDbDocument): NewestLikeType {
-    const { createdAt, userId, userLogin } = dbLike;
     return {
-      createdAt,
-      userLogin,
-      userId,
+      addedAt: dbLike.addedAt,
+      login: dbLike.login,
+      userId: dbLike.userId,
     };
   }
 }

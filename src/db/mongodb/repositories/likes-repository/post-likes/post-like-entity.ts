@@ -5,8 +5,8 @@ export class PostLike {
   status: LikeStatuses;
   postId: string;
   userId: string;
-  userLogin: string;
-  createdAt: string;
+  login: string;
+  addedAt: string;
 
   constructor(
     userId: string,
@@ -17,8 +17,8 @@ export class PostLike {
     this.userId = userId;
     this.postId = postId;
     this.status = status;
-    this.userLogin = userLogin;
-    this.createdAt = new Date().toISOString();
+    this.login = userLogin;
+    this.addedAt = new Date().toISOString();
   }
 }
 
@@ -36,11 +36,11 @@ const PostLikesSchema = new mongoose.Schema<PostLike>({
     type: String,
     required: true,
   },
-  createdAt: {
+  addedAt: {
     type: String,
     required: true,
   },
-  userLogin: {
+  login: {
     type: String,
     required: true,
   },

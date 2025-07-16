@@ -32,7 +32,7 @@ export class PostLikesRepository {
       postId,
       status: LikeStatuses.Like,
     })
-      .sort({ createdAt: -1 })
+      .sort({ addedAt: -1 })
       .limit(limit);
   }
 }
