@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { BlogModel } from "./repositories/blogs-repository/blog-entity";
 import { CommentsModel } from "./repositories/comments-repository/comments-entity";
 import { UserModel } from "./repositories/users-repository/user-entitty";
-import { SessionsModel } from "./repositories/sessions-repository/session-entity";
+import { SessionModel } from "./repositories/sessions-repository/session-entity";
 import { ApiCallsModel } from "./repositories/api-calls-repository/api-call-entity";
 import { PostModel } from "./repositories/posts-repository/post-entity";
 
@@ -21,6 +21,6 @@ export const clearCollections = async () => {
   await PostModel.deleteMany({});
   await UserModel.deleteMany({});
   await CommentsModel.deleteMany({});
-  await SessionsModel.deleteMany({});
+  await SessionModel.deleteMany({});
   await ApiCallsModel.deleteMany({});
 };

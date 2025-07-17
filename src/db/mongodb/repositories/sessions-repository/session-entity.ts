@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { SessionModelType } from "./session-entity-types";
 
-export class Session {
+export class SessionEntity {
   userId: string;
   deviceId: string;
   iat: number;
@@ -25,7 +26,7 @@ export class Session {
   }
 }
 
-const SessionsSchema = new mongoose.Schema<Session>({
+const SessionSchema = new mongoose.Schema<SessionEntity>({
   device_name: { type: String, required: true },
   deviceId: { type: String, required: true },
   exp: { type: Number, required: true },
@@ -34,11 +35,9 @@ const SessionsSchema = new mongoose.Schema<Session>({
   userId: { type: String, required: true },
 });
 
-type SessionsModel = mongoose.Model<Session>;
+SessionSchema.loadClass(SessionEntity);
 
-export type SessionDbDocument = mongoose.HydratedDocument<Session>;
-
-export const SessionsModel = mongoose.model<Session, SessionsModel>(
+export const SessionModel = mongoose.model<SessionEntity, SessionModelType>(
   "Session",
-  SessionsSchema
+  SessionSchema
 );

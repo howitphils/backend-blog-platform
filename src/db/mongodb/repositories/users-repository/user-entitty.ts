@@ -115,11 +115,8 @@ export class UserEntity {
       );
     }
 
-    this.emailConfirmation.confirmationCode = randomUUID();
-
-    this.emailConfirmation.expirationDate = add(new Date(), {
-      hours: 2,
-    });
+    this.emailConfirmation.confirmationCode = uuidService.createRandomCode();
+    this.emailConfirmation.expirationDate = dateFnsService.addToCurrentDate();
   }
 }
 

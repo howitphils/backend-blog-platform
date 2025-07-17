@@ -3,11 +3,11 @@ import {
   SessionDbType,
   SessionViewModel,
 } from "../../../../types/sessions-types";
-import { SessionsModel } from "./session-entity";
+import { SessionModel } from "./session-entity";
 
 export class SessionsQueryRepository {
   async getAllUsersSessions(userId: string): Promise<SessionViewModel[]> {
-    const sessions = await SessionsModel.find({ userId });
+    const sessions = await SessionModel.find({ userId });
 
     return sessions.map(this._mapFromDbToViewModel);
   }
