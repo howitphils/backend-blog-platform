@@ -1,22 +1,14 @@
-import { PostDbType } from "../../../../types/posts-types";
-import { PostDbDocument, PostsModelType } from "./post-entity";
+import { PostModel } from "./post-entity";
+import { PostDbDocumentType } from "./post-entity-types";
 
 export class PostsRepository {
-  async save(post: PostDbDocument) {
+  async save(post: PostDbDocumentType) {
     const result = await post.save();
     return result.id;
   }
 
-  async createNewPost(post: PostDbType): Promise<string> {
-    const dbPost = new PostsModel(post);
-
-    const createResult = await dbPost.save();
-
-    return createResult.id;
-  }
-
-  async getPostById(id: string): Promise<PostDbDocument | null> {
-    return PostsModel.findById(id);
+  async getPostById(id: string): Promise<PostDbDocumentType | null> {
+    return PostModel.findById(id);
   }
 
   // async updatePost(_id: ObjectId, post: PostInputModel): Promise<boolean> {

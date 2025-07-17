@@ -1,9 +1,7 @@
-import { injectable } from "inversify";
 import { v4 } from "uuid";
 
-@injectable()
-export class UuidService {
+export const uuidService = {
   createRandomCode() {
     return v4();
-  }
-}
+  },
+};

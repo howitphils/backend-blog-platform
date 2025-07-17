@@ -4,7 +4,8 @@ import {
   UserViewModel,
 } from "../../../../types/users-types";
 import { PaginationType } from "../../../../types/common-types";
-import { UserDbDocument, UserModel } from "./user-entitty";
+import { UserModel } from "./user-entitty";
+import { UserDbDocumentType } from "./user-entity-types";
 
 export class UsersQueryRepository {
   // Получение всех юзеров с учетом query параметров
@@ -75,7 +76,7 @@ export class UsersQueryRepository {
   }
 
   // Преобразование юзера из формата базы данных в формат, который ожидает клиент
-  _mapFromDbToViewModel(user: UserDbDocument): UserViewModel {
+  _mapFromDbToViewModel(user: UserDbDocumentType): UserViewModel {
     const { createdAt, email, login } = user.accountData;
     return {
       id: user.id,
@@ -85,7 +86,7 @@ export class UsersQueryRepository {
     };
   }
 
-  _createMeModel(user: UserDbDocument): MeModel {
+  _createMeModel(user: UserDbDocumentType): MeModel {
     return {
       userId: user.id,
       email: user.accountData.email,

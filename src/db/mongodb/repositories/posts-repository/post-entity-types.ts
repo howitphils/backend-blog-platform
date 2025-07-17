@@ -7,10 +7,10 @@ export type PostMethodsType = {
 };
 
 export type PostStaticsType = {
-  createNewBlog(dto: CreatePostDto): PostDbDocument;
+  createNewBlog(dto: CreatePostDto): PostDbDocumentType;
 };
 
-export type PostDbDocument = mongoose.HydratedDocument<
+export type PostDbDocumentType = mongoose.HydratedDocument<
   PostEntity,
   PostMethodsType
 >;

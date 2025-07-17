@@ -32,13 +32,16 @@ export class UsersService {
     );
 
     if (existingUser) {
-      const field =
+      const errorField =
         existingUser.accountData.email === email ? "email" : "login";
 
       throw new ErrorWithStatusCode(
         APP_CONFIG.ERROR_MESSAGES.USER_ALREADY_EXISTS,
         HttpStatuses.BadRequest,
-        createErrorsObject(field, `User with this ${field} already exists`)
+        createErrorsObject(
+          errorField,
+          `User with this ${errorField} already exists`
+        )
       );
     }
 

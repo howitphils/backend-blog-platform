@@ -7,10 +7,7 @@ import { HttpStatuses } from "../types/http-statuses";
 import { PostsRepository } from "../db/mongodb/repositories/posts-repository/posts-db-repository";
 import { BlogsService } from "./blogs-service";
 import { inject, injectable } from "inversify";
-import {
-  PostEntity,
-  PostDbDocument,
-} from "../db/mongodb/repositories/posts-repository/post-entity";
+import { PostEntity } from "../db/mongodb/repositories/posts-repository/post-entity";
 import { APP_CONFIG } from "../settings";
 import { PostLikesRepository } from "../db/mongodb/repositories/likes-repository/post-likes/post-like-repository";
 import {
@@ -19,6 +16,7 @@ import {
 } from "../db/mongodb/repositories/likes-repository/post-likes/post-like-entity";
 import { LikeStatuses } from "../types/common-types";
 import { UsersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
+import { PostDbDocumentType } from "../db/mongodb/repositories/posts-repository/post-entity-types";
 
 @injectable()
 export class PostsService {
@@ -59,7 +57,7 @@ export class PostsService {
     return this.postsRepository.save(dbPost);
   }
 
-  async getPostById(id: string): Promise<PostDbDocument> {
+  async getPostById(id: string): Promise<PostDbDocumentType> {
     const post = await this.postsRepository.getPostById(id);
 
     if (!post) {

@@ -1,9 +1,7 @@
 import { BlogsController } from "./routers/controllers/blogs-controller";
 import { BcryptService } from "./adapters/bcryptService";
-import { DateFnsService } from "./adapters/dateFnsService";
 import { JwtService } from "./adapters/jwtService";
 import { NodeMailerService } from "./adapters/nodemailer-service";
-import { UuidService } from "./adapters/uuIdService";
 import { ApiCallsRepository } from "./db/mongodb/repositories/api-calls-repository/apiCalls-repository";
 import { SessionRepository } from "./db/mongodb/repositories/sessions-repository/session-repository";
 import { UsersRepository } from "./db/mongodb/repositories/users-repository/users-db-repository";
@@ -117,10 +115,8 @@ export const container = new Container();
 
 // Регистрация Класса в контейнере
 // Adapters
-container.bind(DateFnsService).to(DateFnsService);
 container.bind(JwtService).to(JwtService);
 container.bind(NodeMailerService).to(NodeMailerService);
-container.bind(UuidService).to(UuidService);
 container.bind(EmailManager).to(EmailManager);
 container.bind(BcryptService).to(BcryptService);
 

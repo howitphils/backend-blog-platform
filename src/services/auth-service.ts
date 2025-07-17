@@ -9,16 +9,15 @@ import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { BcryptService } from "../adapters/bcryptService";
 import { createErrorsObject } from "../routers/controllers/utils";
-import { UuidService } from "../adapters/uuIdService";
 import { JwtPayloadRefresh, JwtService } from "../adapters/jwtService";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
 import { SessionDbType } from "../types/sessions-types";
 import { SessionRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
 import { APP_CONFIG } from "../settings";
 import { EmailManager } from "../managers/email-manager";
-import { DateFnsService } from "../adapters/dateFnsService";
 import { UsersService } from "./users-service";
 import { inject, injectable } from "inversify";
+import { uuidService } from "../adapters/uuIdService";
 
 @injectable()
 export class AuthService {
@@ -38,14 +37,8 @@ export class AuthService {
     @inject(JwtService)
     private jwtService: JwtService,
 
-    @inject(UuidService)
-    private uuIdService: UuidService,
-
     @inject(EmailManager)
-    private emailManager: EmailManager,
-
-    @inject(DateFnsService)
-    private dateFnsService: DateFnsService
+    private emailManager: EmailManager
   ) {}
 
   async loginUser(dto: UserInfoType): Promise<TokenPairType> {
@@ -75,7 +68,7 @@ export class AuthService {
       );
     }
 
-    const deviceId = this.uuIdService.createRandomCode();
+    const deviceId = uuidService.createRandomCode();
 
     const tokenPair = this.jwtService.createJwtPair(
       targetUser._id.toString(),
@@ -100,7 +93,7 @@ export class AuthService {
     return tokenPair;
   }
 
-  async logout(dto: RefreshTokensAndLogoutDto) {
+  async logout(dto: RefreshTokensAndLogoutDto): Promise<void> {
     const targetSession =
       await this.sessionsRepository.findByDeviceIdAndIssuedAt(
         dto.issuedAt,
@@ -163,8 +156,7 @@ export class AuthService {
         targetUser.emailConfirmation.confirmationCode
       )
       .catch((e) => {
-        console.log("registration");
-        console.log(e);
+        console.log("registration", e);
       });
   }
 
@@ -196,26 +188,19 @@ export class AuthService {
       );
     }
 
-    if (user.passwordRecovery.expirationDate < new Date()) {
-      throw new ErrorWithStatusCode(
-        APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_EXPIRED,
-        HttpStatuses.BadRequest
-      );
-    }
-
     const passHash = await this.bcryptService.createHash(newPassword);
 
-    user.accountData.passHash = passHash;
+    user.confirmPasswordRecovery(passHash);
 
     await this.usersRepository.save(user);
   }
 
   async confirmRegistration(confirmationCode: string): Promise<void> {
-    const targetUser = await this.usersRepository.getUserByConfirmationCode(
+    const user = await this.usersRepository.getUserByConfirmationCode(
       confirmationCode
     );
 
-    if (!targetUser) {
+    if (!user) {
       throw new ErrorWithStatusCode(
         APP_CONFIG.ERROR_MESSAGES.USER_NOT_FOUND,
         HttpStatuses.BadRequest,
@@ -226,31 +211,9 @@ export class AuthService {
       );
     }
 
-    if (targetUser.emailConfirmation.expirationDate < new Date()) {
-      throw new ErrorWithStatusCode(
-        APP_CONFIG.ERROR_MESSAGES.CONFIRMATION_CODE_EXPIRED,
-        HttpStatuses.BadRequest,
-        createErrorsObject(
-          APP_CONFIG.ERROR_FIELDS.CONFIRMATION_CODE,
-          APP_CONFIG.ERROR_MESSAGES.CONFIRMATION_CODE_EXPIRED
-        )
-      );
-    }
+    user.confirmRegistration();
 
-    if (targetUser.emailConfirmation.isConfirmed) {
-      throw new ErrorWithStatusCode(
-        APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED,
-        HttpStatuses.BadRequest,
-        createErrorsObject(
-          APP_CONFIG.ERROR_FIELDS.CONFIRMATION_CODE,
-          APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED
-        )
-      );
-    }
-
-    targetUser.emailConfirmation.isConfirmed = true;
-
-    await this.usersRepository.save(targetUser);
+    await this.usersRepository.save(user);
   }
 
   async resendConfirmationCode(email: string) {
@@ -267,22 +230,7 @@ export class AuthService {
       );
     }
 
-    if (user.emailConfirmation.isConfirmed) {
-      throw new ErrorWithStatusCode(
-        APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED,
-        HttpStatuses.BadRequest,
-        createErrorsObject(
-          APP_CONFIG.ERROR_FIELDS.EMAIL,
-          APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED
-        )
-      );
-    }
-
-    user.emailConfirmation.confirmationCode =
-      this.uuIdService.createRandomCode();
-
-    user.emailConfirmation.expirationDate =
-      this.dateFnsService.addToCurrentDate();
+    user.updateConfirmationCode();
 
     await this.usersRepository.save(user);
 

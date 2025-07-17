@@ -3,10 +3,9 @@ import { HttpStatuses } from "../types/http-statuses";
 import { APP_CONFIG } from "../settings";
 import { container } from "../composition-root";
 import { ApiCallsRepository } from "../db/mongodb/repositories/api-calls-repository/apiCalls-repository";
-import { DateFnsService } from "../adapters/dateFnsService";
+import { dateFnsService } from "../adapters/dateFnsService";
 
 const apiCallsRepository = container.get(ApiCallsRepository);
-const dateFnsService = container.get(DateFnsService);
 
 export const apiCallsGuard = async (
   req: Request,

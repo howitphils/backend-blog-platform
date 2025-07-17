@@ -8,11 +8,11 @@ import {
   LikeStatuses,
   PaginationType,
 } from "../../../../types/common-types";
-import { PostsModelType } from "./post-entity";
 import {
   PostLikeDbDocument,
   PostLikesModel,
 } from "../likes-repository/post-likes/post-like-entity";
+import { PostModel } from "./post-entity";
 
 export class PostsQueryRepository {
   // Получение всех постов с учетом query параметров
@@ -26,13 +26,13 @@ export class PostsQueryRepository {
     const filter = blogId ? { blogId } : {};
 
     // Получаем посты с учетом query параметров
-    const posts = await PostsModel.find(filter)
+    const posts = await PostModel.find(filter)
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
 
     // Получаем число всех постов
-    const totalCount = await PostsModel.countDocuments(filter);
+    const totalCount = await PostModel.countDocuments(filter);
 
     let likesStatusesObj: LikesStatusesObjType = {};
 
@@ -79,7 +79,7 @@ export class PostsQueryRepository {
 
   async getPostById(id: string, userId: string): Promise<PostViewModel | null> {
     // Получаем пост по id
-    const post = await PostsModel.findById(id);
+    const post = await PostModel.findById(id);
     // Если пост не найден, возвращаем null
     if (!post) {
       return null;

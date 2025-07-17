@@ -1,10 +1,11 @@
 import { BlogDbType, BlogInputModel } from "../../../../types/blogs-types";
 import { injectable } from "inversify";
-import { BlogDbDocument, BlogModel } from "./blog-entity";
+import { BlogModel } from "./blog-entity";
+import { BlogDbDocumentType } from "./blog-entity-type";
 
 @injectable()
 export class BlogsRepository {
-  async save(blog: BlogDbDocument): Promise<string> {
+  async save(blog: BlogDbDocumentType): Promise<string> {
     const result = await blog.save();
     return result.id;
   }
@@ -19,7 +20,7 @@ export class BlogsRepository {
   }
 
   // Получение блога по айди
-  async getBlogById(id: string): Promise<BlogDbDocument | null> {
+  async getBlogById(id: string): Promise<BlogDbDocumentType | null> {
     return BlogModel.findById(id);
   }
 

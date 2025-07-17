@@ -7,6 +7,12 @@ import {
   UserModelType,
 } from "./user-entity-types";
 import { CreateUserDtoType } from "../../../../types/users-types";
+import { ErrorWithStatusCode } from "../../../../middlewares/error-handler";
+import { HttpStatuses } from "../../../../types/http-statuses";
+import { APP_CONFIG } from "../../../../settings";
+import { createErrorsObject } from "../../../../routers/controllers/utils";
+import { dateFnsService } from "../../../../adapters/dateFnsService";
+import { uuidService } from "../../../../adapters/uuIdService";
 
 export class UserEntity {
   accountData: {
@@ -38,17 +44,13 @@ export class UserEntity {
       createdAt: new Date().toISOString(),
     };
     this.emailConfirmation = {
-      confirmationCode: randomUUID(),
-      expirationDate: add(new Date(), {
-        days: 2,
-      }),
+      confirmationCode: uuidService.createRandomCode(),
+      expirationDate: dateFnsService.addToCurrentDate(),
       isConfirmed: isAdmin,
     };
     this.passwordRecovery = {
-      recoveryCode: randomUUID(),
-      expirationDate: add(new Date(), {
-        days: 2,
-      }),
+      recoveryCode: uuidService.createRandomCode(),
+      expirationDate: dateFnsService.addToCurrentDate(),
     };
   }
 
@@ -56,6 +58,68 @@ export class UserEntity {
     return new UserModel(
       new UserEntity(dto.email, dto.login, dto.passHash, dto.isAdmin)
     );
+  }
+
+  confirmPasswordRecovery(newPasswordHash: string): void {
+    if (this.passwordRecovery.expirationDate < new Date()) {
+      throw new ErrorWithStatusCode(
+        APP_CONFIG.ERROR_MESSAGES.RECOVERY_CODE_IS_EXPIRED,
+        HttpStatuses.BadRequest
+      );
+    }
+
+    this.accountData.passHash = newPasswordHash;
+
+    this.passwordRecovery.recoveryCode = randomUUID();
+    this.passwordRecovery.expirationDate = add(new Date(), {
+      months: 1,
+      days: 2,
+    });
+  }
+
+  confirmRegistration(): void {
+    if (this.emailConfirmation.expirationDate < new Date()) {
+      throw new ErrorWithStatusCode(
+        APP_CONFIG.ERROR_MESSAGES.CONFIRMATION_CODE_EXPIRED,
+        HttpStatuses.BadRequest,
+        createErrorsObject(
+          APP_CONFIG.ERROR_FIELDS.CONFIRMATION_CODE,
+          APP_CONFIG.ERROR_MESSAGES.CONFIRMATION_CODE_EXPIRED
+        )
+      );
+    }
+
+    if (this.emailConfirmation.isConfirmed) {
+      throw new ErrorWithStatusCode(
+        APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED,
+        HttpStatuses.BadRequest,
+        createErrorsObject(
+          APP_CONFIG.ERROR_FIELDS.CONFIRMATION_CODE,
+          APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED
+        )
+      );
+    }
+
+    this.emailConfirmation.isConfirmed = true;
+  }
+
+  updateEmailConfirmationCode() {
+    if (this.emailConfirmation.isConfirmed) {
+      throw new ErrorWithStatusCode(
+        APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED,
+        HttpStatuses.BadRequest,
+        createErrorsObject(
+          APP_CONFIG.ERROR_FIELDS.EMAIL,
+          APP_CONFIG.ERROR_MESSAGES.EMAIL_ALREADY_CONFIRMED
+        )
+      );
+    }
+
+    this.emailConfirmation.confirmationCode = randomUUID();
+
+    this.emailConfirmation.expirationDate = add(new Date(), {
+      hours: 2,
+    });
   }
 }
 
