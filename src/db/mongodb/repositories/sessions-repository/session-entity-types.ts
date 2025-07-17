@@ -1,9 +1,13 @@
 import mongoose from "mongoose";
 import { SessionEntity } from "./session-entity";
 
-export type SessionMethodsType = {};
+export type SessionMethodsType = {
+  updateSessionIatAndExp(newIat: number, newExp: number): void;
+};
 
-export type SessionStaticsType = {};
+export type SessionStaticsType = {
+  createSession(): SessionDbDocumentType;
+};
 
 export type SessionDbDocumentType = mongoose.HydratedDocument<
   SessionEntity,

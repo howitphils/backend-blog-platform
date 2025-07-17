@@ -31,7 +31,7 @@ export class UserEntity {
     expirationDate: Date;
   };
 
-  constructor(
+  private constructor(
     email: string,
     login: string,
     passHash: string,

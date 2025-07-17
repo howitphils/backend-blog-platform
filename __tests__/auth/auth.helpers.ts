@@ -1,19 +1,15 @@
-import { container } from "./../../src/composition-root";
 import { WithId } from "mongodb";
 import { UserDbType } from "../../src/types/users-types";
 import { SessionDbType, SessionTestType } from "../../src/types/sessions-types";
-import { DateFnsService } from "../../src/adapters/dateFnsService";
-import { UuidService } from "../../src/adapters/uuIdService";
 import { UserModel } from "../../src/db/mongodb/repositories/users-repository/user-entitty";
-import { SessionsModel } from "../../src/db/mongodb/repositories/sessions-repository/session-entity";
 import {
   Comment,
   CommentsModel,
 } from "../../src/db/mongodb/repositories/comments-repository/comments-entity";
 import { CommentTestType } from "../../src/types/comments-types";
-
-const dateFnsService = container.get(DateFnsService);
-const uuIdService = container.get(UuidService);
+import { uuidService } from "../../src/adapters/uuIdService";
+import { dateFnsService } from "../../src/adapters/dateFnsService";
+import { SessionModel } from "../../src/db/mongodb/repositories/sessions-repository/session-entity";
 
 type RegisterUserPayloadType = {
   login: string;
@@ -88,14 +84,14 @@ export const testSeeder = {
         createdAt: new Date().toISOString(),
       },
       emailConfirmation: {
-        confirmationCode: confirmationCode ?? uuIdService.createRandomCode(),
+        confirmationCode: confirmationCode ?? uuidService.createRandomCode(),
         expirationDate: expirationDate ?? dateFnsService.addToCurrentDate(),
         isConfirmed: isConfirmed ?? false,
       },
       passwordRecovery: {
         expirationDate:
           recoveryCodeExpirationDate ?? dateFnsService.addToCurrentDate(),
-        recoveryCode: recoveryCode ?? uuIdService.createRandomCode(),
+        recoveryCode: recoveryCode ?? uuidService.createRandomCode(),
       },
     };
 
@@ -120,7 +116,7 @@ export const testSeeder = {
       device_name: device_name ?? "testDevice",
     };
 
-    const dbSession = new SessionsModel(newSession);
+    const dbSession = new SessionModel(newSession);
 
     await dbSession.save();
 

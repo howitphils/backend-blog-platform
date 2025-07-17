@@ -420,13 +420,11 @@ describe("/posts", () => {
       const postDb = await createPostInDbHelper();
       const token = (await getTokenPair(userDto)).accessToken;
 
-      const res = await req
+      await req
         .put(APP_CONFIG.MAIN_PATHS.POSTS + `/${postDb.id}/like-status`)
         .set(jwtAuth(token))
-        .send({ likeStatus: LikeStatuses.Like });
-
-      console.log(res.body);
-      expect(res.status).toBe(HttpStatuses.NoContent);
+        .send({ likeStatus: LikeStatuses.Like })
+        .expect(HttpStatuses.NoContent);
 
       const updatedPostRes = await req
         .get(APP_CONFIG.MAIN_PATHS.POSTS + `/${postDb.id}`)

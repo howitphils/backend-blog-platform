@@ -11,13 +11,13 @@ import { BcryptService } from "../adapters/bcryptService";
 import { createErrorsObject } from "../routers/controllers/utils";
 import { JwtPayloadRefresh, JwtService } from "../adapters/jwtService";
 import { ResultObject, ResultStatus } from "../types/resultObject-types";
-import { SessionDbType } from "../types/sessions-types";
 import { SessionRepository } from "../db/mongodb/repositories/sessions-repository/session-repository";
 import { APP_CONFIG } from "../settings";
 import { EmailManager } from "../managers/email-manager";
 import { UsersService } from "./users-service";
 import { inject, injectable } from "inversify";
 import { uuidService } from "../adapters/uuIdService";
+import { SessionEntity } from "../db/mongodb/repositories/sessions-repository/session-entity";
 
 @injectable()
 export class AuthService {
@@ -79,16 +79,16 @@ export class AuthService {
       tokenPair.refreshToken
     ) as JwtPayloadRefresh;
 
-    const newSession: SessionDbType = {
+    const newSession = SessionEntity.createSession({
+      device_name,
       deviceId,
-      userId,
       exp: exp as number,
       iat: iat as number,
-      device_name,
       ip,
-    };
+      userId,
+    });
 
-    await this.sessionsRepository.createSession(newSession);
+    await this.sessionsRepository.save(newSession);
 
     return tokenPair;
   }
@@ -114,7 +114,7 @@ export class AuthService {
       );
     }
 
-    await this.sessionsRepository.deleteSession(dto.userId, dto.deviceId);
+    await targetSession.deleteOne();
   }
 
   async refreshTokens(dto: RefreshTokensAndLogoutDto): Promise<TokenPairType> {
@@ -136,12 +136,7 @@ export class AuthService {
       tokenPair.refreshToken
     ) as JwtPayloadRefresh;
 
-    await this.sessionsRepository.updateSessionIatAndExp(
-      dto.userId,
-      dto.deviceId,
-      iat as number,
-      exp as number
-    );
+    session.updateSessionIatAndExp(iat as number, exp as number);
 
     return tokenPair;
   }
@@ -230,7 +225,7 @@ export class AuthService {
       );
     }
 
-    user.updateConfirmationCode();
+    user.updateEmailConfirmationCode();
 
     await this.usersRepository.save(user);
 

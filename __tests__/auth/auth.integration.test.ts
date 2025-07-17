@@ -8,10 +8,10 @@ import { UserDbType } from "../../src/types/users-types";
 import { NodeMailerService } from "../../src/adapters/nodemailer-service";
 import { AuthService } from "../../src/services/auth-service";
 import { container } from "../../src/composition-root";
-import { UuidService } from "../../src/adapters/uuIdService";
-import { DateFnsService } from "../../src/adapters/dateFnsService";
 import mongoose from "mongoose";
 import { UserModel } from "../../src/db/mongodb/repositories/users-repository/user-entitty";
+import { dateFnsService } from "../../src/adapters/dateFnsService";
+import { uuidService } from "../../src/adapters/uuIdService";
 
 describe("/auth", () => {
   beforeAll(async () => {
@@ -75,8 +75,6 @@ describe("/auth", () => {
     });
 
     const authService = container.get(AuthService);
-    const uuIdService = container.get(UuidService);
-    const dateFnsService = container.get(DateFnsService);
 
     const confirmEmailUseCase =
       authService.confirmRegistration.bind(authService);
@@ -98,7 +96,7 @@ describe("/auth", () => {
         email: "user2@gmail",
         login: "user2",
       });
-      const confirmationCode = uuIdService.createRandomCode();
+      const confirmationCode = uuidService.createRandomCode();
 
       await testSeeder.insertUser({
         email,
@@ -125,7 +123,7 @@ describe("/auth", () => {
         email: "user3",
         login: "user3",
       });
-      const confirmationCode = uuIdService.createRandomCode();
+      const confirmationCode = uuidService.createRandomCode();
 
       await testSeeder.insertUser({
         email,
@@ -151,7 +149,7 @@ describe("/auth", () => {
         email: "user4",
         login: "user4",
       });
-      const confirmationCode = uuIdService.createRandomCode();
+      const confirmationCode = uuidService.createRandomCode();
 
       const user = await testSeeder.insertUser({
         email,
@@ -249,10 +247,7 @@ describe("/auth", () => {
         login: "user3",
       });
 
-      const uuIdService = container.get(UuidService);
-      const dateFnsService = container.get(DateFnsService);
-
-      const startCode = uuIdService.createRandomCode();
+      const startCode = uuidService.createRandomCode();
       const startExpirationDate = dateFnsService.addToCurrentDate();
 
       const dbUser = await testSeeder.insertUser({
@@ -379,8 +374,6 @@ describe("/auth", () => {
     });
 
     it("should return an error if recovery code has been expired", async () => {
-      const dateFnsService = container.get(DateFnsService);
-
       const { email, login, pass } = testSeeder.createUserDto({
         email: "new_email@mail.com",
         login: "uniqueLogin",

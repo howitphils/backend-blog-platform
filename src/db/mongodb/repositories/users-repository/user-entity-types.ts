@@ -5,7 +5,7 @@ import { UserInputModel } from "../../../../types/users-types";
 export type UserMethodsType = {
   confirmPasswordRecovery(newPasswordHash: string): void;
   confirmRegistration(): void;
-  updateConfirmationCode(): void;
+  updateEmailConfirmationCode(): void;
 };
 
 export type UserStaticsType = {

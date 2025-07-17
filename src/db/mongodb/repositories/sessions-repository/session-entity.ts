@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
-import { SessionModelType } from "./session-entity-types";
+import {
+  SessionDbDocumentType,
+  SessionMethodsType,
+  SessionModelType,
+} from "./session-entity-types";
+import { SessionDbType } from "../../../../types/sessions-types";
 
 export class SessionEntity {
   userId: string;
@@ -9,7 +14,7 @@ export class SessionEntity {
   ip: string;
   device_name: string;
 
-  constructor(
+  private constructor(
     userId: string,
     deviceId: string,
     iat: number,
@@ -24,9 +29,31 @@ export class SessionEntity {
     this.ip = ip;
     this.device_name = deviceName;
   }
+
+  static createSession(dto: SessionDbType): SessionDbDocumentType {
+    return new SessionModel(
+      new SessionEntity(
+        dto.userId,
+        dto.deviceId,
+        dto.iat,
+        dto.exp,
+        dto.ip,
+        dto.device_name
+      )
+    );
+  }
+
+  updateSessionIatAndExp(newIat: number, newExp: number) {
+    this.iat = newIat;
+    this.exp = newExp;
+  }
 }
 
-const SessionSchema = new mongoose.Schema<SessionEntity>({
+const SessionSchema = new mongoose.Schema<
+  SessionEntity,
+  SessionModelType,
+  SessionMethodsType
+>({
   device_name: { type: String, required: true },
   deviceId: { type: String, required: true },
   exp: { type: Number, required: true },

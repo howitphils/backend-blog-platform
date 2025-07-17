@@ -1,7 +1,13 @@
 import { SessionDbType } from "../../../../types/sessions-types";
 import { SessionModel } from "./session-entity";
+import { SessionDbDocumentType } from "./session-entity-types";
 
 export class SessionRepository {
+  async save(session: SessionDbDocumentType) {
+    const result = await session.save();
+    return await result.id;
+  }
+
   async createSession(session: SessionDbType) {
     const insertedId = await SessionModel.insertOne(session);
     return insertedId;
@@ -29,20 +35,20 @@ export class SessionRepository {
     return SessionModel.findOne({ deviceId });
   }
 
-  async updateSessionIatAndExp(
-    userId: string,
-    deviceId: string,
-    newIat: number,
-    newExp: number
-  ) {
-    // TODO: fix types
-    const updateResult = await SessionModel.updateOne(
-      { $and: [{ userId }, { deviceId }] },
-      { $set: { iat: newIat, exp: newExp } }
-    );
+  // async updateSessionIatAndExp(
+  //   userId: string,
+  //   deviceId: string,
+  //   newIat: number,
+  //   newExp: number
+  // ) {
+  //   // TODO: fix types
+  //   const updateResult = await SessionModel.updateOne(
+  //     { $and: [{ userId }, { deviceId }] },
+  //     { $set: { iat: newIat, exp: newExp } }
+  //   );
 
-    return updateResult.matchedCount === 1;
-  }
+  //   return updateResult.matchedCount === 1;
+  // }
 
   async findAllUsersSessions(userId: string): Promise<SessionDbType[]> {
     return SessionModel.find({ userId });
