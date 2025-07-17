@@ -8,7 +8,7 @@ import {
   LikeStatuses,
   PaginationType,
 } from "../../../../types/common-types";
-import { PostsModel } from "./post-entity";
+import { PostsModelType } from "./post-entity";
 import {
   PostLikeDbDocument,
   PostLikesModel,

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { PostsModel } from "./repositories/posts-repository/post-entity";
-import { BlogsModel } from "./repositories/blogs-repository/blogs-entity";
+import { PostsModelType } from "./repositories/posts-repository/post-entity";
+import { BlogModel } from "./repositories/blogs-repository/blog-entity";
 import { CommentsModel } from "./repositories/comments-repository/comments-entity";
 import { UserModel } from "./repositories/users-repository/user-entitty";
 import { SessionsModel } from "./repositories/sessions-repository/session-entity";
@@ -17,7 +17,7 @@ export const runDb = async (url: string, dbName: string | undefined) => {
 };
 
 export const clearCollections = async () => {
-  await BlogsModel.deleteMany({});
+  await BlogModel.deleteMany({});
   await PostsModel.deleteMany({});
   await UserModel.deleteMany({});
   await CommentsModel.deleteMany({});

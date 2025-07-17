@@ -5,7 +5,7 @@ import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { BlogsRepository } from "../db/mongodb/repositories/blogs-repository/blogs-db-repository";
 import { inject, injectable } from "inversify";
-import { BlogEntity } from "../db/mongodb/repositories/blogs-repository/blogs-entity";
+import { BlogEntity } from "../db/mongodb/repositories/blogs-repository/blog-entity";
 
 @injectable()
 export class BlogsService {

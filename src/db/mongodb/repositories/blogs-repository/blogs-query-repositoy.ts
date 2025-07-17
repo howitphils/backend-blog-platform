@@ -5,7 +5,7 @@ import {
 import { WithId } from "mongodb";
 import { BlogDbType } from "../../../../types/blogs-types";
 import { PaginationType } from "../../../../types/common-types";
-import { BlogsModel } from "./blogs-entity";
+import { BlogModel } from "./blog-entity";
 
 export class BlogsQueryRepository {
   async getAllBlogs(
@@ -15,7 +15,7 @@ export class BlogsQueryRepository {
       filters;
 
     // Поиск блогов с учетом фильтров
-    const blogs = await BlogsModel.find(
+    const blogs = await BlogModel.find(
       searchNameTerm ? { name: { $regex: searchNameTerm, $options: "i" } } : {}
     )
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
@@ -24,7 +24,7 @@ export class BlogsQueryRepository {
       .lean();
 
     // Подсчет общего количества блогов
-    const totalCount = await BlogsModel.countDocuments(
+    const totalCount = await BlogModel.countDocuments(
       searchNameTerm
         ? {
             name: { $regex: searchNameTerm, $options: "i" },
@@ -42,7 +42,7 @@ export class BlogsQueryRepository {
   }
 
   async getBlogById(id: string): Promise<BlogViewModel | null> {
-    const targetBlog = await BlogsModel.findById(id);
+    const targetBlog = await BlogModel.findById(id);
     if (targetBlog) {
       return this._mapFromDbToViewModel(targetBlog);
     } else {

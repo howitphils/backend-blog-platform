@@ -1,5 +1,5 @@
 import { PostDbType } from "../../../../types/posts-types";
-import { PostDbDocument, PostsModel } from "./post-entity";
+import { PostDbDocument, PostsModelType } from "./post-entity";
 
 export class PostsRepository {
   async save(post: PostDbDocument) {

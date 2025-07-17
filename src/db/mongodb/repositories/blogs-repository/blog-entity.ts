@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
 import { BlogInputModel } from "../../../../types/blogs-types";
+import {
+  BlogDbDocumentType,
+  BlogMethodsType,
+  BlogModelType,
+} from "./blog-entity-type";
 
 export class BlogEntity {
   name: string;
@@ -16,11 +21,10 @@ export class BlogEntity {
     this.isMembership = false;
   }
 
-  static createNewBlog(dto: BlogInputModel): BlogDbDocument {
-    const newBlog = new BlogEntity(dto.name, dto.description, dto.websiteUrl);
-    const newDbBlog = new BlogsModel(newBlog);
-
-    return newDbBlog;
+  static createNewBlog(dto: BlogInputModel): BlogDbDocumentType {
+    return new BlogModel(
+      new BlogEntity(dto.name, dto.description, dto.websiteUrl)
+    );
   }
 
   updateBlog(dto: BlogInputModel): BlogEntity {
@@ -32,28 +36,28 @@ export class BlogEntity {
   }
 }
 
-interface BlogMethods {
-  updateBlog(dto: BlogInputModel): BlogEntity;
-}
-
-interface BlogStatics {
-  createNewBlog(dto: BlogInputModel): BlogDbDocument;
-}
-
-type BlogsModel = mongoose.Model<BlogEntity, {}, BlogMethods> & BlogStatics;
-
-const BlogsSchema = new mongoose.Schema<BlogEntity, BlogsModel, BlogMethods>({
+const BlogSchema = new mongoose.Schema<
+  BlogEntity,
+  BlogModelType,
+  BlogMethodsType
+>({
   name: {
     type: String,
     required: true,
+    maxlength: 50,
+    minlength: 1,
   },
   description: {
     type: String,
     required: true,
+    maxlength: 500,
+    minlength: 1,
   },
   websiteUrl: {
     type: String,
     required: true,
+    maxlength: 100,
+    minlength: 1,
   },
   createdAt: {
     type: String,
@@ -65,12 +69,10 @@ const BlogsSchema = new mongoose.Schema<BlogEntity, BlogsModel, BlogMethods>({
   },
 });
 
-export type BlogDbDocument = mongoose.HydratedDocument<BlogEntity, BlogMethods>;
+// Заменяет собой присвоение значений BlogsSchema.statics и BlogsSchema.methods и берет их автоматически из класса (не нужно описывать сами методы вручную)
+BlogSchema.loadClass(BlogEntity);
 
-// Заменяет собой присвоение значений BlogsSchema.statics и BlogsSchema.methods и берет их автоматически из класса (не нужно описывать методы вручную)
-BlogsSchema.loadClass(BlogEntity);
-
-export const BlogsModel = mongoose.model<BlogEntity, BlogsModel>(
+export const BlogModel = mongoose.model<BlogEntity, BlogModelType>(
   "Blog",
-  BlogsSchema
+  BlogSchema
 );

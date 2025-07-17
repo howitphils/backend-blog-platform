@@ -5,12 +5,13 @@ import {
   NewestLikeType,
   PostInputModel,
 } from "../../../../types/posts-types";
+import { PostMethodsType, PostModelType } from "./post-entity-types";
 
 export class PostEntity {
-  title: string; // max 30
-  shortDescription: string; // max 100
-  content: string; // max 1000
-  blogId: string; // valid
+  title: string;
+  shortDescription: string;
+  content: string;
+  blogId: string;
   blogName: string;
   createdAt: string;
   likesCount: number;
@@ -36,17 +37,15 @@ export class PostEntity {
   }
 
   static createPost(dto: CreatePostDto) {
-    const newPost = new PostEntity(
-      dto.title,
-      dto.shortDescription,
-      dto.content,
-      dto.blogId,
-      dto.blogName
+    return new PostModel(
+      new PostEntity(
+        dto.title,
+        dto.shortDescription,
+        dto.content,
+        dto.blogId,
+        dto.blogName
+      )
     );
-
-    const newDbPost = new PostsModel(newPost);
-
-    return newDbPost;
   }
 
   updatePost(dto: PostInputModel): PostEntity {
@@ -73,21 +72,28 @@ const NewestLikeSchema = new mongoose.Schema<NewestLikeType>({
   },
 });
 
-const PostsSchema = new mongoose.Schema<PostEntity, PostsModel>({
+const PostSchema = new mongoose.Schema<
+  PostEntity,
+  PostModelType,
+  PostMethodsType
+>({
   title: {
     type: String,
     required: true,
     maxlength: 100,
+    minlength: 1,
   },
   shortDescription: {
     type: String,
     required: true,
     maxlength: 100,
+    minlength: 1,
   },
   content: {
     type: String,
     required: true,
     maxlength: 1000,
+    minlength: 1,
   },
   blogId: {
     type: String,
@@ -96,6 +102,8 @@ const PostsSchema = new mongoose.Schema<PostEntity, PostsModel>({
   blogName: {
     type: String,
     required: true,
+    maxlength: 50,
+    minlength: 1,
   },
   createdAt: {
     type: String,
@@ -109,24 +117,12 @@ const PostsSchema = new mongoose.Schema<PostEntity, PostsModel>({
     type: Number,
     required: true,
   },
-  newestLikes: { type: [NewestLikeSchema] },
+  newestLikes: [NewestLikeSchema],
 });
 
-interface PostMethods {
-  updatePost(dto: PostInputModel): PostEntity;
-}
+PostSchema.loadClass(PostEntity);
 
-interface PostStatics {
-  createNewBlog(dto: CreatePostDto): PostDbDocument;
-}
-
-type PostsModel = mongoose.Model<PostEntity, {}, PostMethods> & PostStatics;
-
-export type PostDbDocument = mongoose.HydratedDocument<PostEntity, PostMethods>;
-
-PostsSchema.loadClass(PostEntity);
-
-export const PostsModel = mongoose.model<PostEntity, PostsModel>(
+export const PostModel = mongoose.model<PostEntity, PostModelType>(
   "Post",
-  PostsSchema
+  PostSchema
 );
