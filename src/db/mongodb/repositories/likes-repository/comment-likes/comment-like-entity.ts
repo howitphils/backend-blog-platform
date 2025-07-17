@@ -1,21 +1,33 @@
 import mongoose from "mongoose";
 import { LikeStatuses } from "../../../../../types/common-types";
+import { CommentLikeModelType } from "./comment-entity-types";
+import { CommentLikeDto } from "../../../../../types/comments-types";
 
-export class CommentLike {
+export class CommentLikeEntity {
   status: LikeStatuses;
   commentId: string;
   userId: string;
   createdAt: string;
 
-  constructor(userId: string, commentId: string, status: LikeStatuses) {
+  private constructor(userId: string, commentId: string, status: LikeStatuses) {
     this.userId = userId;
     this.commentId = commentId;
     this.status = status;
     this.createdAt = new Date().toISOString();
   }
+
+  static createCommentLike(dto: CommentLikeDto) {
+    return new CommentLikeModel(
+      new CommentLikeEntity(dto.userId, dto.commentId, dto.likeStatus)
+    );
+  }
+
+  updateStatus(newStatus: LikeStatuses) {
+    this.status = newStatus;
+  }
 }
 
-const CommentLikesSchema = new mongoose.Schema<CommentLike>({
+const CommentLikeSchema = new mongoose.Schema<CommentLikeEntity>({
   status: {
     type: String,
     required: true,
@@ -35,11 +47,9 @@ const CommentLikesSchema = new mongoose.Schema<CommentLike>({
   },
 });
 
-type CommentLikesModel = mongoose.Model<CommentLike>;
+CommentLikeSchema.loadClass(CommentLikeEntity);
 
-export type CommentLikeDbDocument = mongoose.HydratedDocument<CommentLike>;
-
-export const CommentLikesModel = mongoose.model<CommentLike, CommentLikesModel>(
-  "CommentLikes",
-  CommentLikesSchema
-);
+export const CommentLikeModel = mongoose.model<
+  CommentLikeEntity,
+  CommentLikeModelType
+>("CommentLikes", CommentLikeSchema);

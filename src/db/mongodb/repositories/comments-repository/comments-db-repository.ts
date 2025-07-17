@@ -1,13 +1,14 @@
-import { CommentDbDocument, CommentsModel } from "./comments-entity";
+import { CommentModel } from "./comment-entity";
+import { CommentDbDocumentType } from "./comment-entity-types";
 
 export class CommentsRepository {
-  async save(comment: CommentDbDocument) {
+  async save(comment: CommentDbDocumentType) {
     const result = await comment.save();
     return result.id;
   }
 
-  async getCommentById(id: string): Promise<CommentDbDocument | null> {
-    return CommentsModel.findById(id);
+  async getCommentById(id: string): Promise<CommentDbDocumentType | null> {
+    return CommentModel.findById(id);
   }
 
   // async createComment(comment: CommentDbType): Promise<ObjectId> {

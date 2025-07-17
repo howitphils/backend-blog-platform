@@ -8,11 +8,9 @@ import {
   LikeStatuses,
   PaginationType,
 } from "../../../../types/common-types";
-import {
-  PostLikeDbDocument,
-  PostLikesModel,
-} from "../likes-repository/post-likes/post-like-entity";
 import { PostModel } from "./post-entity";
+import { PostLikeModel } from "../likes-repository/post-likes/post-like-entity";
+import { PostLikeDbDocumentType } from "../likes-repository/post-likes/post-like-entity-types";
 
 export class PostsQueryRepository {
   // Получение всех постов с учетом query параметров
@@ -40,7 +38,7 @@ export class PostsQueryRepository {
       const postsIds = posts.map((post) => post.id);
 
       // Получаем лайки юзера для найденных постов
-      const likes = await PostLikesModel.find({
+      const likes = await PostLikeModel.find({
         postId: { $in: postsIds },
         userId,
       }).lean();
@@ -85,11 +83,11 @@ export class PostsQueryRepository {
       return null;
     }
 
-    let postLike: PostLikeDbDocument | null = null;
+    let postLike: PostLikeDbDocumentType | null = null;
 
     // Получаем лайк для поста конкретного юзера
     if (userId) {
-      postLike = await PostLikesModel.findOne({
+      postLike = await PostLikeModel.findOne({
         postId: post.id,
         userId,
       });
@@ -115,7 +113,7 @@ export class PostsQueryRepository {
     };
   }
 
-  _mapDbNewestLikeToView(dbLike: PostLikeDbDocument): NewestLikeType {
+  _mapDbNewestLikeToView(dbLike: PostLikeDbDocumentType): NewestLikeType {
     return {
       addedAt: dbLike.addedAt,
       login: dbLike.login,

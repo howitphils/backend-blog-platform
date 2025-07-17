@@ -2,14 +2,11 @@ import { WithId } from "mongodb";
 import { UserDbType } from "../../src/types/users-types";
 import { SessionDbType, SessionTestType } from "../../src/types/sessions-types";
 import { UserModel } from "../../src/db/mongodb/repositories/users-repository/user-entitty";
-import {
-  Comment,
-  CommentsModel,
-} from "../../src/db/mongodb/repositories/comments-repository/comments-entity";
-import { CommentTestType } from "../../src/types/comments-types";
+import { CommentDbType, CommentTestType } from "../../src/types/comments-types";
 import { uuidService } from "../../src/adapters/uuIdService";
 import { dateFnsService } from "../../src/adapters/dateFnsService";
 import { SessionModel } from "../../src/db/mongodb/repositories/sessions-repository/session-entity";
+import { CommentModel } from "../../src/db/mongodb/repositories/comments-repository/comment-entity";
 
 type RegisterUserPayloadType = {
   login: string;
@@ -126,7 +123,7 @@ export const testSeeder = {
   async insertComment(comment: CommentTestType) {
     const { postId, content, commentatorInfo } = comment;
 
-    const newComment: Comment = {
+    const newComment: CommentDbType = {
       postId: postId || "testPostId",
       content: content || "Test comment content",
       createdAt: new Date().toISOString(),
@@ -138,7 +135,7 @@ export const testSeeder = {
       dislikesCount: 0,
     };
 
-    const dbComment = new CommentsModel(newComment);
+    const dbComment = new CommentModel(newComment);
 
     await dbComment.save();
 

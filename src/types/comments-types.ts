@@ -28,6 +28,8 @@ export type CommentDbType = {
   commentatorInfo: CommentatorInfo;
   createdAt: string;
   postId: string;
+  likesCount: number;
+  dislikesCount: number;
 };
 
 export type CommentsRequestQueryType = {
@@ -75,4 +77,11 @@ export type CommentTestType = {
   postId?: string;
   content?: string;
   commentatorInfo?: CommentatorInfo;
+};
+
+export type CreateDbCommentDto = {
+  userId: string;
+  postId: string;
+  content: string;
+  userLogin: string;
 };

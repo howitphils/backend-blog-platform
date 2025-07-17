@@ -138,6 +138,8 @@ export class AuthService {
 
     session.updateSessionIatAndExp(iat as number, exp as number);
 
+    await this.sessionsRepository.save(session);
+
     return tokenPair;
   }
 

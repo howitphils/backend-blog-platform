@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
-import { PostLikeDbDocument } from "../likes-repository/post-likes/post-like-entity";
 import {
   CreatePostDto,
   NewestLikeType,
   PostInputModel,
 } from "../../../../types/posts-types";
 import { PostMethodsType, PostModelType } from "./post-entity-types";
+import { PostLikeDbDocumentType } from "../likes-repository/post-likes/post-like-entity-types";
 
 export class PostEntity {
   title: string;
@@ -16,7 +16,7 @@ export class PostEntity {
   createdAt: string;
   likesCount: number;
   dislikesCount: number;
-  newestLikes: PostLikeDbDocument[];
+  newestLikes: PostLikeDbDocumentType[];
 
   private constructor(
     title: string,
@@ -54,6 +54,30 @@ export class PostEntity {
     this.shortDescription = dto.shortDescription;
 
     return this;
+  }
+
+  increaseLikesCount() {
+    this.likesCount += 1;
+  }
+  decreaseLikesCount() {
+    this.likesCount -= 1;
+  }
+  increaseDislikesCount() {
+    this.dislikesCount += 1;
+  }
+  decreaseDislikesCount() {
+    this.dislikesCount -= 1;
+  }
+
+  resetDislikesCount() {
+    this.dislikesCount = 0;
+  }
+  resetLikesCount() {
+    this.likesCount = 0;
+  }
+
+  updateNewestLikes(newestLikes: PostLikeDbDocumentType[]) {
+    this.newestLikes = newestLikes;
   }
 }
 

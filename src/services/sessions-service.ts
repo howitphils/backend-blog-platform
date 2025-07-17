@@ -41,6 +41,6 @@ export class SessionService {
       throw new ErrorWithStatusCode("Forbidden action", HttpStatuses.Forbidden);
     }
 
-    this.sessionsRepository.deleteSession(userId, deviceId);
+    await targetSession.deleteOne();
   }
 }

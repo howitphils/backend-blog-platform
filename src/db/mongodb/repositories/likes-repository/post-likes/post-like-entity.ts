@@ -1,14 +1,16 @@
 import mongoose from "mongoose";
 import { LikeStatuses } from "../../../../../types/common-types";
+import { PostLikeModelType } from "./post-like-entity-types";
+import { CreatePostLikeDto } from "../../../../../types/posts-types";
 
-export class PostLike {
+export class PostLikeEntity {
   status: LikeStatuses;
   postId: string;
   userId: string;
   login: string;
   addedAt: string;
 
-  constructor(
+  private constructor(
     userId: string,
     postId: string,
     status: LikeStatuses,
@@ -20,9 +22,19 @@ export class PostLike {
     this.login = userLogin;
     this.addedAt = new Date().toISOString();
   }
+
+  static createPostLike(dto: CreatePostLikeDto) {
+    return new PostLikeModel(
+      new PostLikeEntity(dto.userId, dto.postId, dto.likeStatus, dto.login)
+    );
+  }
+
+  updateStatus(newStatus: LikeStatuses) {
+    this.status = newStatus;
+  }
 }
 
-const PostLikesSchema = new mongoose.Schema<PostLike>({
+const PostLikeSchema = new mongoose.Schema<PostLikeEntity>({
   status: {
     type: String,
     required: true,
@@ -46,11 +58,9 @@ const PostLikesSchema = new mongoose.Schema<PostLike>({
   },
 });
 
-type PostLikesModel = mongoose.Model<PostLike>;
+PostLikeSchema.loadClass(PostLikeEntity);
 
-export type PostLikeDbDocument = mongoose.HydratedDocument<PostLike>;
-
-export const PostLikesModel = mongoose.model<PostLike, PostLikesModel>(
-  "PostLikes",
-  PostLikesSchema
+export const PostLikeModel = mongoose.model<PostLikeEntity, PostLikeModelType>(
+  "PostLike",
+  PostLikeSchema
 );

@@ -10,10 +10,7 @@ import { inject, injectable } from "inversify";
 import { PostEntity } from "../db/mongodb/repositories/posts-repository/post-entity";
 import { APP_CONFIG } from "../settings";
 import { PostLikesRepository } from "../db/mongodb/repositories/likes-repository/post-likes/post-like-repository";
-import {
-  PostLike,
-  PostLikesModel,
-} from "../db/mongodb/repositories/likes-repository/post-likes/post-like-entity";
+import { PostLikeEntity } from "../db/mongodb/repositories/likes-repository/post-likes/post-like-entity";
 import { LikeStatuses } from "../types/common-types";
 import { UsersRepository } from "../db/mongodb/repositories/users-repository/users-db-repository";
 import { PostDbDocumentType } from "../db/mongodb/repositories/posts-repository/post-entity-types";
@@ -120,28 +117,29 @@ export class PostsService {
         throw new Error("User not found in update post like");
       }
 
-      const newLike = new PostLike(
-        dto.userId,
-        dto.postId,
-        dto.likeStatus,
-        currentUser.accountData.login
-      );
+      const newLike = PostLikeEntity.createPostLike({
+        userId: dto.userId,
+        postId: dto.postId,
+        likeStatus: dto.likeStatus,
+        login: currentUser.accountData.login,
+      });
 
-      const dbLike = new PostLikesModel(newLike);
+      if (dto.likeStatus === LikeStatuses.Like) {
+        targetPost.increaseLikesCount();
 
-      await this.postLikesRepository.save(dbLike);
-
-      if (dto.likeStatus === "Like") {
-        targetPost.likesCount += 1;
-
-        targetPost.newestLikes = await this.postLikesRepository.getNewestLikes(
+        const newestLikes = await this.postLikesRepository.getNewestLikes(
           targetPost.id
         );
-      } else if (dto.likeStatus === "Dislike") {
-        targetPost.dislikesCount += 1;
+
+        targetPost.updateNewestLikes(newestLikes);
+      } else if (dto.likeStatus === LikeStatuses.Dislike) {
+        targetPost.increaseDislikesCount();
       }
 
-      await this.postsRepository.save(targetPost);
+      Promise.all([
+        await this.postLikesRepository.save(newLike),
+        await this.postsRepository.save(targetPost),
+      ]);
 
       return;
     }
@@ -152,44 +150,45 @@ export class PostsService {
       if (dto.likeStatus === LikeStatuses.None) {
         if (targetLike.status === LikeStatuses.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
-          targetPost.likesCount -= 1;
+          targetPost.decreaseLikesCount();
         } else if (targetLike.status === LikeStatuses.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
-          targetPost.dislikesCount -= 1;
+          targetPost.decreaseDislikesCount();
         }
       }
 
       if (dto.likeStatus === LikeStatuses.Like) {
         if (targetLike.status === LikeStatuses.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
-          targetPost.dislikesCount -= 1;
+          targetPost.decreaseDislikesCount();
         }
         // Если текущий статус лайка - None, то просто добавляем лайк
-        targetPost.likesCount += 1;
+        targetPost.increaseLikesCount();
       }
 
       if (dto.likeStatus === LikeStatuses.Dislike) {
         if (targetLike.status === LikeStatuses.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
-          targetPost.likesCount -= 1;
+          targetPost.decreaseLikesCount();
         }
         // Если текущий статус лайка - None, то просто добавляем дизлайк
-        targetPost.dislikesCount += 1;
+        targetPost.increaseDislikesCount();
       }
 
       if (targetPost.likesCount < 0) {
-        targetPost.likesCount = 0;
+        targetPost.resetLikesCount();
       } else if (targetPost.dislikesCount < 0) {
-        targetPost.dislikesCount = 0;
+        targetPost.resetDislikesCount();
       }
       // Обновляем статус лайка
-      targetLike.status = dto.likeStatus;
+      targetLike.updateStatus(dto.likeStatus);
 
       await this.postLikesRepository.save(targetLike);
 
-      targetPost.newestLikes = await this.postLikesRepository.getNewestLikes(
+      const newestLikes = await this.postLikesRepository.getNewestLikes(
         targetPost.id
       );
+      targetPost.updateNewestLikes(newestLikes);
 
       await this.postsRepository.save(targetPost);
     }

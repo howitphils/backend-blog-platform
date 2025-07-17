@@ -7,11 +7,10 @@ import {
   LikeStatuses,
   PaginationType,
 } from "../../../../types/common-types";
-import {
-  CommentLikeDbDocument,
-  CommentLikesModel,
-} from "../likes-repository/comment-likes/comment-like-entity";
-import { CommentsModel } from "./comments-entity";
+import { CommentLikeDbDocumentType } from "../likes-repository/comment-likes/comment-entity-types";
+import { CommentLikeModel } from "../likes-repository/comment-likes/comment-like-entity";
+
+import { CommentModel } from "./comment-entity";
 
 export class CommentsQueryRepository {
   // Получение всех комментариев с учетом query параметров
@@ -23,13 +22,13 @@ export class CommentsQueryRepository {
     const { pageNumber, pageSize, sortBy, sortDirection } = filters;
 
     // Получаем комментарии с учетом query параметров
-    const comments = await CommentsModel.find({ postId })
+    const comments = await CommentModel.find({ postId })
       .sort({ [sortBy]: sortDirection === "desc" ? -1 : 1 })
       .skip((pageNumber - 1) * pageSize)
       .limit(pageSize);
 
     // Получаем число всех комментов конкретного поста
-    const totalCount = await CommentsModel.countDocuments({ postId });
+    const totalCount = await CommentModel.countDocuments({ postId });
 
     let likesObj: LikesStatusesObjType = {};
 
@@ -37,7 +36,7 @@ export class CommentsQueryRepository {
       const commentsIds = comments.map((comment) => comment.id);
 
       // Получаем лайки для всех комментариев юзера
-      const likes = await CommentLikesModel.find({
+      const likes = await CommentLikeModel.find({
         commentId: { $in: commentsIds },
         userId,
       }).lean();
@@ -73,14 +72,14 @@ export class CommentsQueryRepository {
     commentId: string,
     userId: string
   ): Promise<CommentViewModel | null> {
-    const targetComment = await CommentsModel.findById(commentId);
+    const targetComment = await CommentModel.findById(commentId);
 
     if (!targetComment) return null;
 
-    let userLike: CommentLikeDbDocument | null = null;
+    let userLike: CommentLikeDbDocumentType | null = null;
 
     if (userId !== "") {
-      userLike = await CommentLikesModel.findOne({ commentId, userId });
+      userLike = await CommentLikeModel.findOne({ commentId, userId });
     }
 
     return {

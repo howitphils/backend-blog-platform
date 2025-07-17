@@ -1,17 +1,18 @@
 import { injectable } from "inversify";
-import { PostLikeDbDocument, PostLikesModel } from "./post-like-entity";
 import { LikeStatuses } from "../../../../../types/common-types";
 import { APP_CONFIG } from "../../../../../settings";
+import { PostLikeDbDocumentType } from "./post-like-entity-types";
+import { PostLikeModel } from "./post-like-entity";
 
 @injectable()
 export class PostLikesRepository {
-  async save(like: PostLikeDbDocument): Promise<string> {
+  async save(like: PostLikeDbDocumentType): Promise<string> {
     const result = await like.save();
     return result.id;
   }
 
-  async getLikeById(id: string): Promise<PostLikeDbDocument | null> {
-    return PostLikesModel.findById(id);
+  async getLikeById(id: string): Promise<PostLikeDbDocumentType | null> {
+    return PostLikeModel.findById(id);
   }
 
   async getPostLikeByUserIdAndPostId({
@@ -20,20 +21,19 @@ export class PostLikesRepository {
   }: {
     userId: string;
     postId: string;
-  }): Promise<PostLikeDbDocument | null> {
-    return PostLikesModel.findOne({ userId, postId });
+  }): Promise<PostLikeDbDocumentType | null> {
+    return PostLikeModel.findOne({ userId, postId });
   }
 
   async getNewestLikes(
     postId: string,
     limit: number = APP_CONFIG.NEWEST_LIKES_LIMIT
   ) {
-    const likes = await PostLikesModel.find({
+    return PostLikeModel.find({
       postId,
       status: LikeStatuses.Like,
     })
       .sort({ addedAt: -1 })
       .limit(limit);
-    return likes;
   }
 }

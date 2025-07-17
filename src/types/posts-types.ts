@@ -1,4 +1,4 @@
-import { PostLikeDbDocument } from "../db/mongodb/repositories/likes-repository/post-likes/post-like-entity";
+import { PostLikeDbDocumentType } from "../db/mongodb/repositories/likes-repository/post-likes/post-like-entity-types";
 import { LikeStatuses } from "./common-types";
 
 export type PostInputModel = {
@@ -39,7 +39,7 @@ export type PostDbType = {
   createdAt: string;
   likesCount: number;
   dislikesCount: number;
-  newestLikes: PostLikeDbDocument[];
+  newestLikes: PostLikeDbDocumentType[];
 };
 
 export type PostsRequestQueryType = {
@@ -87,4 +87,11 @@ export type CreatePostDto = {
   content: string;
   blogId: string;
   blogName: string;
+};
+
+export type CreatePostLikeDto = {
+  userId: string;
+  postId: string;
+  likeStatus: LikeStatuses;
+  login: string;
 };

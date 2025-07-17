@@ -1,18 +1,16 @@
 import { injectable } from "inversify";
-import {
-  CommentLikeDbDocument,
-  CommentLikesModel,
-} from "./comment-like-entity";
+import { CommentLikeDbDocumentType } from "./comment-entity-types";
+import { CommentLikeModel } from "./comment-like-entity";
 
 @injectable()
 export class CommentLikesRepository {
-  async save(like: CommentLikeDbDocument): Promise<string> {
+  async save(like: CommentLikeDbDocumentType): Promise<string> {
     const result = await like.save();
     return result.id;
   }
 
-  async getLikeById(id: string): Promise<CommentLikeDbDocument | null> {
-    return CommentLikesModel.findById(id);
+  async getLikeById(id: string): Promise<CommentLikeDbDocumentType | null> {
+    return CommentLikeModel.findById(id);
   }
 
   async getLikeByUserIdAndCommentId({
@@ -21,7 +19,7 @@ export class CommentLikesRepository {
   }: {
     userId: string;
     commentId: string;
-  }): Promise<CommentLikeDbDocument | null> {
-    return CommentLikesModel.findOne({ userId, commentId });
+  }): Promise<CommentLikeDbDocumentType | null> {
+    return CommentLikeModel.findOne({ userId, commentId });
   }
 }

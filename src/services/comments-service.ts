@@ -10,14 +10,8 @@ import { PostsService } from "./posts-service";
 import { CommentsRepository } from "../db/mongodb/repositories/comments-repository/comments-db-repository";
 import { UsersService } from "./users-service";
 import { inject, injectable } from "inversify";
-import {
-  Comment,
-  CommentsModel,
-} from "../db/mongodb/repositories/comments-repository/comments-entity";
-import {
-  CommentLike,
-  CommentLikesModel,
-} from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
+import { CommentEntity } from "../db/mongodb/repositories/comments-repository/comment-entity";
+import { CommentLikeEntity } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-entity";
 import { ErrorWithStatusCode } from "../middlewares/error-handler";
 import { HttpStatuses } from "../types/http-statuses";
 import { CommentLikesRepository } from "../db/mongodb/repositories/likes-repository/comment-likes/comment-like-repository";
@@ -64,23 +58,19 @@ export class CommentsService {
       };
     }
 
-    const { commentBody, postId, userId } = dto;
+    const newComment = CommentEntity.createComment({
+      content: dto.commentBody.content,
+      postId: dto.postId,
+      userId: dto.userId,
+      userLogin: targetUser.accountData.login,
+    });
 
-    const newComment = new Comment(
-      commentBody.content,
-      userId,
-      targetUser.accountData.login,
-      postId
-    );
-
-    const dbComment = new CommentsModel(newComment);
-
-    const result = await dbComment.save();
+    const result = await this.commentsRepository.save(newComment);
 
     return {
       status: ResultStatus.Success,
       extensions: [],
-      data: result.id,
+      data: result,
     };
   }
 
@@ -130,9 +120,9 @@ export class CommentsService {
       };
     }
 
-    targetComment.content = dto.commentBody.content;
+    targetComment.updateCommentContent(dto.commentBody.content);
 
-    await targetComment.save();
+    await this.commentsRepository.save(targetComment);
 
     return {
       status: ResultStatus.Success,
@@ -157,23 +147,23 @@ export class CommentsService {
       });
 
     if (!targetLike) {
-      const newLike = new CommentLike(
-        dto.userId,
-        dto.commentId,
-        dto.likeStatus
-      );
+      const newLike = CommentLikeEntity.createCommentLike(dto);
 
-      const dbLike = new CommentLikesModel(newLike);
-
-      await this.commentLikesRepository.save(dbLike);
+      await this.commentLikesRepository.save(newLike);
 
       if (dto.likeStatus === LikeStatuses.Like) {
-        targetComment.likesCount += 1;
+        targetComment.updateCommentsLikeOrDislikeCount(
+          "likesCount",
+          "increase"
+        );
       } else if (dto.likeStatus === LikeStatuses.Dislike) {
-        targetComment.dislikesCount += 1;
+        targetComment.updateCommentsLikeOrDislikeCount(
+          "dislikesCount",
+          "increase"
+        );
       }
 
-      this.commentsRepository.save(targetComment);
+      await this.commentsRepository.save(targetComment);
 
       return;
     }
@@ -184,43 +174,56 @@ export class CommentsService {
       if (dto.likeStatus === LikeStatuses.None) {
         if (targetLike.status === LikeStatuses.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
-          targetComment.likesCount -= 1;
+          targetComment.updateCommentsLikeOrDislikeCount(
+            "likesCount",
+            "decrease"
+          );
         } else if (targetLike.status === LikeStatuses.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
-          targetComment.dislikesCount -= 1;
+          targetComment.updateCommentsLikeOrDislikeCount(
+            "dislikesCount",
+            "decrease"
+          );
         }
       }
 
       if (dto.likeStatus === LikeStatuses.Like) {
         if (targetLike.status === LikeStatuses.Dislike) {
           // Если текущий статус лайка - дизлайк, то убираем дизлайк
-          targetComment.dislikesCount -= 1;
+          targetComment.updateCommentsLikeOrDislikeCount(
+            "dislikesCount",
+            "decrease"
+          );
         }
         // Если текущий статус лайка - None, то просто добавляем лайк
-        targetComment.likesCount += 1;
+        targetComment.updateCommentsLikeOrDislikeCount(
+          "likesCount",
+          "increase"
+        );
       }
 
       if (dto.likeStatus === LikeStatuses.Dislike) {
         if (targetLike.status === LikeStatuses.Like) {
           // Если текущий статус лайка - лайк, то убираем лайк
-          targetComment.likesCount -= 1;
+          targetComment.updateCommentsLikeOrDislikeCount(
+            "likesCount",
+            "decrease"
+          );
         }
         // Если текущий статус лайка - None, то просто добавляем дизлайк
-        targetComment.dislikesCount += 1;
+        targetComment.updateCommentsLikeOrDislikeCount(
+          "dislikesCount",
+          "increase"
+        );
       }
-
-      if (targetComment.likesCount < 0) {
-        targetComment.likesCount = 0;
-      } else if (targetComment.dislikesCount < 0) {
-        targetComment.dislikesCount = 0;
-      }
-
-      await this.commentsRepository.save(targetComment);
 
       // если статус лайка отличается от текущего, обновляем его
-      targetLike.status = dto.likeStatus;
+      targetLike.updateStatus(dto.likeStatus);
 
-      await this.commentLikesRepository.save(targetLike);
+      Promise.all([
+        this.commentLikesRepository.save(targetLike),
+        this.commentsRepository.save(targetComment),
+      ]);
     }
   }
 
