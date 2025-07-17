@@ -62,3 +62,10 @@ export type MeModel = {
   login: string;
   userId: string;
 };
+
+export type CreateUserDtoType = {
+  login: string;
+  email: string;
+  passHash: string;
+  isAdmin: boolean;
+};

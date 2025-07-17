@@ -6,12 +6,9 @@ import { UsersRepository } from "../db/mongodb/repositories/users-repository/use
 import { BcryptService } from "../adapters/bcryptService";
 import { inject, injectable } from "inversify";
 
-import {
-  User,
-  UserDbDocument,
-  UserModel,
-} from "../db/mongodb/repositories/users-repository/user-entitty";
+import { UserEntity } from "../db/mongodb/repositories/users-repository/user-entitty";
 import { createErrorsObject } from "../routers/controllers/utils";
+import { UserDbDocumentType } from "../db/mongodb/repositories/users-repository/user-entity-types";
 
 @injectable()
 export class UsersService {
@@ -47,14 +44,17 @@ export class UsersService {
 
     const passHash = await this.bcryptService.createHash(password);
 
-    const newUser: User = new User(email, login, passHash, isAdmin);
-
-    const newDbUser = new UserModel(newUser);
+    const newDbUser = UserEntity.createNewUser({
+      email,
+      login,
+      passHash,
+      isAdmin,
+    });
 
     return this.usersRepository.save(newDbUser);
   }
 
-  async getUserById(id: string): Promise<UserDbDocument> {
+  async getUserById(id: string): Promise<UserDbDocumentType> {
     const user = await this.usersRepository.getUserById(id);
 
     if (!user) {

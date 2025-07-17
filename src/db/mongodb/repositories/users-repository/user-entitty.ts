@@ -1,8 +1,14 @@
 import { randomUUID } from "crypto";
 import { add } from "date-fns";
 import mongoose from "mongoose";
+import {
+  UserDbDocumentType,
+  UserMethodsType,
+  UserModelType,
+} from "./user-entity-types";
+import { CreateUserDtoType } from "../../../../types/users-types";
 
-export class User {
+export class UserEntity {
   accountData: {
     login: string;
     email: string;
@@ -23,7 +29,7 @@ export class User {
     email: string,
     login: string,
     passHash: string,
-    isAdmin?: boolean
+    isAdmin: boolean
   ) {
     this.accountData = {
       email,
@@ -36,7 +42,7 @@ export class User {
       expirationDate: add(new Date(), {
         days: 2,
       }),
-      isConfirmed: isAdmin ? true : false,
+      isConfirmed: isAdmin,
     };
     this.passwordRecovery = {
       recoveryCode: randomUUID(),
@@ -45,12 +51,34 @@ export class User {
       }),
     };
   }
+
+  static createNewUser(dto: CreateUserDtoType): UserDbDocumentType {
+    return new UserModel(
+      new UserEntity(dto.email, dto.login, dto.passHash, dto.isAdmin)
+    );
+  }
 }
 
-const UsersSchema = new mongoose.Schema<User>({
+const UserSchema = new mongoose.Schema<
+  UserEntity,
+  UserModelType,
+  UserMethodsType
+>({
   accountData: {
-    login: { type: String, unique: true, required: true },
-    email: { type: String, unique: true, required: true },
+    login: {
+      type: String,
+      unique: true,
+      required: true,
+      minlength: 3,
+      maxlength: 50,
+    },
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+      minlength: 3,
+      maxlength: 100,
+    },
     passHash: { type: String, required: true },
     createdAt: { type: String, required: true },
   },
@@ -65,8 +93,9 @@ const UsersSchema = new mongoose.Schema<User>({
   },
 });
 
-type UserModel = mongoose.Model<User>;
+UserSchema.loadClass(UserEntity);
 
-export type UserDbDocument = mongoose.HydratedDocument<User>;
-
-export const UserModel = mongoose.model<User, UserModel>("User", UsersSchema);
+export const UserModel = mongoose.model<UserEntity, UserModelType>(
+  "User",
+  UserSchema
+);
