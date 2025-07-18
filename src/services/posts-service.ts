@@ -124,6 +124,8 @@ export class PostsService {
         login: currentUser.accountData.login,
       });
 
+      await this.postLikesRepository.save(newLike);
+
       if (dto.likeStatus === LikeStatuses.Like) {
         targetPost.increaseLikesCount();
 
@@ -136,10 +138,7 @@ export class PostsService {
         targetPost.increaseDislikesCount();
       }
 
-      Promise.all([
-        await this.postLikesRepository.save(newLike),
-        await this.postsRepository.save(targetPost),
-      ]);
+      await this.postsRepository.save(targetPost);
 
       return;
     }
