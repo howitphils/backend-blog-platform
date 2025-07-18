@@ -28,7 +28,7 @@ export class PostLikesRepository {
   async getNewestLikes(
     postId: string,
     limit: number = APP_CONFIG.NEWEST_LIKES_LIMIT
-  ) {
+  ): Promise<PostLikeDbDocumentType[]> {
     return PostLikeModel.find({
       postId,
       status: LikeStatuses.Like,

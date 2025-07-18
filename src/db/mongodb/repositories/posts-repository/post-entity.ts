@@ -4,7 +4,11 @@ import {
   NewestLikeType,
   PostInputModel,
 } from "../../../../types/posts-types";
-import { PostMethodsType, PostModelType } from "./post-entity-types";
+import {
+  PostDbDocumentType,
+  PostMethodsType,
+  PostModelType,
+} from "./post-entity-types";
 import { PostLikeDbDocumentType } from "../likes-repository/post-likes/post-like-entity-types";
 
 export class PostEntity {
@@ -36,7 +40,7 @@ export class PostEntity {
     this.newestLikes = [];
   }
 
-  static createPost(dto: CreatePostDto) {
+  static createPost(dto: CreatePostDto): PostDbDocumentType {
     return new PostModel(
       new PostEntity(
         dto.title,
@@ -141,7 +145,7 @@ const PostSchema = new mongoose.Schema<
     type: Number,
     required: true,
   },
-  newestLikes: [NewestLikeSchema],
+  newestLikes: { type: [NewestLikeSchema] },
 });
 
 PostSchema.loadClass(PostEntity);

@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
-import { CreatePostDto, PostInputModel } from "../../../../types/posts-types";
+import {
+  CreatePostDto,
+  NewestLikeType,
+  PostInputModel,
+} from "../../../../types/posts-types";
 import { PostEntity } from "./post-entity";
-import { PostLikeDbDocumentType } from "../likes-repository/post-likes/post-like-entity-types";
 
 export type PostMethodsType = {
   updatePost(dto: PostInputModel): PostEntity;
@@ -9,7 +12,7 @@ export type PostMethodsType = {
   decreaseLikesCount(): void;
   increaseDislikesCount(): void;
   decreaseDislikesCount(): void;
-  updateNewestLikes(newestLikes: PostLikeDbDocumentType[]): void;
+  updateNewestLikes(newestLikes: NewestLikeType[]): void;
 };
 
 export type PostStaticsType = {

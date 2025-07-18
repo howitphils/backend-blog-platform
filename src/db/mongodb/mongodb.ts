@@ -5,6 +5,8 @@ import { SessionModel } from "./repositories/sessions-repository/session-entity"
 import { ApiCallsModel } from "./repositories/api-calls-repository/api-call-entity";
 import { PostModel } from "./repositories/posts-repository/post-entity";
 import { CommentModel } from "./repositories/comments-repository/comment-entity";
+import { CommentLikeModel } from "./repositories/likes-repository/comment-likes/comment-like-entity";
+import { PostLikeModel } from "./repositories/likes-repository/post-likes/post-like-entity";
 
 export const runDb = async (url: string, dbName: string | undefined) => {
   try {
@@ -23,4 +25,6 @@ export const clearCollections = async () => {
   await CommentModel.deleteMany({});
   await SessionModel.deleteMany({});
   await ApiCallsModel.deleteMany({});
+  await CommentLikeModel.deleteMany({});
+  await PostLikeModel.deleteMany({});
 };
